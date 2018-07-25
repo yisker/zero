@@ -376,7 +376,7 @@ end
 function rotation:condition_action()
     -- 编写判断模块是否可用的脚本。
     local current_specialization = GetSpecializationInfo(GetSpecialization())
-    local speci = 250 --- 250 在 游戏中，/run print(GetSpecializationInfo(GetSpecialization())) 获取当前职业专精
+    local speci = 64 --- 250 在 游戏中，/run print(GetSpecializationInfo(GetSpecialization())) 获取当前职业专精
     return current_specialization == speci;
     -- return true
 end
