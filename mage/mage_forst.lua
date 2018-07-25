@@ -1,53 +1,53 @@
 -- 注册全局事件
-  -- local _G = _G
-  local guid = UnitGUID("player")
-  local frame = CreateFrame('Frame')
-  frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
-  if H == nil then
-        H = {}
-  end
+local guid = UnitGUID("player")
+local frame = CreateFrame('Frame')
+frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
-  if H.lastspell_failed == nil then
-    H.lastspell_failed = 0;
-  end
-  if H.lastspell_failedtime == nil then
-    H.lastspell_failedtime = 0;
-  end
-  if H.lastspell_time == nil then
-    H.lastspell_time = 0;
-  end
-  if H.lastspell_cast == nil then
-    H.lastspell_cast = 0;
-  end
-  if H.spelllist_failed == nil then 
-    H.spelllist_failed = {};
-  end
-  if H.spelllist_success == nil then 
-    H.spelllist_success = {};
-  end
-  if H.data == nil then 
-    H.data = {};
-  end
-	if H.nNove == nil then 
-		H.nNove = {};
-	end
-  if H.nTank == nil then 
-    H.nTank = {};
-  end
+if Y == nil then
+    Y = {}
+end
+
+if Y.lastspell_failed == nil then
+    Y.lastspell_failed = 0;
+end
+if Y.lastspell_failedtime == nil then
+    Y.lastspell_failedtime = 0;
+end
+if Y.lastspell_time == nil then
+    Y.lastspell_time = 0;
+end
+if Y.lastspell_cast == nil then
+    Y.lastspell_cast = 0;
+end
+if Y.spelllist_failed == nil then 
+    Y.spelllist_failed = {};
+end
+if Y.spelllist_success == nil then 
+    Y.spelllist_success = {};
+end
+if Y.data == nil then 
+    Y.data = {};
+end
+if Y.nNove == nil then 
+    Y.nNove = {};
+end
+if Y.nTank == nil then 
+    Y.nTank = {};
+end
 
   -------------------------------------------------------------------------------------------------------------------
   -- 记录进入战斗后自己释放成功和失败的技能队列，
 
-  -- 通过访问H.lastspell_failed获得上一次失败的技能ID，
-  -- H.lastspell_failedtime获得上一次失败的技能时间，
-  -- H.spelllist_failed记录失败的施法队列，
-  -- H.spelllist_failed[id]为最近一次释放同ID技能失败的列表，键值是name，target，stime
+  -- 通过访问Y.lastspell_failed获得上一次失败的技能ID，
+  -- Y.lastspell_failedtime获得上一次失败的技能时间，
+  -- Y.spelllist_failed记录失败的施法队列，
+  -- Y.spelllist_failed[id]为最近一次释放同ID技能失败的列表，键值是name，target，stime
 
-  -- 通过访问H.lastspell_time获得上一次成功的技能ID，
-  -- H.lastspell_time获得上一次失败的技能时间，
-  -- H.lastspell_cast记录失败的施法队列，
-  -- H.spelllist_success[id]为最近一次释放同ID技能成功的列表，键值是name，target，stime
+  -- 通过访问Y.lastspell_time获得上一次成功的技能ID，
+  -- Y.lastspell_time获得上一次失败的技能时间，
+  -- Y.lastspell_cast记录失败的施法队列，
+  -- Y.spelllist_success[id]为最近一次释放同ID技能成功的列表，键值是name，target，stime
   -------------------------------------------------------------------------------------------------------------------
   local function reader(self,event,...)
     local timeStamp, param, hideCaster, source, sourceName, sourceFlags, 
@@ -59,45 +59,45 @@
         if sourceName ~= nil then
           if isInCombat("player") and UnitIsUnit(sourceName,"player") 
           and spell ~= 48018 and spell ~= 48020 then
-            H.lastspell_failed = spell
-            H.lastspell_failedtime = GetTime()
-            if H.spelllist_failed[spell] == nil then 
-              H.spelllist_failed[spell] = {};
+            Y.lastspell_failed = spell
+            Y.lastspell_failedtime = GetTime()
+            if Y.spelllist_failed[spell] == nil then 
+              Y.spelllist_failed[spell] = {};
             end
-            table.insert(H.spelllist_failed[spell],
+            table.insert(Y.spelllist_failed[spell],
             {name = spellName, target = destination, 
-            stime = H.lastspell_failedtime})
+            stime = Y.lastspell_failedtime})
             if source == guid then
               --print(spellName.." 失败原因: "..spellType)
             end
-            if spell == H.lastspell_start then
-              H.lastspell_start = nil
+            if spell == Y.lastspell_start then
+              Y.lastspell_start = nil
             end
           end
         end
       end
       
       if param == "SPELL_CAST_START" then
-        H.lastspell_start = spell
+        Y.lastspell_start = spell
       end
       
       if param == "SPELL_CAST_SUCCESS" then
         if sourceName ~= nil then
           if isInCombat("player") and UnitIsUnit(sourceName,"player") 
           then
-            H.lastspell_time = GetTime()
-            H.lastspell_cast = spell
-            if H.spelllist_success[spell] == nil then 
-              H.spelllist_success[spell] = {};
+            Y.lastspell_time = GetTime()
+            Y.lastspell_cast = spell
+            if Y.spelllist_success[spell] == nil then 
+              Y.spelllist_success[spell] = {};
             end
-            table.insert(H.spelllist_success[spell],
+            table.insert(Y.spelllist_success[spell],
             {name = spellName, target = destination, 
-            stime = H.lastspell_time})
+            stime = Y.lastspell_time})
             if destination then
-              H.lastspell_target = destination               
+              Y.lastspell_target = destination               
             --   GH_Print("成功对 "..destName.." ".."施放了 "..spellName)
             else
-              H.lastspell_target = none
+              Y.lastspell_target = none
             end
           end
         end
@@ -109,7 +109,7 @@
   frame:SetScript("OnEvent", reader)
   -------------------------------------------------------------------------------------------------------------------
   -- 记录进入战斗的时间
-  -- 通过访问H.data["Combat Started"]获得战斗开始时间，
+  -- 通过访问Y.data["Combat Started"]获得战斗开始时间，
   -- 离开战斗或者玩家死亡，清除所有的_G
   -------------------------------------------------------------------------------------------------------------------
   local Frame = CreateFrame('Frame')
@@ -120,21 +120,21 @@
     if event == "PLAYER_REGEN_DISABLED" then
       -- here we should manage stats snapshots
       --AgiSnap = getAgility()
-      H.data["Combat Started"] = GetTime();
-      -- H.data["GCD"] = getGCD();
+      Y.data["Combat Started"] = GetTime();
+      -- Y.data["GCD"] = getGCD();
       --ChatOverlay("|cffFF0000Entering Combat")
 	  SetupTables()
     end
     if event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_DEAD"  then
       
-      H.data["Combat Started"] = 0
-      H.lastspell_failed = 0;
-      H.lastspell_failedtime = 0;
-      H.lastspell_cast = 0;
-      H.lastspell_time = 0;
-      H.spelllist_failed = {};
-      H.spelllist_success = {};
-      -- H.data["GCD"] = getGCD();
+      Y.data["Combat Started"] = 0
+      Y.lastspell_failed = 0;
+      Y.lastspell_failedtime = 0;
+      Y.lastspell_cast = 0;
+      Y.lastspell_time = 0;
+      Y.spelllist_failed = {};
+      Y.spelllist_success = {};
+      -- Y.data["GCD"] = getGCD();
 	  SetupTables()
       
     end
@@ -149,30 +149,30 @@
 --   local updateHealingTable = CreateFrame("frame", nil)
 --   updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
 --   updateHealingTable:SetScript("OnEvent", function()
---     table.wipe(H.nNove)
---     table.wipe(H.nTank)  
+--     table.wipe(Y.nNove)
+--     table.wipe(Y.nTank)  
 --     SetupTables()
 --   end)
   
--- 	-- if H.nNove == nil then
+-- 	-- if Y.nNove == nil then
 -- 		-- SetupTables()
 -- 	-- end
   
 --   function SetupTables()    
     
--- 	table.wipe(H.nNove)
---     table.wipe(H.nTank)
+-- 	table.wipe(Y.nNove)
+--     table.wipe(Y.nTank)
 --     local group =  IsInRaid() and "raid" or "party" 
 --     local groupSize = IsInRaid() and GetNumGroupMembers() or 
 --     GetNumGroupMembers() - 1
 
 --     for i=1, groupSize do 
 --       local groupUnit = group..i      
---       if UnitExists(groupUnit) then table.insert(H.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
---       if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(H.nTank, groupUnit); end
+--       if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
+--       if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
 --     end
 
---     table.insert(H.nNove, "player")
+--     table.insert(Y.nNove, "player")
 	
 --   end
 
@@ -362,9 +362,9 @@ function rotation:macro_handler(argument)
         print("收到宏命令参数：", argument);
     end
     if argument == "baofa" then
-        H.baofa = not H.baofa
+        Y.baofa = not Y.baofa
     end
-    if H.baofa == true then
+    if Y.baofa == true then
         GH_Print("爆发开启")
         OverlayR("爆发开启")
     else
@@ -415,7 +415,7 @@ function rotation:default_action()
 
 
     -- 本地化
-    local lastSpellCast = H.lastspell_cast
+    local lastSpellCast = Y.lastspell_cast
     -- GH_Print(lastSpellCast)
     -- 不打断施法
     if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
@@ -817,7 +817,7 @@ function rotation:default_action()
     -- # Time Warp is used right at the start. If the actor has Shard of the Exodar, try to synchronize the second Time Warp with Icy Veins. If the target is about to die, use Time Warp regardless.
     -- actions+=/time_warp,if=buff.bloodlust.down&(buff.exhaustion.down|equipped.shard_of_the_exodar)&(prev_gcd.1.icy_veins|target.time_to_die<50)
     -- actions+=/call_action_list,name=cooldowns
-    if isKeyDown("1") or H.baofa == true then 
+    if isKeyDown("1") or Y.baofa == true then 
         cooldowns() 
         -- return true
     end
