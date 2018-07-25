@@ -187,7 +187,7 @@ function getGCD()
     if duration ~= 0 then
       GCD = duration
     end
-    return shGCD
+    return GCD
 end
 ----------------------------------------------
 -- 模块属性

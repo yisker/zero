@@ -186,8 +186,8 @@ end
 local rotation_id = "0c02decd-b730-4509-b5bf-259d28ca3c28";
 -- 定义循环的英文名称。
 local rotation_name = "bing_fa";
-Scorpio(rotation_name)("");
-import "zeus";
+Scorpio("zeus"..rotation_name)("");
+-- import "zeus";
 -- 定义多语言字符串。
 local L = _Locale("zhCN", true);
 if L then
