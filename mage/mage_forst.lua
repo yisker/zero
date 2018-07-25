@@ -89,7 +89,7 @@ do
                         table.insert(Y.spelllist_success[spell],{name = spellName, target = destination, stime = Y.lastspell_time})
                         if destination then
                             Y.lastspell_target = destination
-                            if ydebug.is_enabled then             
+                            if self.settings.ydebug.is_enabled then             
                                 GH_Print("成功对 "..destName.." ".."施放了 "..spellName)
                             end
                         else
@@ -135,7 +135,7 @@ do
             Y.spelllist_success = {};
             -- Y.data["GCD"] = getGCD();
             -- SetupTables()
-            if ydebug.is_enabled then
+            if self.settings.ydebug.is_enabled then
                 GH_Print("|cffFF0000离开战斗，重置参数")
             end
         
