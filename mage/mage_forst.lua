@@ -1,181 +1,183 @@
 -- 注册全局事件
+do
+    local guid = UnitGUID("player")
+    local frame = CreateFrame('Frame')
+    frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
 
-local guid = UnitGUID("player")
-local frame = CreateFrame('Frame')
-frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    if Y == nil then
+        Y = {}
+    end
 
-if Y == nil then
-    Y = {}
-end
+    if Y.lastspell_failed == nil then
+        Y.lastspell_failed = 0;
+    end
+    if Y.lastspell_failedtime == nil then
+        Y.lastspell_failedtime = 0;
+    end
+    if Y.lastspell_time == nil then
+        Y.lastspell_time = 0;
+    end
+    if Y.lastspell_cast == nil then
+        Y.lastspell_cast = 0;
+    end
+    if Y.spelllist_failed == nil then 
+        Y.spelllist_failed = {};
+    end
+    if Y.spelllist_success == nil then 
+        Y.spelllist_success = {};
+    end
+    if Y.data == nil then 
+        Y.data = {};
+    end
+    if Y.nNove == nil then 
+        Y.nNove = {};
+    end
+    if Y.nTank == nil then 
+        Y.nTank = {};
+    end
 
-if Y.lastspell_failed == nil then
-    Y.lastspell_failed = 0;
-end
-if Y.lastspell_failedtime == nil then
-    Y.lastspell_failedtime = 0;
-end
-if Y.lastspell_time == nil then
-    Y.lastspell_time = 0;
-end
-if Y.lastspell_cast == nil then
-    Y.lastspell_cast = 0;
-end
-if Y.spelllist_failed == nil then 
-    Y.spelllist_failed = {};
-end
-if Y.spelllist_success == nil then 
-    Y.spelllist_success = {};
-end
-if Y.data == nil then 
-    Y.data = {};
-end
-if Y.nNove == nil then 
-    Y.nNove = {};
-end
-if Y.nTank == nil then 
-    Y.nTank = {};
-end
+    -------------------------------------------------------------------------------------------------------------------
+    -- 记录进入战斗后自己释放成功和失败的技能队列，
 
-  -------------------------------------------------------------------------------------------------------------------
-  -- 记录进入战斗后自己释放成功和失败的技能队列，
+    -- 通过访问Y.lastspell_failed获得上一次失败的技能ID，
+    -- Y.lastspell_failedtime获得上一次失败的技能时间，
+    -- Y.spelllist_failed记录失败的施法队列，
+    -- Y.spelllist_failed[id]为最近一次释放同ID技能失败的列表，键值是name，target，stime
 
-  -- 通过访问Y.lastspell_failed获得上一次失败的技能ID，
-  -- Y.lastspell_failedtime获得上一次失败的技能时间，
-  -- Y.spelllist_failed记录失败的施法队列，
-  -- Y.spelllist_failed[id]为最近一次释放同ID技能失败的列表，键值是name，target，stime
+    -- 通过访问Y.lastspell_time获得上一次成功的技能ID，
+    -- Y.lastspell_time获得上一次成功的技能时间，
+    -- Y.lastspell_cast记录成功的施法队列，
+    -- Y.spelllist_success[id]为最近一次释放同ID技能成功的列表，键值是name，target，stime
+    -------------------------------------------------------------------------------------------------------------------
+    local function reader(self,event,...)
+        local timeStamp, param, hideCaster, source, sourceName, sourceFlags, 
+        sourceRaidFlags, destination,
+        destName, destFlags, destRaidFlags, spell, spellName, _, spellType = CombatLogGetCurrentEventInfo()
 
-  -- 通过访问Y.lastspell_time获得上一次成功的技能ID，
-  -- Y.lastspell_time获得上一次失败的技能时间，
-  -- Y.lastspell_cast记录失败的施法队列，
-  -- Y.spelllist_success[id]为最近一次释放同ID技能成功的列表，键值是name，target，stime
-  -------------------------------------------------------------------------------------------------------------------
-  local function reader(self,event,...)
-    local timeStamp, param, hideCaster, source, sourceName, sourceFlags, 
-    sourceRaidFlags, destination,
-    destName, destFlags, destRaidFlags, spell, spellName, _, spellType = CombatLogGetCurrentEventInfo()
-    
-    if source == guid then
-      if param == "SPELL_CAST_FAILED" then
-        if sourceName ~= nil then
-          if isInCombat("player") and UnitIsUnit(sourceName,"player") 
-          and spell ~= 48018 and spell ~= 48020 then
-            Y.lastspell_failed = spell
-            Y.lastspell_failedtime = GetTime()
-            if Y.spelllist_failed[spell] == nil then 
-              Y.spelllist_failed[spell] = {};
+        if source == guid then
+            if param == "SPELL_CAST_FAILED" then
+                if sourceName ~= nil then
+                    if isInCombat("player") and UnitIsUnit(sourceName,"player") and spell ~= 48018 and spell ~= 48020 then
+                        Y.lastspell_failed = spell 
+                        Y.lastspell_failedtime = GetTime()
+                        if Y.spelllist_failed[spell] == nil then 
+                            Y.spelllist_failed[spell] = {};
+                        end
+                        table.insert(Y.spelllist_failed[spell],{name = spellName, target = destination, stime = Y.lastspell_failedtime})
+                        -- if source == guid then
+                            --print(spellName.." 失败原因: "..spellType)
+                        -- end
+                        if spell == Y.lastspell_start then
+                            Y.lastspell_start = 0
+                        end
+                    end
+                end
             end
-            table.insert(Y.spelllist_failed[spell],
-            {name = spellName, target = destination, 
-            stime = Y.lastspell_failedtime})
-            if source == guid then
-              --print(spellName.." 失败原因: "..spellType)
+            
+            if param == "SPELL_CAST_START" then
+                Y.lastspell_start = spell
             end
-            if spell == Y.lastspell_start then
-              Y.lastspell_start = nil
+            
+            if param == "SPELL_CAST_SUCCESS" then
+                if sourceName ~= nil then
+                    if isInCombat("player") and UnitIsUnit(sourceName,"player") then
+                        Y.lastspell_time = GetTime()
+                        Y.lastspell_cast = spell
+                        if Y.spelllist_success[spell] == nil then 
+                            Y.spelllist_success[spell] = {};
+                        end
+                        table.insert(Y.spelllist_success[spell],{name = spellName, target = destination, stime = Y.lastspell_time})
+                        if destination then
+                            Y.lastspell_target = destination
+                            if ydebug.is_enabled then             
+                                GH_Print("成功对 "..destName.." ".."施放了 "..spellName)
+                            end
+                        else
+                            Y.lastspell_target = none
+                        end
+                    end
+                end
             end
-          end
         end
-      end
-      
-      if param == "SPELL_CAST_START" then
-        Y.lastspell_start = spell
-      end
-      
-      if param == "SPELL_CAST_SUCCESS" then
-        if sourceName ~= nil then
-          if isInCombat("player") and UnitIsUnit(sourceName,"player") 
-          then
-            Y.lastspell_time = GetTime()
-            Y.lastspell_cast = spell
-            if Y.spelllist_success[spell] == nil then 
-              Y.spelllist_success[spell] = {};
-            end
-            table.insert(Y.spelllist_success[spell],
-            {name = spellName, target = destination, 
-            stime = Y.lastspell_time})
-            if destination then
-              Y.lastspell_target = destination               
-            --   GH_Print("成功对 "..destName.." ".."施放了 "..spellName)
-            else
-              Y.lastspell_target = none
-            end
-          end
+
+    end
+    frame:SetScript("OnEvent", reader)
+
+
+    -------------------------------------------------------------------------------------------------------------------
+    -- 记录进入战斗的时间
+    -- 通过访问Y.data["Combat Started"]获得战斗开始时间，
+    -- 离开战斗或者玩家死亡，清除所有的_G
+    -------------------------------------------------------------------------------------------------------------------
+    local Frame = CreateFrame('Frame')
+    Frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    Frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    Frame:RegisterEvent("PLAYER_DEAD")
+    local function EnteringCombat(self,event,...)
+        if event == "PLAYER_REGEN_DISABLED" then
+        -- here we should manage stats snapshots
+        --AgiSnap = getAgility()
+        Y.data["Combat Started"] = GetTime();
+        -- Y.data["GCD"] = getGCD();
+        if ydebug.is_enabled then
+            GH_Print("|cffFF0000进入战斗，开始计时")
         end
-      end
+        -- SetupTables()
+        end
+        if event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_DEAD"  then
+        
+            Y.data["Combat Started"] = 0
+            Y.lastspell_failed = 0;
+            Y.lastspell_failedtime = 0;
+            Y.lastspell_cast = 0;
+            Y.lastspell_time = 0;
+            Y.spelllist_failed = {};
+            Y.spelllist_success = {};
+            -- Y.data["GCD"] = getGCD();
+            -- SetupTables()
+            if ydebug.is_enabled then
+                GH_Print("|cffFF0000离开战斗，重置参数")
+            end
+        
+        end
     end
+    Frame:SetScript("OnEvent",EnteringCombat)
     
-  end
-
-  frame:SetScript("OnEvent", reader)
-  -------------------------------------------------------------------------------------------------------------------
-  -- 记录进入战斗的时间
-  -- 通过访问Y.data["Combat Started"]获得战斗开始时间，
-  -- 离开战斗或者玩家死亡，清除所有的_G
-  -------------------------------------------------------------------------------------------------------------------
-  local Frame = CreateFrame('Frame')
-  Frame:RegisterEvent("PLAYER_REGEN_DISABLED")
-  Frame:RegisterEvent("PLAYER_REGEN_ENABLED")
-  Frame:RegisterEvent("PLAYER_DEAD")
-  local function EnteringCombat(self,event,...)
-    if event == "PLAYER_REGEN_DISABLED" then
-      -- here we should manage stats snapshots
-      --AgiSnap = getAgility()
-      Y.data["Combat Started"] = GetTime();
-      -- Y.data["GCD"] = getGCD();
-      --ChatOverlay("|cffFF0000Entering Combat")
-	  SetupTables()
-    end
-    if event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_DEAD"  then
-      
-      Y.data["Combat Started"] = 0
-      Y.lastspell_failed = 0;
-      Y.lastspell_failedtime = 0;
-      Y.lastspell_cast = 0;
-      Y.lastspell_time = 0;
-      Y.spelllist_failed = {};
-      Y.spelllist_success = {};
-      -- Y.data["GCD"] = getGCD();
-	  SetupTables()
-      
-    end
-  end
-  Frame:SetScript("OnEvent",EnteringCombat)
-  
---   -------------------------------------------------------------------------------------------------------------------
---   -- 创建队友列表，通过团队时间驱动刷新
---   -- 通过访问_nNova获得列表，
---   -- 
---   -------------------------------------------------------------------------------------------------------------------
---   local updateHealingTable = CreateFrame("frame", nil)
---   updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
---   updateHealingTable:SetScript("OnEvent", function()
---     table.wipe(Y.nNove)
---     table.wipe(Y.nTank)  
---     SetupTables()
---   end)
-  
--- 	-- if Y.nNove == nil then
--- 		-- SetupTables()
--- 	-- end
-  
---   function SetupTables()    
+    --   -------------------------------------------------------------------------------------------------------------------
+    --   -- 创建队友列表，通过团队时间驱动刷新
+    --   -- 通过访问_nNova获得列表，
+    --   -- 
+    --   -------------------------------------------------------------------------------------------------------------------
+    --   local updateHealingTable = CreateFrame("frame", nil)
+    --   updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
+    --   updateHealingTable:SetScript("OnEvent", function()
+    --     table.wipe(Y.nNove)
+    --     table.wipe(Y.nTank)  
+    --     SetupTables()
+    --   end)
     
--- 	table.wipe(Y.nNove)
---     table.wipe(Y.nTank)
---     local group =  IsInRaid() and "raid" or "party" 
---     local groupSize = IsInRaid() and GetNumGroupMembers() or 
---     GetNumGroupMembers() - 1
+    -- 	-- if Y.nNove == nil then
+    -- 		-- SetupTables()
+    -- 	-- end
+    
+    --   function SetupTables()    
+        
+    -- 	table.wipe(Y.nNove)
+    --     table.wipe(Y.nTank)
+    --     local group =  IsInRaid() and "raid" or "party" 
+    --     local groupSize = IsInRaid() and GetNumGroupMembers() or 
+    --     GetNumGroupMembers() - 1
 
---     for i=1, groupSize do 
---       local groupUnit = group..i      
---       if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
---       if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
---     end
+    --     for i=1, groupSize do 
+    --       local groupUnit = group..i      
+    --       if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
+    --       if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
+    --     end
 
---     table.insert(Y.nNove, "player")
-	
---   end
-
+    --     table.insert(Y.nNove, "player")
+        
+    --   end
+end
 
 
 
@@ -282,16 +284,16 @@ targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
 
 -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
--- local test1_setting = rotation.default_setting_category:create_setting("test1"); -- 指定变量的名字为test1，用于在脚本中进行引用
--- test1_setting.display_name = L["Test 1"]; -- 变量在界面上显示的名字
--- test1_setting.description = "这是number数组类型的变量，其值为number数组。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
--- test1_setting.value_type = rotation_setting_type.numbers; -- 变量值类型（number数组类型）
--- test1_setting.default_value = {100, 200}; -- 变量默认值（删除此行不设，则为{}）
--- test1_setting.optional_values = {100, 200, 300}; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
--- test1_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
--- test1_setting.is_enabled_by_default = true; -- 是否默认启用（勾选框默认选中）
--- test1_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
--- test1_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+local ydebug_setting = rotation.default_setting_category:create_setting("ydebug"); -- 指定变量的名字为test1，用于在脚本中进行引用
+ydebug_setting.display_name = L["Test 1"]; -- 变量在界面上显示的名字
+ydebug_setting.description = "这是number数组类型的变量，其值为number数组。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+ydebug_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+ydebug_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+ydebug_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+ydebug_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+ydebug_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+ydebug_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+ydebug_setting.value_width = 120; -- 值显示宽度像素（默认为100）
 -- -- 给默认类别添加一个配置变量test2，并配置相关属性。
 -- local test2_setting = rotation.default_setting_category:create_setting("test2"); -- 指定变量的名字为test2，用于在脚本中进行引用（名字不能与test1重复）
 -- test2_setting.display_name = L["Test 2"]; -- 变量在界面上显示的名字
