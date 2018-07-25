@@ -196,7 +196,7 @@ end
 local rotation_id = "83ef4a33-ae42-49e2-aaf5-6a16a91ab121";
 -- 定义循环的英文名称。
 local rotation_name = "shouwang";
-Scorpio(rotation_name)("");
+Scorpio("zeus"..rotation_name)("");
 import "zeus";
 -- 定义多语言字符串。
 local L = _Locale("zhCN", true);
@@ -318,7 +318,7 @@ end
 function rotation:condition_action()
     -- 编写判断模块是否可用的脚本。
     local current_specialization = GetSpecializationInfo(GetSpecialization())
-    local speci = 63 --- 250 在 游戏中，/run print(GetSpecializationInfo(GetSpecialization())) 获取当前职业专精
+    local speci = 253 --- 250 在 游戏中，/run print(GetSpecializationInfo(GetSpecialization())) 获取当前职业专精
     return current_specialization == speci;
     -- return true
 end
@@ -345,7 +345,7 @@ function rotation:default_action()
     -- if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
     
     local spell_haste = GetHaste("player")/100
-    local time = (GetTime() - _G.data["Combat Started"]) or 0
+    local time = (GetTime() - Y.data["Combat Started"]) or 0
     local gcd = getGCD()
     local charges_fractional = getChargesFrac
     local regen = select(2,GetPowerRegen("player"))
@@ -371,7 +371,17 @@ function rotation:default_action()
 	local dire_beast = 120679 --凶暴野兽
 	local barrage = 120360 --弹幕射击
 	local cobra_shot = 193455 --眼镜蛇射击
-	
+    
+    local function getRecharge(spellID)
+        local charges,maxCharges,chargeStart,chargeDuration = GetSpellCharges(spellID)
+        if charges then
+            if charges < maxCharges then
+                chargeEnd = chargeStart + chargeDuration
+                return chargeEnd - GetTime()
+            end
+            return 0
+        end
+    end
 	
 
     --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
@@ -396,7 +406,9 @@ function rotation:default_action()
     if tgtype.value ~= "智能" then
         tg = "target"
     end
-
+    if tg then
+        TargetUnit(tg)
+    end
     local active_enemies = getNumEnemies(tg,8)
     local spell_targets = active_enemies
 
@@ -473,7 +485,7 @@ if focus>=25 and canCast(dire_beast) and castSpell(tg,dire_beast) then
 	print(113)
 end
 -- actions+=/barbed_shot,if=pet.cat.buff.frenzy.down&charges_fractional>1.4|full_recharge_time<gcd.max|target.time_to_die<9
-if UnitBuffID("pet",frenzy) and charges_fractional(barbed_shot)>1.4 or full_recharge_time(barbed_shot) < gcd or getTimeToDie(tg)<9 then
+if UnitBuffID("pet",frenzy) and charges_fractional(barbed_shot)>1.4 or getRecharge(barbed_shot) < gcd or getTimeToDie(tg)<9 then
 	if getCharges(barbed_shot)>=1 and castSpell(tg,barbed_shot) then
 		print(114)
 	end
