@@ -196,7 +196,7 @@ end
 local rotation_id = "83ef4a33-ae42-49e2-aaf5-6a16a91ab121";
 -- 定义循环的英文名称。
 local rotation_name = "shouwang";
-Scorpio("zeus"..rotation_name)("");
+Scorpio("zeus."..rotation_name)("");
 -- import "zeus";
 -- 定义多语言字符串。
 local L = _Locale("zhCN", true);
