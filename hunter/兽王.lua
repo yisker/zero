@@ -415,97 +415,97 @@ function rotation:default_action()
     -- actions=auto_shot
     AttackTarget()
     PetAttack()
--- actions+=/counter_shot,if=equipped.sephuzs_secret&target.debuff.casting.react&cooldown.buff_sephuzs_secret.up&!buff.sephuzs_secret.up
--- actions+=/use_items
--- actions+=/berserking,if=cooldown.bestial_wrath.remains>30
--- actions+=/blood_fury,if=cooldown.bestial_wrath.remains>30
--- actions+=/ancestral_call,if=cooldown.bestial_wrath.remains>30
-if getSpellCD(bestial_wrath)>30 then
-    if castSpell(tg,ancestral_call) then
-        print(101)
+    -- actions+=/counter_shot,if=equipped.sephuzs_secret&target.debuff.casting.react&cooldown.buff_sephuzs_secret.up&!buff.sephuzs_secret.up
+    -- actions+=/use_items
+    -- actions+=/berserking,if=cooldown.bestial_wrath.remains>30
+    -- actions+=/blood_fury,if=cooldown.bestial_wrath.remains>30
+    -- actions+=/ancestral_call,if=cooldown.bestial_wrath.remains>30
+    if getSpellCD(bestial_wrath)>30 then
+        if castSpell(tg,ancestral_call) then
+            print(101)
+        end
     end
-end
--- actions+=/fireblood,if=cooldown.bestial_wrath.remains>30
-if getSpellCD(bestial_wrath)>30 then
-	if castSpell(tg,fireblood) then
-		print(102)
-	end
-end
--- actions+=/lights_judgment
-if castSpell(tg,lights_judgment) then
-	print(103)
-end
--- actions+=/potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up
--- actions+=/barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max
-if UnitBuffID("pet",frenzy) and getBuffRemain("pet",frenzy)<=gcd then
-	if getCharges(barbed_shot)>=1 and castSpell(tg,barbed_shot) then
-		print(104)
-	end
-end
--- actions+=/a_murder_of_crows
-if focus>=30 and castSpell(tg,a_murder_of_crows) then
-	print(105)
-end
--- actions+=/spitting_cobra
-if canCast(spitting_cobra) and castSpell(tg,spitting_cobra) then
-	print(106)
-end
--- actions+=/stampede,if=buff.bestial_wrath.up|cooldown.bestial_wrath.remains<gcd|target.time_to_die<15
-if UnitBuffID("player",bestial_wrath) or getSpellCD(bestial_wrath)<gcd or getTimeToDie(tg)<15 then
-	if canCast(stampede) and castSpell(tg,stampede) then
-		print(107)
-	end
-end
--- actions+=/aspect_of_the_wild
-if canCast(aspect_of_the_wild) and castSpell("player",aspect_of_the_wild) then
-	print(108)
-end
--- actions+=/bestial_wrath,if=!buff.bestial_wrath.up
-if not UnitBuffID("player",bestial_wrath) then
-	if castSpell(tg,bestial_wrath) then
-		print(109)
-	end
-end
--- actions+=/multishot,if=spell_targets>2&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
-if spell_targets>2 and (getBuffRemain("pet",beast_cleave)<gcd or not UnitBuffID("pet",beast_cleave)) then
-	if focus>= 40 and castSpell(tg,multishot) then
-		print(110)
-	end
-end
--- actions+=/chimaera_shot
-if canCast(chimaera_shot) and castSpell(tg,chimaera_shot) then
-	print(111)
-end
--- actions+=/kill_command
-if focus>=30 and canCast(kill_command) and castSpell(tg,kill_command) then
-	print(112)
-end
--- actions+=/dire_beast
-if focus>=25 and canCast(dire_beast) and castSpell(tg,dire_beast) then
-	print(113)
-end
--- actions+=/barbed_shot,if=pet.cat.buff.frenzy.down&charges_fractional>1.4|full_recharge_time<gcd.max|target.time_to_die<9
-if UnitBuffID("pet",frenzy) and charges_fractional(barbed_shot)>1.4 or getRecharge(barbed_shot) < gcd or getTimeToDie(tg)<9 then
-	if getCharges(barbed_shot)>=1 and castSpell(tg,barbed_shot) then
-		print(114)
-	end
-end
--- actions+=/barrage
-if canCast(barrage) and focus>=60 and castSpell(tg,barrage) then
-	print(115)
-end
--- actions+=/multishot,if=spell_targets>1&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
-if spell_targets>1 and (getBuffRemain("pet",beast_cleave)<gcd or not UnitBuffID("pet",beast_cleave)) then
-	if focus>=40 and castSpell(tg,multishot) then
-		print(116)
-	end
-end
--- actions+=/cobra_shot,if=(active_enemies<2|cooldown.kill_command.remains>focus.time_to_max)&(buff.bestial_wrath.up&active_enemies>1|cooldown.kill_command.remains>1+gcd&cooldown.bestial_wrath.remains>focus.time_to_max|focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost)
-if (active_enemies<2 or getSpellCD("player",kill_command)>getTimeToMax("player")) and (UnitBuffID("player",bestial_wrath) and active_enemies>1 or getSpellCD(kill_command)>1+gcd and getSpellCD(bestial_wrath)>getTimeToMax("player") or getRealMana("player")-35+regen*(getSpellCD(kill_command)-1)>30) then
-	if focus>=35 and castSpell(tg,cobra_shot) then
-		print(116)
-	end
-end
+    -- actions+=/fireblood,if=cooldown.bestial_wrath.remains>30
+    if getSpellCD(bestial_wrath)>30 then
+        if castSpell(tg,fireblood) then
+            print(102)
+        end
+    end
+    -- actions+=/lights_judgment
+    if castSpell(tg,lights_judgment) then
+        print(103)
+    end
+    -- actions+=/potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up
+    -- actions+=/barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max
+    if UnitBuffID("pet",frenzy) and getBuffRemain("pet",frenzy)<=gcd then
+        if getCharges(barbed_shot)>=1 and castSpell(tg,barbed_shot) then
+            print(104)
+        end
+    end
+    -- actions+=/a_murder_of_crows
+    if focus>=30 and castSpell(tg,a_murder_of_crows) then
+        print(105)
+    end
+    -- actions+=/spitting_cobra
+    if canCast(spitting_cobra) and castSpell(tg,spitting_cobra) then
+        print(106)
+    end
+    -- actions+=/stampede,if=buff.bestial_wrath.up|cooldown.bestial_wrath.remains<gcd|target.time_to_die<15
+    if UnitBuffID("player",bestial_wrath) or getSpellCD(bestial_wrath)<gcd or getTimeToDie(tg)<15 then
+        if canCast(stampede) and castSpell(tg,stampede) then
+            print(107)
+        end
+    end
+    -- actions+=/aspect_of_the_wild
+    if canCast(aspect_of_the_wild) and castSpell("player",aspect_of_the_wild) then
+        print(108)
+    end
+    -- actions+=/bestial_wrath,if=!buff.bestial_wrath.up
+    if not UnitBuffID("player",bestial_wrath) then
+        if castSpell(tg,bestial_wrath) then
+            print(109)
+        end
+    end
+    -- actions+=/multishot,if=spell_targets>2&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
+    if spell_targets>2 and (getBuffRemain("pet",beast_cleave)<gcd or not UnitBuffID("pet",beast_cleave)) then
+        if focus>= 40 and castSpell(tg,multishot) then
+            print(110)
+        end
+    end
+    -- actions+=/chimaera_shot
+    if canCast(chimaera_shot) and castSpell(tg,chimaera_shot) then
+        print(111)
+    end
+    -- actions+=/kill_command
+    if focus>=30 and canCast(kill_command) and castSpell(tg,kill_command) then
+        print(112)
+    end
+    -- actions+=/dire_beast
+    if focus>=25 and canCast(dire_beast) and castSpell(tg,dire_beast) then
+        print(113)
+    end
+    -- actions+=/barbed_shot,if=pet.cat.buff.frenzy.down&charges_fractional>1.4|full_recharge_time<gcd.max|target.time_to_die<9
+    if UnitBuffID("pet",frenzy) and charges_fractional(barbed_shot)>1.4 or getRecharge(barbed_shot) < gcd or getTimeToDie(tg)<9 then
+        if getCharges(barbed_shot)>=1 and castSpell(tg,barbed_shot) then
+            print(114)
+        end
+    end
+    -- actions+=/barrage
+    if canCast(barrage) and focus>=60 and castSpell(tg,barrage) then
+        print(115)
+    end
+    -- actions+=/multishot,if=spell_targets>1&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
+    if spell_targets>1 and (getBuffRemain("pet",beast_cleave)<gcd or not UnitBuffID("pet",beast_cleave)) then
+        if focus>=40 and castSpell(tg,multishot) then
+            print(116)
+        end
+    end
+    -- actions+=/cobra_shot,if=(active_enemies<2|cooldown.kill_command.remains>focus.time_to_max)&(buff.bestial_wrath.up&active_enemies>1|cooldown.kill_command.remains>1+gcd&cooldown.bestial_wrath.remains>focus.time_to_max|focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost)
+    if (active_enemies<2 or getSpellCD("player",kill_command)>getTimeToMax("player")) and (UnitBuffID("player",bestial_wrath) and active_enemies>1 or getSpellCD(kill_command)>1+gcd and getSpellCD(bestial_wrath)>getTimeToMax("player") or getRealMana("player")-35+regen*(getSpellCD(kill_command)-1)>30) then
+        if focus>=35 and castSpell(tg,cobra_shot) then
+            print(116)
+        end
+    end
     
 end
 
