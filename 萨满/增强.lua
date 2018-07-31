@@ -1,30 +1,99 @@
-local wind_shear = 57994
+-----------------------------------------------------------
+--全局函数
+function getGCD()
+    local start, duration, enabled, modRate = GetSpellCooldown(61304)
+    if GCD == nil then
+      GCD = 1.5 / ((UnitSpellHaste("player")/100)+1);
+    end
+    if duration ~= 0 then
+      GCD = duration
+    end
+    return GCD
+end
+-----------------------------------------------------------
+
+
+local maelstrom = getRealMana("player")
+local gcd = getGCD()
+
+local wind_shear = 57994 --风剪
+local frostbrand = 196834 --冰封打击
+local lightning_bolt = 187837 --闪电箭
+local ascendance = 114051 --升腾
+local earthen_spike = 188089 --大地之刺
+local crash_lightning = 187874 --毁灭闪电
+local rockbiter = 193786 --石化
+local landslide = 202004 --山崩buff
+local windstrike = 115356 --风切
 
 -- actions=wind_shear
 if canCast(wind_shear) and castSpell("target",wind_shear) then
 	print(101)
 end
 -- actions+=/variable,name=hailstormCheck,value=((talent.hailstorm.enabled&!buff.frostbrand.up)|!talent.hailstorm.enabled)
+local hailstormCheck = ((getTalent(4,2) and not UnitBuffID("player",frostbrand)) or not getTalent(4,2))
 -- actions+=/variable,name=furyCheck80,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&((maelstrom>35&cooldown.lightning_bolt.remains>=3*gcd)|maelstrom>80)))
+local furyCheck80 = (not getTalent(6,2) or (getTalent(6,2) and ((maelstrom > 35 and getSpellCD(lightning_bolt) >= 3 * gcd) or maelstrom > 80)))
 -- actions+=/variable,name=furyCheck70,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>70))
+local furyCheck70 = (not getTalent(6,2) or (getTalent(6,2) and maelstrom > 70))
 -- actions+=/variable,name=furyCheck45,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>45))
+local furyCheck45 = (not getTalent(6,2) or (getTalent(6,2) and maelstrom > 45))
 -- actions+=/variable,name=furyCheck35,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>35))
+local furyCheck35 = (not getTalent(6,2) or (getTalent(6,2) and maelstrom > 35))
 -- actions+=/variable,name=furyCheck25,value=(!talent.fury_of_air.enabled|(talent.fury_of_air.enabled&maelstrom>25))
+local furyCheck25 = (not getTalent(6,2) or (getTalent(6,2) and maelstrom > 25))
 -- actions+=/variable,name=OCPool70,value=(!talent.overcharge.enabled|(talent.overcharge.enabled&maelstrom>70))
+local OCPool70 = (not getTalent(4,3) or (getTalent(4,3) and maelstrom > 70))
 -- actions+=/variable,name=OCPool60,value=(!talent.overcharge.enabled|(talent.overcharge.enabled&maelstrom>60))
+local OCPool70 = (not getTalent(4,3) or (getTalent(4,3) and maelstrom > 60))
 -- actions+=/auto_attack
 -- actions+=/use_items
 -- actions+=/call_action_list,name=opener
+if opener() then
+end
 -- actions+=/call_action_list,name=asc,if=buff.ascendance.up
+if UnitBuffID("player",ascendance) then
+	asc()
+end
 -- actions+=/call_action_list,name=buffs
+if buffs() then
+end
 -- actions+=/call_action_list,name=cds
+if cds() then
+end
 -- actions+=/call_action_list,name=core
+if core() then
+end
 -- actions+=/call_action_list,name=filler
+if filler() then
+end
 
--- actions.asc=earthen_spike
--- actions.asc+=/crash_lightning,if=!buff.crash_lightning.up&active_enemies>=2
--- actions.asc+=/rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
--- actions.asc+=/windstrike
+
+local function asc( ... )
+	-- body
+	-- actions.asc=earthen_spike
+	if canCast(earthen_spike) and castSpell(tg,earthen_spike) then
+		print(201)
+		return true
+	end
+	-- actions.asc+=/crash_lightning,if=!buff.crash_lightning.up&active_enemies>=2
+	if canCast(crash_lightning) and not UnitBuffID("player",crash_lightning) and active_enemies >= 2 then
+		if castSpell("player",crash_lightning) then
+			print(202)
+			return true
+		end
+	end
+	-- actions.asc+=/rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
+	if getTalent(2,1) and not UnitBuffID("player",landslide) and charges_fractional(rockbiter) > 1.7 then
+		if canCast(rockbiter) and castSpell(tg,rockbiter) then
+			print(203)
+			return true
+		end
+	end
+	-- actions.asc+=/windstrike
+	if canCast(windstrike)
+end
+
 
 -- actions.buffs=rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
 -- actions.buffs+=/fury_of_air,if=!ticking&maelstrom>22
