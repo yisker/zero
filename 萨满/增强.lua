@@ -91,17 +91,24 @@ local function asc( ... )
 		end
 	end
 	-- actions.asc+=/windstrike
-	if canCast(windstrike)
+	if canCast(windstrike) and castSpell(tg,windstrike) then
+		print(204)
+		return true
+	end
 end
 
 
--- actions.buffs=rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
--- actions.buffs+=/fury_of_air,if=!ticking&maelstrom>22
--- actions.buffs+=/flametongue,if=!buff.flametongue.up
--- actions.buffs+=/frostbrand,if=talent.hailstorm.enabled&!buff.frostbrand.up&variable.furyCheck45
--- actions.buffs+=/flametongue,if=buff.flametongue.remains<6+gcd
--- actions.buffs+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<6+gcd
--- actions.buffs+=/totem_mastery,if=buff.resonance_totem.remains<2
+local function buffs( ... )
+	-- body
+	-- actions.buffs=rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
+	-- actions.buffs+=/fury_of_air,if=!ticking&maelstrom>22
+	-- actions.buffs+=/flametongue,if=!buff.flametongue.up
+	-- actions.buffs+=/frostbrand,if=talent.hailstorm.enabled&!buff.frostbrand.up&variable.furyCheck45
+	-- actions.buffs+=/flametongue,if=buff.flametongue.remains<6+gcd
+	-- actions.buffs+=/frostbrand,if=talent.hailstorm.enabled&buff.frostbrand.remains<6+gcd
+	-- actions.buffs+=/totem_mastery,if=buff.resonance_totem.remains<2
+end
+
 
 -- # Bloodlust casting behavior mirrors the simulator settings for proxy bloodlust. See options 'bloodlust_percent', and 'bloodlust_time'. 
 -- actions.cds=bloodlust,if=target.health.pct<25|time>0.500
