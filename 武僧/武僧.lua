@@ -137,22 +137,22 @@ do
     end;
     zlsyz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
-    local lgsh_setting = rotation.default_setting_category:create_setting("lgsh"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    lgsh_setting.display_name = L["lgsh"];
-    lgsh_setting.description = "低于阈值且灵龟守护可用，使用灵龟守护疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    lgsh_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
-    lgsh_setting.default_value = 30; -- 变量默认值
-    lgsh_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
-    lgsh_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    lgsh_setting.is_enabled_by_default = true; -- 是否默认启用
-    lgsh_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
-        if (value > 0 or value <= 100) then
-            return true;
-        else
-            return false, "The number is not right.";
-        end
-    end;
-    lgsh_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+    -- local lgsh_setting = rotation.default_setting_category:create_setting("lgsh"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    -- lgsh_setting.display_name = L["lgsh"];
+    -- lgsh_setting.description = "低于阈值且灵龟守护可用，使用灵龟守护疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    -- lgsh_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    -- lgsh_setting.default_value = 30; -- 变量默认值
+    -- lgsh_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    -- lgsh_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    -- lgsh_setting.is_enabled_by_default = true; -- 是否默认启用
+    -- lgsh_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+    --     if (value > 0 or value <= 100) then
+    --         return true;
+    --     else
+    --         return false, "The number is not right.";
+    --     end
+    -- end;
+    -- lgsh_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
     local ddyz_setting = rotation.default_setting_category:create_setting("ddyz"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     ddyz_setting.display_name = L["ddyz"];
@@ -171,22 +171,22 @@ do
     end;
     ddyz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
-    local pethp_setting = rotation.default_setting_category:create_setting("pethp"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    pethp_setting.display_name = L["pethp"];
-    pethp_setting.description = "设置是否启用打断"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    pethp_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
-    pethp_setting.default_value = 70; -- 变量默认值
-    pethp_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
-    pethp_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    pethp_setting.is_enabled_by_default = false; -- 是否默认启用
-    pethp_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
-        if (value > 0 or value <= 100) then
-            return true;
-        else
-            return false, "The number is not right.";
-        end
-    end;
-    pethp_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+    -- local pethp_setting = rotation.default_setting_category:create_setting("pethp"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    -- pethp_setting.display_name = L["pethp"];
+    -- pethp_setting.description = "设置是否启用打断"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    -- pethp_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    -- pethp_setting.default_value = 70; -- 变量默认值
+    -- pethp_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    -- pethp_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    -- pethp_setting.is_enabled_by_default = false; -- 是否默认启用
+    -- pethp_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+    --     if (value > 0 or value <= 100) then
+    --         return true;
+    --     else
+    --         return false, "The number is not right.";
+    --     end
+    -- end;
+    -- pethp_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
     -- 在类别test_category下添加配置变量test5
     local spsolt_setting = rotation.default_setting_category:create_setting("spsolt"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
@@ -200,16 +200,16 @@ do
     spsolt_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     spsolt_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
-    local wd_setting = rotation.default_setting_category:create_setting("wd"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    wd_setting.display_name = L["wd"];
-    wd_setting.description = "确定是否使用误导，误导谁"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    wd_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
-    wd_setting.default_value = "宠物"; -- 变量默认值
-    wd_setting.optional_values = {"宠物", "当前T"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
-    wd_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    wd_setting.is_enabled_by_default = true; -- 是否默认启用
-    wd_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-    wd_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+    -- local wd_setting = rotation.default_setting_category:create_setting("wd"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    -- wd_setting.display_name = L["wd"];
+    -- wd_setting.description = "确定是否使用误导，误导谁"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    -- wd_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    -- wd_setting.default_value = "宠物"; -- 变量默认值
+    -- wd_setting.optional_values = {"宠物", "当前T"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    -- wd_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    -- wd_setting.is_enabled_by_default = true; -- 是否默认启用
+    -- wd_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    -- wd_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
 end
 -----------------------------------------------------------
@@ -450,38 +450,22 @@ function rotation:default_action()
     local time = (GetTime() - Y.data["Combat Started"]) or 0
     local gcd = getGCD()
     local charges_fractional = getChargesFrac
-    local regen = select(2,GetPowerRegen("player"))
-	local focus = getRealMana("player")
+    -- local regen = select(2,GetPowerRegen("player"))
+	-- local focus = getRealMana("player")
     local castSpell = csi
 
 
     local tgtype = self.settings.targets --目标选择
     local zlsyz = self.settings.zlsyz --治疗石
-    local lgsh = self.settings.lgsh --灵龟守护
+    -- local lgsh = self.settings.lgsh --灵龟守护
     local ddyz = self.settings.ddyz --打断
-    local pethp = self.settings.pethp --宠物治疗
+    -- local pethp = self.settings.pethp --宠物治疗
     local spsolt = self.settings.spsolt --饰品
-    local wd = self.settings.wd --误导
+    local aoenum = self.settings.aoenum --饰品
+    -- local wd = self.settings.wd --误导
 
     
-    local bestial_wrath = 19574 --狂野怒火
-    local ancestral_call = 274738 --
-	local fireblood = 265221
-	local lights_judgment = 247427
-	local frenzy = 138895
-	local barbed_shot = 217200 --倒刺射击
-	local a_murder_of_crows = 131894 --夺命黑鸦
-	local spitting_cobra = 194407 --喷毒眼镜蛇
-	local stampede = 201430  --群兽奔腾
-	local aspect_of_the_wild = 193530 --野性守护
-	local beast_cleave = 115939  --野兽顺劈
-	local multishot = 2643 --多重射击
-	local chimaera_shot = 53209 --奇美拉射击
-	local kill_command = 34026 --杀戮命令
-	local dire_beast = 120679 --凶暴野兽
-	local barrage = 120360 --弹幕射击
-    local cobra_shot = 193455 --眼镜蛇射击
-    local counter_shot = 147362 --反制射击
+    
     
 
     --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
@@ -514,7 +498,7 @@ function rotation:default_action()
 
     AttackTarget()
 
-    if emnums <= 2 then
+    if active_enemies <= aoenum.value then
 
         -- Use Fists of Fury Icon Fists of Fury.
         if canCast(113656) and castSpell(tg,113656) then
@@ -553,7 +537,7 @@ function rotation:default_action()
     end
 
 
-    if emnums > 2 then  
+    if active_enemies > aoenum.value then  
         -- Use Whirling Dragon Punch Icon Whirling Dragon Punch. 
         if canCast(152175) and castSpell(tg,152175) then
             print(201)
