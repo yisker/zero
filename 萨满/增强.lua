@@ -101,6 +101,12 @@ end
 local function buffs( ... )
 	-- body
 	-- actions.buffs=rockbiter,if=talent.landslide.enabled&!buff.landslide.up&charges_fractional>1.7
+	if getTalent(2,1) and not UnitBuffID("player",landslide) and charges_fractional(rockbiter) > 1.7 then
+		if canCast(rockbiter) and castSpell(tg,rockbiter) then
+			print(301)
+			return true
+		end
+	end
 	-- actions.buffs+=/fury_of_air,if=!ticking&maelstrom>22
 	-- actions.buffs+=/flametongue,if=!buff.flametongue.up
 	-- actions.buffs+=/frostbrand,if=talent.hailstorm.enabled&!buff.frostbrand.up&variable.furyCheck45

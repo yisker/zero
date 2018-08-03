@@ -2,17 +2,17 @@
 -- 模块属性
 -----------------------------------------------------------
 -- 定义循环的唯一ID，可以去https://1024tools.com/uuid生成，保证每次都不一样，宇宙唯一。
-local rotation_id = "83ef4a33-ae42-49e2-aaf5-6a16a91ab121";
+local rotation_id = "c7cba9a6-34e9-458a-a77d-bba64d6310ac";
 -- 定义循环的英文名称。
-local rotation_name = "shouwang";
+local rotation_name = "tafeng";
 Scorpio("zeus."..rotation_name)("");
 -- import "zeus";
 -- 定义多语言字符串。
 local L = _Locale("zhCN", true);
 if L then
     -- 简体中文系列。
-    L[rotation_name] = "兽王测试";
-    L["Welcome to use test module."] = "欢迎使用兽王测试模块！";
+    L[rotation_name] = "踏风测试";
+    L["Welcome to use test module."] = "欢迎使用踏风测试模块！";
     L["Test 1"] = "测试1号";
     L["Test 2"] = "测试2号";
     L["At least 2 values must be entered."] = "至少要输入2个值";
@@ -53,7 +53,7 @@ rotation.condition_no_message = "N/A";
 -- 定义循环的执行间隔（秒），如果不设默认是0.1。
 rotation.interval = 0.1;
 -- 定义模块专用宏命令，下面的例子会定义出：/zeus test [argument]。如果不需要宏控制，则删除下面一行。
-rotation.macro = "shouwang";
+rotation.macro = "tafeng";
 -----------------------------------------------------------
 -- 模块变量
 -----------------------------------------------------------
@@ -420,7 +420,7 @@ end
 function rotation:condition_action()
     -- 编写判断模块是否可用的脚本。
     local current_specialization = GetSpecializationInfo(GetSpecialization())
-    local speci = 253 --- 250 在 游戏中，/run print(GetSpecializationInfo(GetSpecialization())) 获取当前职业专精
+    local speci = 269 --- 250 在 游戏中，/run print(GetSpecializationInfo(GetSpecialization())) 获取当前职业专精
     return current_specialization == speci;
     -- return true
 end
@@ -481,20 +481,9 @@ function rotation:default_action()
 	local dire_beast = 120679 --凶暴野兽
 	local barrage = 120360 --弹幕射击
     local cobra_shot = 193455 --眼镜蛇射击
-	local counter_shot = 147362 --反制射击
+    local counter_shot = 147362 --反制射击
     
-    local function getRecharge(spellID)
-        local charges,maxCharges,chargeStart,chargeDuration = GetSpellCharges(spellID)
-        if charges then
-            if charges < maxCharges then
-                chargeEnd = chargeStart + chargeDuration
-                return chargeEnd - GetTime()
-            end
-            return 0
-        end
-    end
-	
-    
+
     --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
     local function filler_unit(Unit)
         if (UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) then
@@ -505,7 +494,7 @@ function rotation:default_action()
     end
     --获得第一个符合条件的目标
     if tgtype.value == "智能" then
-        tg = getOneEnemy(40,filler_unit)
+        tg = getOneEnemy(8,filler_unit)
         
         --如果有当前目标，并且当前目标可以攻击，则对当前目标攻击
         if UnitExists("target") and isAlive("target") and UnitCanAttack("player","target") then
@@ -523,165 +512,75 @@ function rotation:default_action()
     local active_enemies = getNumEnemies(tg,8)
     local spell_targets = active_enemies
 
+    AttackTarget()
 
-    ---------------------------------------------------------
-    --保命模块
-    --治疗石
-    if getHP("player") <= zlsyz.value and canUse(5512) then
-        useItem(5512)
-    end
-    self:rest();
-    --灵龟守护
-    if lgsh.is_enabled and getHP("player") <= lgsh.value and canCast(186265) then
-        castSpell("player",186265)
-    end
-    self:rest();
-    --治疗宠物
-    if getHP("pet") <= pethp.value and canCast(136) then
-        castSpell("pet",136)
-    end
-    self:rest();
-    ---------------------------------------------------------
+    if emnums <= 2 then
 
-    if wd.is_enabled and canCast(34477) and wd.value == "宠物" then
-        castSpell("pet",34477)
-    end
-    -- actions=auto_shot
-    -- AttackTarget()
-    PetAttack(tg)
-    self:rest();
-    -- actions+=/counter_shot,if=equipped.sephuzs_secret&target.debuff.casting.react&cooldown.buff_sephuzs_secret.up&!buff.sephuzs_secret.up
-    if ddyz.is_enabled and canCast(counter_shot) and canInterrupt(tg,1,ddyz.value) then
-        if castSpell(tg,counter_shot) then
-            print(100)
-        end
-    end
-    self:rest();
-    -- actions+=/use_items
-    if spsolt.is_enabled then
-        if spsolt.value == "全部" then
-            if canUse(13) and useItem(13) then
-            end
-            if canUse(14) and useItem(14) then
-            end
-        end
-        if spsolt.value == "第一栏位" then
-            if canUse(13) and useItem(13) then
-            end
-        end
-        if spsolt.value == "第二栏位" then
-            if canUse(14) and useItem(14) then
-            end
-        end
-    end
-    self:rest();
-    -- actions+=/berserking,if=cooldown.bestial_wrath.remains>30
-    -- actions+=/blood_fury,if=cooldown.bestial_wrath.remains>30
-    -- actions+=/ancestral_call,if=cooldown.bestial_wrath.remains>30
-    if getSpellCD(bestial_wrath)>30 then
-        if castSpell(tg,ancestral_call) then
+        -- Use Fists of Fury Icon Fists of Fury.
+        if canCast(113656) and castSpell(tg,113656) then
             print(101)
         end
-    end
-    self:rest();
-    -- actions+=/fireblood,if=cooldown.bestial_wrath.remains>30
-    if getSpellCD(bestial_wrath)>30 then
-        if castSpell(tg,fireblood) then
+        -- Use Fist of the White Tiger Icon Fist of the White Tiger.
+        if canCast(261947) and castSpell(tg,261947) then
             print(102)
         end
-    end
-    self:rest();
-    -- actions+=/lights_judgment
-    if castSpell(tg,lights_judgment) then
-        print(103)
-    end
-    self:rest();
-    -- actions+=/potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up
-    -- actions+=/barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max
-    if UnitBuffID("pet",frenzy) and getBuffRemain("pet",frenzy)<=gcd then
-        if getCharges(barbed_shot)>=1 and castSpell(tg,barbed_shot) then
+        -- Use Rising Sun Kick Icon Rising Sun Kick if Whirling Dragon Punch Icon Whirling Dragon Punch is coming off cooldown.
+        if getSpellCD(152175) <= gcd and canCast(107428) and castSpell(tg,107428) then
+            print(103)
+        end
+        -- Use Whirling Dragon Punch Icon Whirling Dragon Punch.
+        if canCast(152175) and castSpell(tg,152175) then
             print(104)
         end
-    end
-    self:rest();
-    -- actions+=/a_murder_of_crows
-    if focus>=30 and castSpell(tg,a_murder_of_crows) then
-        print(105)
-    end
-    self:rest();
-    -- actions+=/spitting_cobra
-    if canCast(spitting_cobra) and castSpell(tg,spitting_cobra) then
-        print(106)
-    end
-    self:rest();
-    -- actions+=/stampede,if=buff.bestial_wrath.up|cooldown.bestial_wrath.remains<gcd|target.time_to_die<15
-    if UnitBuffID("player",bestial_wrath) or getSpellCD(bestial_wrath)<gcd or getTimeToDie(tg)<15 then
-        if canCast(stampede) and castSpell(tg,stampede) then
+        -- Use Blackout Kick Icon Blackout Kick.
+        if canCast(100784) and castSpell(tg,100784) then
+            print(104)
+        end
+        -- Use Tiger Palm Icon Tiger Palm if you have 3 or less Chi.
+        if getChi("player") <= 3 and canCast(100780) and castSpell(tg,100780) then
+            print(105)
+        end
+        -- Use Rising Sun Kick Icon Rising Sun Kick if you are close to capping Chi.
+        if getChi("player") >= 5 and canCast(107428) and castSpell(tg,107428) then
+            print(106)
+        end
+        -- Keep in mind that Tiger Palm Icon Tiger Palm has a chance to cause the next Blackout Kick Icon Blackout Kick not to cost any Chi.
+        -- Use Tiger Palm Icon Tiger Palm.
+        if canCast(100780) and castSpell(tg,100780) then
             print(107)
         end
+
     end
-    self:rest();
-    -- actions+=/aspect_of_the_wild
-    if canCast(aspect_of_the_wild) and castSpell("player",aspect_of_the_wild) then
-        print(108)
-    end
-    self:rest();
-    -- actions+=/bestial_wrath,if=!buff.bestial_wrath.up
-    if not UnitBuffID("player",bestial_wrath) then
-        if castSpell(tg,bestial_wrath) then
-            print(109)
+
+
+    if emnums > 2 then  
+        -- Use Whirling Dragon Punch Icon Whirling Dragon Punch. 
+        if canCast(152175) and castSpell(tg,152175) then
+            print(201)
         end
-    end
-    self:rest();
-    -- actions+=/multishot,if=spell_targets>2&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
-    if spell_targets>2 and (getBuffRemain("pet",beast_cleave)<gcd or not UnitBuffID("pet",beast_cleave)) then
-        if focus>= 40 and castSpell(tg,multishot) then
-            print(110)
+        -- Use Fists of Fury Icon Fists of Fury.
+        if canCast(113656) and castSpell(tg,113656) then
+            print(202)
         end
-    end
-    self:rest();
-    -- actions+=/chimaera_shot
-    if canCast(chimaera_shot) and castSpell(tg,chimaera_shot) then
-        print(111)
-    end
-    self:rest();
-    -- actions+=/kill_command
-    if focus>=30 and canCast(kill_command) and castSpell(tg,kill_command) then
-        print(112)
-    end
-    self:rest();
-    -- actions+=/dire_beast
-    if focus>=25 and canCast(dire_beast) and castSpell(tg,dire_beast) then
-        print(113)
-    end
-    self:rest();
-    -- actions+=/barbed_shot,if=pet.cat.buff.frenzy.down&charges_fractional>1.4|full_recharge_time<gcd.max|target.time_to_die<9
-    if UnitBuffID("pet",frenzy) and charges_fractional(barbed_shot)>1.4 or getRecharge(barbed_shot) < gcd or getTimeToDie(tg)<9 then
-        if getCharges(barbed_shot)>=1 and castSpell(tg,barbed_shot) then
-            print(114)
+        -- Use Fist of the White Tiger Icon Fist of the White Tiger.
+        if canCast(261947) and castSpell(tg,261947) then
+            print(203)
         end
-    end
-    self:rest();
-    -- actions+=/barrage
-    if canCast(barrage) and focus>=60 and castSpell(tg,barrage) then
-        print(115)
-    end
-    self:rest();
-    -- actions+=/multishot,if=spell_targets>1&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
-    if spell_targets>1 and (getBuffRemain("pet",beast_cleave)<gcd or not UnitBuffID("pet",beast_cleave)) then
-        if focus>=40 and castSpell(tg,multishot) then
-            print(116)
+        -- Use Spinning Crane Kick Icon Spinning Crane Kick on 3 or more targets.
+        if canCast(107270) and castSpell(tg,107270) then
+            print(203)
         end
-    end
-    self:rest();
-    -- actions+=/cobra_shot,if=(active_enemies<2|cooldown.kill_command.remains>focus.time_to_max)&(buff.bestial_wrath.up&active_enemies>1|cooldown.kill_command.remains>1+gcd&cooldown.bestial_wrath.remains>focus.time_to_max|focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost)
-    if (active_enemies<2 or getSpellCD("player",kill_command)>getTimeToMax("player")) and (UnitBuffID("player",bestial_wrath) and active_enemies>1 or getSpellCD(kill_command)>1+gcd and getSpellCD(bestial_wrath)>getTimeToMax("player") or getRealMana("player")-35+regen*(getSpellCD(kill_command)-1)>30) then
-        if focus>=35 and castSpell(tg,cobra_shot) then
-            print(116)
+        -- Use Blackout Kick Icon Blackout Kick.
+        if canCast(100784) and castSpell(tg,100784) then
+            print(204)
         end
+        -- Use Tiger Palm Icon Tiger Palm.
+        if canCast(100780) and castSpell(tg,100780) then
+            print(205)
+        end
+
     end
-    self:rest();
-    
+
 end
 
 -----------------------------------------------------------
