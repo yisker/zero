@@ -30,6 +30,7 @@ if L then
     L["pethp"] = "宠物治疗"
     L["spsolt"] = "使用饰品"
     L["wd"] = "误导"
+    L["Touch_of_Death"] = "爆发"
 end
 -- L = _Locale("zhTW");
 -- if L then
@@ -211,6 +212,23 @@ do
     -- wd_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     -- wd_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
+    local Touch_of_Death_setting = rotation.default_setting_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    Touch_of_Death_setting.display_name = L["Touch_of_Death"];
+    Touch_of_Death_setting.description = "按住这个键开启爆发！"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    Touch_of_Death_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    Touch_of_Death_setting.default_value = "q"; -- 变量默认值
+    Touch_of_Death_setting.optional_values = nil -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    Touch_of_Death_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    Touch_of_Death_setting.is_enabled_by_default = true; -- 是否默认启用
+    Touch_of_Death_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (#value == 1 ) then
+            return true;
+        else
+            return false, "没有这个按键";
+        end
+    end; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    Touch_of_Death_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
 end
 -----------------------------------------------------------
 --注册事件
@@ -249,6 +267,10 @@ do
     end
     if Y.nTank == nil then 
         Y.nTank = {};
+    end
+
+    if tt == nil then
+        tt = 0
     end
 
     -------------------------------------------------------------------------------------------------------------------
@@ -436,7 +458,23 @@ function rotation:prestop_action()
     -- 编写模块停止前脚本。
     print("stop now!");
 end
-function rotation:precombat_action() 
+function rotation:precombat_action()
+
+    local bf = self.settings.Touch_of_Death.value --爆发
+
+    
+
+    if isKeyDown(bf) and GetTime() - tt > 1 then
+        baofa = not baofa
+        tt = GetTime()
+        if baofa then
+            GH_Print("爆发开启")
+            OverlayY("爆发开启")
+        else
+            GH_Print("爆发关闭")
+            OverlayY("爆发关闭")
+        end
+    end
 
 end
 
@@ -463,8 +501,19 @@ function rotation:default_action()
     local spsolt = self.settings.spsolt --饰品
     local aoenum = self.settings.aoenum --饰品
     -- local wd = self.settings.wd --误导
+    local bf = self.settings.Touch_of_Death.value --爆发
 
-    
+    if isKeyDown(bf) and GetTime() - tt > 1 then
+        baofa = not baofa
+        tt = GetTime()
+        if baofa then
+            GH_Print("爆发开启")
+            OverlayY("爆发开启")
+        else
+            GH_Print("爆发关闭")
+            OverlayY("爆发关闭")
+        end
+    end
     
     
 
@@ -496,7 +545,22 @@ function rotation:default_action()
     local active_enemies = getNumEnemies(tg,8)
     local spell_targets = active_enemies
 
-    AttackTarget()
+    if time < 2 then
+        AttackTarget()
+    end
+
+    if baofa and canCast(115080) and castSpell(tg,115080) then
+        print(11)
+    end
+
+    if baofa and  canCast(138130) and castSpell(tg,138130) then
+        print(22)
+    end
+
+    if baofa and  canCast(123904) and castSpell(tg,123904) then
+        print(33)
+    end
+
 
     if active_enemies <= aoenum.value then
 
