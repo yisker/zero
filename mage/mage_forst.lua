@@ -238,7 +238,144 @@ rotation.macro = "bingfa";
 -- 变量的当前值会保存在WTF中。
 -----------------------------------------------------------
 do
-    local aoetg_setting = rotation.default_setting_category:create_setting("aoetg"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    -- -- 添加一个自定义类别test_category。
+    local jc_category = rotation:create_setting_category("jc_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+    jc_category.display_name = L["|cff00FFFF基础设置"]; -- 类别在界面上显示的名字
+
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local ydebug_setting = jc_category:create_setting("ydebug"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    ydebug_setting.display_name = L["ydebug"]; -- 变量在界面上显示的名字
+    ydebug_setting.description = "这是number数组类型的变量，其值为number数组。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    ydebug_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    ydebug_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    ydebug_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    ydebug_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    ydebug_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    ydebug_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    ydebug_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local isbus_setting = jc_category:create_setting("isbus"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    isbus_setting.display_name = L["有坐骑不打怪"]; -- 变量在界面上显示的名字
+    isbus_setting.description = "有坐骑不打怪"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    isbus_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    isbus_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    isbus_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    isbus_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    isbus_setting.is_enabled_by_default = true; -- 是否默认启用（勾选框默认选中）
+    isbus_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    isbus_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local callpet_setting = jc_category:create_setting("callpet"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    callpet_setting.display_name = L["自动召唤水元素"]; -- 变量在界面上显示的名字
+    callpet_setting.description = "自动召唤水元素"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    callpet_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    callpet_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    callpet_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    callpet_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    callpet_setting.is_enabled_by_default = true; -- 是否默认启用（勾选框默认选中）
+    callpet_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    callpet_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+-----------------------------------------------------------
+
+
+    -- -- 添加一个自定义类别test_category。
+    local hps_category = rotation:create_setting_category("hps_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+    hps_category.display_name = L["|cff00FFFF治疗设置"]; -- 类别在界面上显示的名字
+
+    local zlsyz_setting = hps_category:create_setting("zlsyz"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    zlsyz_setting.display_name = L["治疗石"];
+    zlsyz_setting.description = "低于阈值且治疗石可用，使用治疗石疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    zlsyz_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    zlsyz_setting.default_value = 20; -- 变量默认值
+    zlsyz_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    zlsyz_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    zlsyz_setting.is_enabled_by_default = false; -- 是否默认启用
+    zlsyz_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    zlsyz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local jslq_setting = hps_category:create_setting("jslq"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    jslq_setting.display_name = L["急速冷却"]; -- 变量在界面上显示的名字
+    jslq_setting.description = "自动急速冷却"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    jslq_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    jslq_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    jslq_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    jslq_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    jslq_setting.is_enabled_by_default = true; -- 是否默认启用（勾选框默认选中）
+    jslq_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    jslq_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+
+    local hbpz_setting = hps_category:create_setting("hbpz"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    hbpz_setting.display_name = L["寒冰屏障"];
+    hbpz_setting.description = "寒冰屏障"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    hbpz_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    hbpz_setting.default_value = 20; -- 变量默认值
+    hbpz_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    hbpz_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    hbpz_setting.is_enabled_by_default = true; -- 是否默认启用
+    hbpz_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    hbpz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+    local hbht_setting = hps_category:create_setting("hbht"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    hbht_setting.display_name = L["寒冰护体"];
+    hbht_setting.description = "寒冰护体"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    hbht_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    hbht_setting.default_value = 70; -- 变量默认值
+    hbht_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    hbht_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    hbht_setting.is_enabled_by_default = true; -- 是否默认启用
+    hbht_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    hbht_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+    local lgpz_setting = hps_category:create_setting("lgpz"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    lgpz_setting.display_name = L["棱光屏障"];
+    lgpz_setting.description = "棱光屏障"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    lgpz_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    lgpz_setting.default_value = 30; -- 变量默认值
+    lgpz_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    lgpz_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    lgpz_setting.is_enabled_by_default = true; -- 是否默认启用
+    lgpz_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    lgpz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+
+-----------------------------------------------------------
+
+
+
+    -- -- 添加一个自定义类别test_category。
+    local dps_category = rotation:create_setting_category("dps_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+    dps_category.display_name = L["|cff00FFFF输出设置"]; -- 类别在界面上显示的名字
+
+    local aoetg_setting = dps_category:create_setting("aoetg"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     aoetg_setting.display_name = L["aoetg"];
     aoetg_setting.description = "用来确定暴风雪技能目标释放位置，智能表示放在人群最密集的地方"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     aoetg_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
@@ -250,7 +387,7 @@ do
     aoetg_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
 
-    local aoenum_setting = rotation.default_setting_category:create_setting("aoenum"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    local aoenum_setting = dps_category:create_setting("aoenum"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     aoenum_setting.display_name = L["aoenum"];
     aoenum_setting.description = "超过设定人数，进入AOE循环"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     aoenum_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
@@ -269,7 +406,7 @@ do
 
 
     -- 在类别test_category下添加配置变量test5
-    local targets_setting = rotation.default_setting_category:create_setting("targets"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    local targets_setting = dps_category:create_setting("targets"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     targets_setting.display_name = L["targets"];
     targets_setting.description = "确定目标的选择方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     targets_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
@@ -281,21 +418,12 @@ do
     targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
 
-    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
-    local ydebug_setting = rotation.default_setting_category:create_setting("ydebug"); -- 指定变量的名字为test1，用于在脚本中进行引用
-    ydebug_setting.display_name = L["ydebug"]; -- 变量在界面上显示的名字
-    ydebug_setting.description = "这是number数组类型的变量，其值为number数组。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    ydebug_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
-    ydebug_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
-    ydebug_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
-    ydebug_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    ydebug_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
-    ydebug_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-    ydebug_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+    
 end
+-----------------------------------------------------------
 --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
 local function filler_unit(Unit)
-    if (UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) then
+    if (UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) then
         return true
     else
         return false
@@ -368,6 +496,21 @@ function rotation:default_action()
     local aoe_blizzard = self.settings.aoetg --暴风雪
     local aoe_num = self.settings.aoenum --aoe人数
     local tgtype = self.settings.targets --目标选择
+    local ydebug = self.settings.ydebug --调试信息
+    local isbus = self.settings.isbus --坐骑
+    local callpet = self.settings.callpet --坐骑
+    local jslq = self.settings.jslq --急速冷却
+    local zlsyz = self.settings.zlsyz --治疗石
+    local hbpz = self.settings.hbpz --寒冰屏障
+    local hbht = self.settings.hbht --寒冰护体
+    local lgpz = self.settings.lgpz --棱光屏障
+
+
+
+    if isbus.is_enabled and isBused("player") then return; end
+
+    
+
 
 
     -- 本地化
@@ -433,6 +576,48 @@ function rotation:default_action()
     -- local tier20_2pc = false  
     
     local charges_fractional = getChargesFrac
+    local castSpell = csi
+
+
+    --水元素
+    if callpet.is_enabled then
+        if not UnitExists("pet") or not isAlive("pet") then
+            castSpell(zj,31687)
+        end
+    end
+
+    -- 石头
+    if getHP(zj) <= zlsyz.value and canUse(5512) then
+        useItem(5512)
+    end
+
+    -- 当你身上没有低温41425DEBUFF，且你的寒冰屏障CD时，且你的血量低于50%，则释放急速冷却235219（做开关）
+    if jslq.is_enabled and not UnitDebuffID("player",41425) and getSpellCD(45438) > 0 and getHP("player") < 50 then
+        if canCast(235219) and castSpell(zj,235219) then
+        end
+    end
+
+    -- 当自己的血低于多少时，则释放寒冰屏障45438（做阈值，默认20）
+    if hbpz.is_enabled and getHP(zj) <= hbpz.value and canCast(45438) then
+        if castSpell(zj,45438) then
+        end
+    end
+
+    -- 当自己的血低于多少时，则释放寒冰护体11426（做阈值，默认70）
+    if hbht.is_enabled and getHP(zj) <= hbht.value and canCast(11426) then
+        if castSpell(zj,11426) then
+        end
+    end
+
+    -- 当自己的血低于多少时，则释放棱光屏障235450（做阈值，默认30）
+    if lgpz.is_enabled and getHP(zj) <= lgpz.value and canCast(235450) then
+        if castSpell(zj,235450) then
+        end
+    end
+
+
+
+
 
        
     
@@ -728,7 +913,7 @@ function rotation:default_action()
     -- # Free Ice Lance after Flurry. This action has rather high priority to ensure that we don't cast Rune of Power, Ray of Frost, etc. after Flurry and break up the combo. If FoF was already active, we do not lose anything by delaying the Ice Lance.
     -- actions+=/ice_lance,if=prev_gcd.1.flurry&!buff.fingers_of_frost.react
     if lastSpellCast == flurry and not UnitBuffID("player",fingers_of_frost) then
-        if castSpell("target",ice_lance) then
+        if castSpell(tg,ice_lance) then
             print(1)
             return true
         end
