@@ -417,6 +417,23 @@ do
     targets_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
+    local Touch_of_Death_setting = dps_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    Touch_of_Death_setting.display_name = L["爆发快捷键"];
+    Touch_of_Death_setting.description = "按下这个键切换爆发状态！因为暴雪本身的bug，只支持1-0，A-Z"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    Touch_of_Death_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    Touch_of_Death_setting.default_value = "e"; -- 变量默认值
+    Touch_of_Death_setting.optional_values = nil -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    Touch_of_Death_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    Touch_of_Death_setting.is_enabled_by_default = true; -- 是否默认启用
+    -- Touch_of_Death_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+    --     if (#value == 1 ) then
+    --         return true;
+    --     else
+    --         return false, "没有这个按键";
+    --     end
+    -- end; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    Touch_of_Death_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
 
     
 end
