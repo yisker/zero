@@ -293,6 +293,14 @@ do
     ydebug_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     ydebug_setting.value_width = 120; -- 值显示宽度像素（默认为100）
 end
+--过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
+local function filler_unit(Unit)
+    if (UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) then
+        return true
+    else
+        return false
+    end
+end
 -----------------------------------------------------------
 -- 模块脚本
 -----------------------------------------------------------
@@ -346,31 +354,28 @@ function rotation:precombat_action()
     -- castSpell(tg,116)
     self:rest();
 end
+
+
+
+
+
 function rotation:default_action()
+    
+    -- 不打断施法
+    if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
+
     --获得变量
     local aoe_blizzard = self.settings.aoetg --暴风雪
     local aoe_num = self.settings.aoenum --aoe人数
     local tgtype = self.settings.targets --目标选择
-    -- print(aoe_blizzard.value)
-    -- print(aoe_num.value)
-    -- print(tgtype.value == "智能")
 
 
     -- 本地化
     local lastSpellCast = Y.lastspell_cast
     -- GH_Print(lastSpellCast)
-    -- 不打断施法
-    if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
 
     
-    --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
-    local function filler_unit(Unit)
-        if UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3 and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) then
-            return true
-        else
-            return false
-        end
-    end
+    
     --获得第一个符合条件的目标
     if tgtype.value == "智能" then
         tg = getOneEnemy(40,filler_unit)
@@ -389,13 +394,8 @@ function rotation:default_action()
     --本地化自己
     local zj = "player"
     --获得目标周围8码的敌人数量
-    local active_enemies = getNumEnemies(tg,8) 
+    local active_enemies = getNumEnemies(tg,8)    
     
-    -- print(tg)
-    -- print(active_enemies)
-    -- for i,v in ipairs(et) do
-    --     print(i,v)
-    -- end
     
     
     local blizzard = 190356 --暴风雪
@@ -433,31 +433,8 @@ function rotation:default_action()
     -- local tier20_2pc = false  
     
     local charges_fractional = getChargesFrac
-    
-    -- local function charges_fractional(Name)
-    --     -- body
-    --     -- ChargesRemaining(spellName) + ((SpellCooldownSec(spellName) - ChargeSecRemaining(spellName)) / SpellCooldownSec(spellName))
-    --     local function SpellCooldownSec(Name)
-    --         -- body
-    --         return select(2,GetSpellCharges(Name)) * select(4,GetSpellCharges(Name))
-    --     end
 
-    --     return getCharges(Name) + (( SpellCooldownSec(Name) - getChargesCD(Name) ) / SpellCooldownSec(Name) )
-    -- end
-
-
-    
-    
-    -- # Executed every time the actor is available.
-    -- actions=counterspell
-    -- # Free Ice Lance after Flurry. This action has rather high priority to ensure that we don't cast Rune of Power, Ray of Frost, etc. after Flurry and break up the combo. If FoF was already active, we do not lose anything by delaying the Ice Lance.
-    -- actions+=/ice_lance, if  not   UnitBuffID("player",) fingers_of_frost.react and  lastSpellCast .1.flurry
-    -- # Time Warp is used right at the start. If the actor has Shard of the Exodar, try to synchronize the second Time Warp with Icy Veins. If the target is about to die, use Time Warp regardless.
-    -- actions+=/time_warp, if  UnitBuffID("player",) bloodlust.down and ( UnitBuffID("player",) exhaustion.down or equipped.shard_of_the_exodar) and ( getSpellCD() .icy_veins.remains<1 or  getTimeToDie(tg) <50)
-    -- actions+=/call_action_list,name= getSpellCD() s
-    -- actions+=/call_action_list,name=aoe, if active_enemies>=3
-    -- actions+=/call_action_list,name=single
-    
+       
     
     local function aoe( ... )
         -- body
