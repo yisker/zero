@@ -186,7 +186,7 @@ end
 local rotation_id = "0c02decd-b730-4509-b5bf-259d28ca3c28";
 -- 定义循环的英文名称。
 local rotation_name = "bing_fa";
-Scorpio("zeus"..rotation_name)("");
+Scorpio("zeus."..rotation_name)("");
 -- import "zeus";
 -- 定义多语言字符串。
 local L = _Locale("zhCN", true);
@@ -452,7 +452,7 @@ end
 function rotation:macro_handler(argument)
     -- 编写执行模块宏对应的处理脚本。
     if (not argument or argument == "") then
-        print("使用宏//zkm bingfa baofa控制爆发");
+        -- print("使用宏/zkm bingfa baofa控制爆发");
     else
         print("收到宏命令参数：", argument);
     end
@@ -497,11 +497,33 @@ function rotation:precombat_action()
     --     print(UnitName(tg))
     -- end
     -- castSpell(tg,116)
+    local callpet = self.settings.callpet --坐骑
+    --水元素
+    if callpet.is_enabled then
+        if not UnitExists("pet") or not isAlive("pet") then
+            castSpell(zj,31687)
+        end
+    end
     self:rest();
 end
 
+local function full_recharge_time(spellID)
+    local charges,maxCharges,chargeStart,chargeDuration = GetSpellCharges(spellID)
+    if charges then
+        if charges < maxCharges and maxCharges - charges < 1 then
+            chargeEnd = chargeStart + chargeDuration
+            return chargeEnd - GetTime()
+        end
+        if maxCharges - charges > 1 then
+            chargeEnd = chargeStart + chargeDuration
+            return chargeEnd - GetTime() + chargeDuration
+        end
+        return 0
+    end
+end
 
-
+if baofa == nil then baofa = false;end
+if tt == nil then tt = 0;end
 
 
 function rotation:default_action()
@@ -521,6 +543,20 @@ function rotation:default_action()
     local hbpz = self.settings.hbpz --寒冰屏障
     local hbht = self.settings.hbht --寒冰护体
     local lgpz = self.settings.lgpz --棱光屏障
+    local Touch_of_Death = self.settings.Touch_of_Death.value --爆發
+
+
+    if isKeyDown(Touch_of_Death) and GetTime() - tt > 1 then
+        baofa = not baofa
+        tt = GetTime()
+        if baofa then
+            GH_Print("爆发开启")
+            OverlayY("爆发开启")
+        else
+            GH_Print("爆发关闭")
+            OverlayY("爆发关闭")
+        end
+    end
 
 
 
@@ -642,8 +678,12 @@ function rotation:default_action()
         -- body
         -- actions.aoe+=/frozen_orb
         if canCast(frozen_orb) and castSpell(tg,frozen_orb) then
-            print(101)
-            return true
+            if ydebug.is_enabled then
+                print(101)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.aoe+=/blizzard
         -- if canCast(blizzard) and castSpell(tg,blizzard) then
@@ -671,52 +711,88 @@ function rotation:default_action()
         end
         -- actions.aoe+=/comet_storm
         if canCast(comet_storm) and castSpell(tg,comet_storm) then
-            print(103)
-            return true
+            if ydebug.is_enabled then
+                print(102)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.aoe+=/ice_nova
         if canCast(ice_nova) and castSpell(tg,ice_nova) then
-            print(104)
-            return true
+            if ydebug.is_enabled then
+                print(103)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.aoe+=/flurry,if=prev_gcd.1.ebonbolt|buff.brain_freeze.react&(prev_gcd.1.frostbolt&(buff.icicles.stack<4|!talent.glacial_spike.enabled)|prev_gcd.1.glacial_spike)
         if lastSpellCast == ebonbolt or UnitBuffID("player",brain_freeze) and ( lastSpellCast == frostbolt and ( getBuffStacks("player",icicles) < 4 or not getTalent(7,3) ) or lastSpellCast == glacial_spike ) then
             if canCast(flurry) and castSpell(tg,flurry) then
-                print(105)
-                return true
+                if ydebug.is_enabled then
+                    print(104)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.aoe+=/ice_lance,if=buff.fingers_of_frost.react
         if  UnitBuffID("player",fingers_of_frost) then
             if canCast(ice_lance) and castSpell(tg,ice_lance) then
-                print(106)
-                return true
+                if ydebug.is_enabled then
+                    print(105)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.aoe+=/ray_of_frost
         if canCast(ray_of_frost) and castSpell(tg,ray_of_frost) then
-            print(107)
-            return true
+           if ydebug.is_enabled then
+                print(106)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.aoe+=/ebonbolt
         if canCast(ebonbolt) and castSpell(tg,ebonbolt) then
-            print(108)
-            return true
+            if ydebug.is_enabled then
+                print(108)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.aoe+=/glacial_spike
         if canCast(glacial_spike) and castSpell(tg,glacial_spike) then
-            print(109)
-            return true
+            if ydebug.is_enabled then
+                print(109)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.aoe+=/cone_of_cold
         if canCast(cone_of_cold) and castSpell(tg,cone_of_cold) then
-            print(110)
-            return true
+            if ydebug.is_enabled then
+                print(120)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.aoe+=/frostbolt
         if canCast(frostbolt) and castSpell(tg,frostbolt) then
-            print(111)
-            return true
+           if ydebug.is_enabled then
+                print(121)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.aoe+=/call_action_list,name=movement
         -- if isMoving("player") and movement() then
@@ -725,8 +801,12 @@ function rotation:default_action()
         -- end
         -- actions.aoe+=/ice_lance
         if canCast(ice_lance) and castSpell(tg,ice_lance) then
-            print(113)
-            return true
+            if ydebug.is_enabled then
+                print(123)
+                return 0
+            else
+                return 0
+            end
         end        
     end
     
@@ -734,76 +814,103 @@ function rotation:default_action()
     local function cooldowns( ... )
         -- body
         -- actions.cooldowns=icy_veins
-        if canCast(icy_veins) and castSpell(zj,icy_veins) then
-            print(201)
-            return true
+        if baofa and canCast(icy_veins) and castSpell(zj,icy_veins) then
+            if ydebug.is_enabled then
+                print(201)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.cooldowns+=/mirror_image
-        if canCast(mirror_image) and castSpell(zj,mirror_image) then
-            print(202)
-            return true
+        if baofa and canCast(mirror_image) and castSpell(zj,mirror_image) then
+            if ydebug.is_enabled then
+                print(202)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.cooldowns+=/rune_of_power,if=time_to_die>10+cast_time&time_to_die<25
         if getTimeToDie(tg) > 10 + getCastTime(rune_of_power) and getTimeToDie(tg) < 25 then
             if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
-                print(203)
-                return true
+                if ydebug.is_enabled then
+                    print(203)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.cooldowns+=/rune_of_power,if=active_enemies=1&talent.glacial_spike.enabled&buff.icicles.stack=5&(!talent.ebonbolt.enabled&buff.brain_freeze.react|talent.ebonbolt.enabled&(full_recharge_time<=cooldown.ebonbolt.remains&buff.brain_freeze.react|cooldown.ebonbolt.remains<cast_time&!buff.brain_freeze.react))
-        local function full_recharge_time(spellID)
-            local charges,maxCharges,chargeStart,chargeDuration = GetSpellCharges(spellID)
-            if charges then
-                if charges < maxCharges and maxCharges - charges < 1 then
-                    chargeEnd = chargeStart + chargeDuration
-                    return chargeEnd - GetTime()
-                end
-                if maxCharges - charges > 1 then
-                    chargeEnd = chargeStart + chargeDuration
-                    return chargeEnd - GetTime() + chargeDuration
-                end
-                return 0
-            end
-        end
+        
         if active_enemies == 1 and getTalent(7,3) and getBuffStacks("player",icicles) == 5 and (not getTalent(4,3) and UnitBuffID("player",brain_freeze) or getTalent(4,3) and ( full_recharge_time(rune_of_power) <= getSpellCD(ebonbolt) and UnitBuffID("player",brain_freeze) or getSpellCD(ebonbolt) < getCastTime(rune_of_power) and not UnitBuffID("player",brain_freeze) )) then
             if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
-                print(204)
-                return true
+                if ydebug.is_enabled then
+                    print(204)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.cooldowns+=/rune_of_power,if=active_enemies=1&!talent.glacial_spike.enabled&(prev_gcd.1.frozen_orb|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
         if active_enemies == 1 and not getTalent(7,3) and (lastSpellCast == frozen_orb or getTalent(4,3) and getSpellCD(ebonbolt) < getCastTime(rune_of_power) or getTalent(6,3) and getSpellCD(comet_storm) < getCastTime(rune_of_power) or getTalent(7,2) and getSpellCD(ray_of_frost) < getCastTime(rune_of_power) or charges_fractional(rune_of_power) > 1.9) then
             if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
-                print(205)
-                return true
+                if ydebug.is_enabled then
+                    print(205)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.cooldowns+=/rune_of_power,if=active_enemies>1&prev_gcd.1.frozen_orb
         if active_enemies > 1 and lastSpellCast == frozen_orb then
             if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
-                print(206)
-                return true
+                if ydebug.is_enabled then
+                    print(206)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.cooldowns+=/potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
         -- actions.cooldowns+=/use_items
         if canUse(13) and useItem(13) then
-            print(207)
-            return true
+            if ydebug.is_enabled then
+                print(207)
+                return 0
+            else
+                return 0
+            end
         end
         if canUse(14) and useItem(14) then
-            print(208)
-            return true
+            if ydebug.is_enabled then
+                print(208)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.cooldowns+=/blood_fury
         if canCast(blood_fury) and castSpell(zj,blood_fury) then
-            print(209)
-            return true
+           if ydebug.is_enabled then
+                print(209)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.cooldowns+=/berserking
         if canCast(berserking) and castSpell(zj,berserking) then
-            print(210)
-            return true
+            if ydebug.is_enabled then
+                print(210)
+                return 0
+            else
+                return 0
+            end
         end
         -- actions.cooldowns+=/lights_judgment
         
@@ -817,8 +924,12 @@ function rotation:default_action()
         -- actions.movement+=/ice_floes,if=buff.ice_floes.down
         if not UnitBuffID("player",ice_floes) then
             if canCast(ice_floes) and castSpell(zj,ice_floes) then
-                print(401)
-                return true
+                if ydebug.is_enabled then
+                    print(401)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
     
@@ -831,96 +942,156 @@ function rotation:default_action()
         -- actions.single=ice_nova,if=cooldown.ice_nova.ready&debuff.winters_chill.up
         if getSpellCD(ice_nova) == 0 and UnitDebuffID(tg,winters_chill) then
             if canCast(ice_nova) and castSpell(tg,ice_nova) then
-                print(301)
-                return true
+                if ydebug.is_enabled then
+                    print(301)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.single+=/flurry,if=!talent.glacial_spike.enabled&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&prev_gcd.1.frostbolt)
         if not getTalent(7,3) and (lastSpellCast == ebonbolt or UnitBuffID("player",brain_freeze) and lastSpellCast== frostbolt) then
             if canCast(flurry) and castSpell(tg,flurry) then
-                print(302)
-                return true
+                if ydebug.is_enabled then
+                    print(302)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.single+=/flurry,if=talent.glacial_spike.enabled&buff.brain_freeze.react&(prev_gcd.1.frostbolt&buff.icicles.stack<4|prev_gcd.1.glacial_spike|prev_gcd.1.ebonbolt)
         if getTalent(7,3) and UnitBuffID("player",brain_freeze) and (lastSpellCast == frostbolt and getBuffStacks("player",icicles) < 4 or lastSpellCast == glacial_spike or lastSpellCast == ebonbolt) then
             if canCast(flurry) and castSpell(tg,flurry) then
-                print(303)
-                return true
+                if ydebug.is_enabled then
+                    print(303)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.single+=/frozen_orb
         if canCast(frozen_orb) and castSpell(tg,frozen_orb) then
-            print(304)
-            return true
+            if ydebug.is_enabled then
+                    print(304)
+                    return 0
+                else
+                    return 0
+                end
         end
         -- actions.single+=/blizzard,if=active_enemies>2|active_enemies>1&cast_time=0&buff.fingers_of_frost.react<2
         if active_enemies > 2 or active_enemies > 1 and getCastTime(blizzard) == 0 and getBuffRemain("player",fingers_of_frost) < 2 then
             if canCast(blizzard) and castSpell(tg,blizzard) then
-                print(305)
-                return true
+                if ydebug.is_enabled then
+                    print(305)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.single+=/ice_lance,if=buff.fingers_of_frost.react
         if  UnitBuffID("player",fingers_of_frost) then
             if canCast(ice_lance) and castSpell(tg,ice_lance) then
-                print(306)
-                return true
+                if ydebug.is_enabled then
+                    print(306)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.single+=/ray_of_frost,if=!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
         if --[[not action.frozen_orb.in_flight and ]]active_enemies < 2 then
             if canCast(ray_of_frost) and castSpell(tg,ray_of_frost) then
-                print(307)
-                return true
+                if ydebug.is_enabled then
+                    print(307)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.single+=/comet_storm
         if canCast(comet_storm) and castSpell(tg,comet_storm) then
-            print(308)
-            return true
+            if ydebug.is_enabled then
+                    print(308)
+                    return 0
+                else
+                    return 0
+                end
         end
         -- actions.single+=/ebonbolt,if=!talent.glacial_spike.enabled|buff.icicles.stack=5&!buff.brain_freeze.react
         if not getTalent(7,3) or getBuffStacks("player",icicles) == 5 and not UnitBuffID("player",brain_freeze) then
             if canCast(ebonbolt) and castSpell(tg,ebonbolt) then
-                print(309)
-                return true
+                if ydebug.is_enabled then
+                    print(309)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.single+=/glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|active_enemies>1&talent.splitting_ice.enabled
         if UnitBuffID("player",brain_freeze) or lastSpellCast == ebonbolt or active_enemies > 1 and getTalent(6,2) then
             if canCast(glacial_spike) and castSpell(tg,glacial_spike) then
-                print(310)
-                return true
+                if ydebug.is_enabled then
+                    print(310)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.single+=/blizzard,if=cast_time=0|active_enemies>1|buff.zannesu_journey.stack=5&buff.zannesu_journey.remains>cast_time
         if getCastTime(blizzard) == 0 or active_enemies > 1 or getBuffStacks("player",zannesu_journey) == 5 and getBuffRemain("player",zannesu_journey) > getCastTime(blizzard) then
             if canCast(blizzard) and castSpell(tg,blizzard) then
-                print(311)
-                return true
+                if ydebug.is_enabled then
+                    print(311)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
         -- actions.single+=/ice_nova
         if canCast(ice_nova) and castSpell(tg,ice_nova) then
-            print(312)
-            return true
+            if ydebug.is_enabled then
+                    print(312)
+                    return 0
+                else
+                    return 0
+                end
         end
         -- actions.single+=/frostbolt
         if canCast(frostbolt) and castSpell(tg,frostbolt) then
-            print(313)
-            return true
+           if ydebug.is_enabled then
+                    print(313)
+                    return 0
+                else
+                    return 0
+                end
         end
         -- actions.single+=/call_action_list,name=movement
         --這裏判斷也有問題
         if isMoving("player") and movement() then
-            print(314)
-            return true
+            if ydebug.is_enabled then
+                    print(314)
+                    return 0
+                else
+                    return 0
+                end
         end
         -- actions.single+=/ice_lance
         if canCast(ice_lance) and castSpell(tg,ice_lance) then
-            print(315)
-            return true
+            if ydebug.is_enabled then
+                    print(315)
+                    return 0
+                else
+                    return 0
+                end
         end        
     
     end
@@ -931,20 +1102,24 @@ function rotation:default_action()
     -- actions+=/ice_lance,if=prev_gcd.1.flurry&!buff.fingers_of_frost.react
     if lastSpellCast == flurry and not UnitBuffID("player",fingers_of_frost) then
         if castSpell(tg,ice_lance) then
-            print(1)
-            return true
+            if ydebug.is_enabled then
+                print(1)
+                return 0
+            else
+                return 0
+            end
         end
     end
     -- # Time Warp is used right at the start. If the actor has Shard of the Exodar, try to synchronize the second Time Warp with Icy Veins. If the target is about to die, use Time Warp regardless.
     -- actions+=/time_warp,if=buff.bloodlust.down&(buff.exhaustion.down|equipped.shard_of_the_exodar)&(prev_gcd.1.icy_veins|target.time_to_die<50)
     -- actions+=/call_action_list,name=cooldowns
-    if isKeyDown("1") or Y.baofa == true then 
+    if true then 
         cooldowns() 
         -- return true
     end
     -- actions+=/call_action_list,name=aoe,if=active_enemies>3&talent.freezing_rain.enabled|active_enemies>4
     if active_enemies >= aoe_num.value - 1 and getTalent(6,2) or active_enemies > aoe_num.value then
-        print(2)
+        
         if aoe() then
             return true
         end
