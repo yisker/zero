@@ -190,6 +190,7 @@ end
 
 -----------------------------------------------------------
 --全局变量
+if Y == nil then Y = {}; end
 if Y.baofa == nil then Y.baofa = false; end
 
 --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
@@ -260,7 +261,7 @@ end
 function rotation:default_action()
     -- if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
     
-    if isbus_setting.is_enabled and isBused("player") then return; end
+    
 
     local spell_haste = GetHaste("player")/100
     local time = getCombatTime()
@@ -269,7 +270,13 @@ function rotation:default_action()
     local tgtype = self.settings.targets --目标选择
     local daduan = self.settings.daduan --打断
     local zlsyz = self.settings.zlsyz --石头
-    local hbht = self.settings.hbht --烈焰护体
+    local hbht_setting = self.settings.hbht --烈焰护体
+    local hbpz_setting = self.settings.hbpz --烈焰护体
+    local lgpz_setting = self.settings.lgpz --烈焰护体
+    local isbus_setting = self.settings.isbus --zuoqi
+
+
+    if isbus_setting.is_enabled and isBused("player") then return; end
 
 
 
