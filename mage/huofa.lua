@@ -260,12 +260,16 @@ end
 function rotation:default_action()
     -- if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
     
+    if isbus_setting.is_enabled and isBused("player") then return; end
+
     local spell_haste = GetHaste("player")/100
     local time = getCombatTime()
     local gcd = getGCD()
     local charges_fractional = getChargesFrac
     local tgtype = self.settings.targets --目标选择
     local daduan = self.settings.daduan --打断
+    local zlsyz = self.settings.zlsyz --石头
+    local hbht = self.settings.hbht --烈焰护体
 
 
 
@@ -302,6 +306,7 @@ function rotation:default_action()
     local pyroclasm                         = 269650 --火焰冲撞
 
     local castspell = csi
+    local zj = "player"
 
     
     --获得第一个符合条件的目标
@@ -320,6 +325,27 @@ function rotation:default_action()
     end
 
     local active_enemies = getNumEnemies(tg,8)
+
+    -- 保命
+    -- 石头
+    if getHP(zj) <= zlsyz.value and canUse(5512) then
+        useItem(5512)
+    end
+    -- 当自己的血低于多少时，则释放烈焰护体235313（做阈值，默认70）
+    if hbht_setting.is_enabled and getHP(zj) <= hbht_setting.value and canCast(235313) then
+        if castSpell(zj,235313) then
+        end
+    end
+    -- 当自己的血低于多少时，则释放棱光屏障235450（做阈值，默认30）
+    if lgpz_setting.is_enabled and getHP(zj) <= lgpz_setting.value and canCast(235450) then
+        if castSpell(zj,235450) then
+        end
+    end
+    -- 当自己的血低于多少时，则释放寒冰屏障45438（做阈值，默认20）
+    if hbpz_setting.is_enabled and getHP(zj) <= hbpz_setting.value and canCast(45438) then
+        if castSpell(zj,45438) then
+        end
+    end
 
 
 
