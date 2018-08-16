@@ -11,7 +11,7 @@ Scorpio("zeus."..rotation_name)("");
 local L = _Locale("zhCN", true);
 if L then
     -- 简体中文系列。
-    L[rotation_name] = "兽王测试";
+    L[rotation_name] = "猎人-野兽控制";
     L["Welcome to use test module."] = "欢迎使用兽王测试模块！";
     L["Test 1"] = "测试1号";
     L["Test 2"] = "测试2号";
@@ -63,20 +63,45 @@ rotation.macro = "shouwang";
 -- 变量的当前值会保存在WTF中。
 -----------------------------------------------------------
 
-do
-    -- local aoetg_setting = rotation.default_setting_category:create_setting("aoetg"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    -- aoetg_setting.display_name = L["aoetg"];
-    -- aoetg_setting.description = "用来确定暴风雪技能目标释放位置，智能表示放在人群最密集的地方"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    -- aoetg_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
-    -- aoetg_setting.default_value = "智能"; -- 变量默认值
-    -- aoetg_setting.optional_values = {"智能", "自己", "小队T", "焦点", "鼠标", "当前目标"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
-    -- aoetg_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    -- aoetg_setting.is_enabled_by_default = false; -- 是否默认启用
-    -- aoetg_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-    -- aoetg_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+do  
 
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+    -- -- 添加一个自定义类别test_category。
+    local jc_category = rotation:create_setting_category("jc_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+    jc_category.display_name = L["|cff00FFFF基础设置"]; -- 类别在界面上显示的名字
 
-    local aoenum_setting = rotation.default_setting_category:create_setting("aoenum"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    -- if UnitName("player") == "Ylx" then
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local ydebug_setting = jc_category:create_setting("ydebug"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    ydebug_setting.display_name = L["ydebug"]; -- 变量在界面上显示的名字
+    ydebug_setting.description = "打开以后显示调试信息"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    ydebug_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    ydebug_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    ydebug_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    ydebug_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    ydebug_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    ydebug_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    ydebug_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+    -- end
+
+    -- 在类别test_category下添加配置变量test5
+    local targets_setting = jc_category:create_setting("targets"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    targets_setting.display_name = L["targets"];
+    targets_setting.description = "确定目标的选择方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    targets_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    targets_setting.default_value = "智能"; -- 变量默认值
+    targets_setting.optional_values = {"智能", "当前目标"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    targets_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    targets_setting.is_enabled_by_default = false; -- 是否默认启用
+    targets_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+    -- -- 添加一个自定义类别test_category。
+    local dps_category = rotation:create_setting_category("dps_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+    dps_category.display_name = L["|cff00FFFFDPS设置"]; -- 类别在界面上显示的名字
+
+    local aoenum_setting = dps_category:create_setting("aoenum"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     aoenum_setting.display_name = L["aoenum"];
     aoenum_setting.description = "超过设定人数，进入AOE循环"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     aoenum_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
@@ -93,68 +118,7 @@ do
     end;
     aoenum_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
-
-    -- 在类别test_category下添加配置变量test5
-    local targets_setting = rotation.default_setting_category:create_setting("targets"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    targets_setting.display_name = L["targets"];
-    targets_setting.description = "确定目标的选择方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    targets_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
-    targets_setting.default_value = "智能"; -- 变量默认值
-    targets_setting.optional_values = {"智能", "当前目标"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
-    targets_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    targets_setting.is_enabled_by_default = false; -- 是否默认启用
-    targets_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-    targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
-
-    if UnitName("player") == "Ylx" then
-    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
-    local ydebug_setting = rotation.default_setting_category:create_setting("ydebug"); -- 指定变量的名字为test1，用于在脚本中进行引用
-    ydebug_setting.display_name = L["ydebug"]; -- 变量在界面上显示的名字
-    ydebug_setting.description = "这是number数组类型的变量，其值为number数组。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    ydebug_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
-    ydebug_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
-    ydebug_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
-    ydebug_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    ydebug_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
-    ydebug_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-    ydebug_setting.value_width = 120; -- 值显示宽度像素（默认为100）
-    end
-
-    local zlsyz_setting = rotation.default_setting_category:create_setting("zlsyz"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    zlsyz_setting.display_name = L["zlsyz"];
-    zlsyz_setting.description = "低于阈值且治疗石可用，使用治疗石疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    zlsyz_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
-    zlsyz_setting.default_value = 20; -- 变量默认值
-    zlsyz_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
-    zlsyz_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    zlsyz_setting.is_enabled_by_default = false; -- 是否默认启用
-    zlsyz_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
-        if (value > 0 or value <= 100) then
-            return true;
-        else
-            return false, "The number is not right.";
-        end
-    end;
-    zlsyz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
-
-    local lgsh_setting = rotation.default_setting_category:create_setting("lgsh"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    lgsh_setting.display_name = L["lgsh"];
-    lgsh_setting.description = "低于阈值且灵龟守护可用，使用灵龟守护疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    lgsh_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
-    lgsh_setting.default_value = 30; -- 变量默认值
-    lgsh_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
-    lgsh_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    lgsh_setting.is_enabled_by_default = true; -- 是否默认启用
-    lgsh_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
-        if (value > 0 or value <= 100) then
-            return true;
-        else
-            return false, "The number is not right.";
-        end
-    end;
-    lgsh_setting.value_width = 100; -- 值显示宽度像素（默认为100）
-
-    local ddyz_setting = rotation.default_setting_category:create_setting("ddyz"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    local ddyz_setting = dps_category:create_setting("ddyz"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     ddyz_setting.display_name = L["ddyz"];
     ddyz_setting.description = "设置是否启用打断"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     ddyz_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
@@ -171,11 +135,111 @@ do
     end;
     ddyz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
-    local pethp_setting = rotation.default_setting_category:create_setting("pethp"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    -- 在类别test_category下添加配置变量test5
+    local spsolt_setting = dps_category:create_setting("spsolt"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    spsolt_setting.display_name = L["spsolt"];
+    spsolt_setting.description = "确定是否使用主动饰品，使用哪一个栏位的饰品"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    spsolt_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    spsolt_setting.default_value = "全部"; -- 变量默认值
+    spsolt_setting.optional_values = {"全部", "第一栏位", "第二栏位"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    spsolt_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    spsolt_setting.is_enabled_by_default = true; -- 是否默认启用
+    spsolt_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    spsolt_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
+    local wd_setting = dps_category:create_setting("wd"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    wd_setting.display_name = L["wd"];
+    wd_setting.description = "确定是否使用误导，误导谁"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    wd_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    wd_setting.default_value = "宠物"; -- 变量默认值
+    wd_setting.optional_values = {"宠物", "当前T"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    wd_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    wd_setting.is_enabled_by_default = true; -- 是否默认启用
+    wd_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    wd_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
+    local Touch_of_Death_setting = dps_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    Touch_of_Death_setting.display_name = L["爆发快捷键"];
+    Touch_of_Death_setting.description = "按下这个键切换爆发状态！因为暴雪本身的bug，只支持1-0，A-Z"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    Touch_of_Death_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    Touch_of_Death_setting.default_value = "e"; -- 变量默认值
+    Touch_of_Death_setting.optional_values = nil -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    Touch_of_Death_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    Touch_of_Death_setting.is_enabled_by_default = true; -- 是否默认启用
+    -- Touch_of_Death_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+    --     if (#value == 1 ) then
+    --         return true;
+    --     else
+    --         return false, "没有这个按键";
+    --     end
+    -- end; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    Touch_of_Death_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
+    
+--------------------------------------------------------------------------------------------------------------------------------------------------------  
+
+    -- -- 添加一个自定义类别test_category。
+    local hps_category = rotation:create_setting_category("hps_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+    hps_category.display_name = L["|cff00FFFF治疗设置"]; -- 类别在界面上显示的名字
+
+    local zlsyz_setting = hps_category:create_setting("zlsyz"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    zlsyz_setting.display_name = L["zlsyz"];
+    zlsyz_setting.description = "低于阈值且治疗石可用，使用治疗石疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    zlsyz_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    zlsyz_setting.default_value = 20; -- 变量默认值
+    zlsyz_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    zlsyz_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    zlsyz_setting.is_enabled_by_default = false; -- 是否默认启用
+    zlsyz_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    zlsyz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+    local lgsh_setting = hps_category:create_setting("lgsh"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    lgsh_setting.display_name = L["lgsh"];
+    lgsh_setting.description = "低于阈值且灵龟守护可用，使用灵龟守护疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    lgsh_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    lgsh_setting.default_value = 30; -- 变量默认值
+    lgsh_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    lgsh_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    lgsh_setting.is_enabled_by_default = true; -- 是否默认启用
+    lgsh_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    lgsh_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+    local yqff_setting = hps_category:create_setting("yqff"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    yqff_setting.display_name = L["意气风发"];
+    yqff_setting.description = "低于阈值且灵龟守护可用，使用灵龟守护疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    yqff_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    yqff_setting.default_value = 35; -- 变量默认值
+    yqff_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    yqff_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    yqff_setting.is_enabled_by_default = true; -- 是否默认启用
+    yqff_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    lgsh_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+    
+
+    local pethp_setting = hps_category:create_setting("pethp"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     pethp_setting.display_name = L["pethp"];
-    pethp_setting.description = "设置是否启用打断"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    pethp_setting.description = "宠物低于指定血量治疗"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     pethp_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
-    pethp_setting.default_value = 70; -- 变量默认值
+    pethp_setting.default_value = 90; -- 变量默认值
     pethp_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
     pethp_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
     pethp_setting.is_enabled_by_default = false; -- 是否默认启用
@@ -188,28 +252,16 @@ do
     end;
     pethp_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
-    -- 在类别test_category下添加配置变量test5
-    local spsolt_setting = rotation.default_setting_category:create_setting("spsolt"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    spsolt_setting.display_name = L["spsolt"];
-    spsolt_setting.description = "确定是否使用主动饰品，使用哪一个栏位的饰品"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    spsolt_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
-    spsolt_setting.default_value = "全部"; -- 变量默认值
-    spsolt_setting.optional_values = {"全部", "第一栏位", "第二栏位"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
-    spsolt_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    spsolt_setting.is_enabled_by_default = true; -- 是否默认启用
-    spsolt_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-    spsolt_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
-    local wd_setting = rotation.default_setting_category:create_setting("wd"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    wd_setting.display_name = L["wd"];
-    wd_setting.description = "确定是否使用误导，误导谁"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    wd_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
-    wd_setting.default_value = "宠物"; -- 变量默认值
-    wd_setting.optional_values = {"宠物", "当前T"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
-    wd_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    wd_setting.is_enabled_by_default = true; -- 是否默认启用
-    wd_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-    wd_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+     -- -- 添加一个自定义类别test_category。
+     local ts1_category = rotation:create_setting_category("ts1_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+     ts1_category.display_name = L["|cffbdbdbd提示信息"]; -- 类别在界面上显示的名字
+     local ts2_category = rotation:create_setting_category("ts2_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+     ts2_category.display_name = L["|cffbdbdbd天赋全支持"]; -- 类别在界面上显示的名字
+     local ts3_category = rotation:create_setting_category("ts3_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+     ts3_category.display_name = L["|cffbdbdbd推荐天赋1323211"]; -- 类别在界面上显示的名字
+
+    
 
 end
 -----------------------------------------------------------
@@ -249,6 +301,9 @@ do
     end
     if Y.nTank == nil then 
         Y.nTank = {};
+    end
+    if tt == nil then
+        tt = 0
     end
 
     -------------------------------------------------------------------------------------------------------------------
@@ -304,9 +359,9 @@ do
                         table.insert(Y.spelllist_success[spell],{name = spellName, target = destination, stime = Y.lastspell_time})
                         if destination then
                             Y.lastspell_target = destination
-                            if self.settings.ydebug.is_enabled then             
-                                GH_Print("成功对 "..destName.." ".."施放了 "..spellName)
-                            end
+                            -- if self.settings.ydebug.is_enabled then             
+                            --     GH_Print("成功对 "..destName.." ".."施放了 "..spellName)
+                            -- end
                         else
                             Y.lastspell_target = none
                         end
@@ -358,53 +413,58 @@ do
     end
     Frame:SetScript("OnEvent",EnteringCombat)
     
-    --   -------------------------------------------------------------------------------------------------------------------
-    --   -- 创建队友列表，通过团队时间驱动刷新
-    --   -- 通过访问_nNova获得列表，
-    --   -- 
-    --   -------------------------------------------------------------------------------------------------------------------
-    --   local updateHealingTable = CreateFrame("frame", nil)
-    --   updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
-    --   updateHealingTable:SetScript("OnEvent", function()
-    --     table.wipe(Y.nNove)
-    --     table.wipe(Y.nTank)  
-    --     SetupTables()
-    --   end)
+    -------------------------------------------------------------------------------------------------------------------
+    -- 创建队友列表，通过团队时间驱动刷新
+    -- 通过访问_nNova获得列表，
+    -- 
+    -------------------------------------------------------------------------------------------------------------------
+    local updateHealingTable = CreateFrame("frame", nil)
+    updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
+    updateHealingTable:SetScript("OnEvent", function()
+    table.wipe(Y.nNove)
+    table.wipe(Y.nTank)  
+    SetupTables()
+    end)
     
-    --  -- if Y.nNove == nil then
-    --      -- SetupTables()
-    --  -- end
+     -- if Y.nNove == nil then
+         -- SetupTables()
+     -- end
     
-    --   function SetupTables()    
-        
-    --  table.wipe(Y.nNove)
-    --     table.wipe(Y.nTank)
-    --     local group =  IsInRaid() and "raid" or "party" 
-    --     local groupSize = IsInRaid() and GetNumGroupMembers() or 
-    --     GetNumGroupMembers() - 1
+    function SetupTables()    
+    
+        table.wipe(Y.nNove)
+        table.wipe(Y.nTank)
+        local group =  IsInRaid() and "raid" or "party" 
+        local groupSize = IsInRaid() and GetNumGroupMembers() or 
+        GetNumGroupMembers() - 1
 
-    --     for i=1, groupSize do 
-    --       local groupUnit = group..i      
-    --       if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
-    --       if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
-    --     end
+        for i=1, groupSize do 
+            local groupUnit = group..i      
+            if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
+            if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
+        end
 
-    --     table.insert(Y.nNove, "player")
-        
-    --   end
+        table.insert(Y.nNove, "player")
+    
+    end
 end
 -----------------------------------------------------------
 --全局函数
-function getGCD()
-    local start, duration, enabled, modRate = GetSpellCooldown(61304)
-    if GCD == nil then
-      GCD = 1.5 / ((UnitSpellHaste("player")/100)+1);
+local function getGCD()
+    if gcd == nil then
+        local start, duration, enabled, modRate = GetSpellCooldown(61304)
+        if GCD == nil then
+        GCD = 1.5 / ((UnitSpellHaste("player")/100)+1);
+        end
+        if duration ~= 0 then
+        GCD = duration
+        end
+        gcd = GCD
     end
-    if duration ~= 0 then
-      GCD = duration
-    end
-    return GCD
+    return gcd
 end
+
+
 
 -----------------------------------------------------------
 -- 模块脚本
@@ -437,18 +497,36 @@ function rotation:prestop_action()
     print("stop now!");
 end
 function rotation:precombat_action() 
+    local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发 
+    
+    -- print(ADDON_SLASH_COMMAND)
+    -- print(bf)
+    -- print(isKeyDown(bf))
+    if isKeyDown(bf) and GetTime() - tt > 1 then
+        baofa = not baofa
+        tt = GetTime()
+        if baofa then
+            GH_Print("爆发开启")
+            OverlayY("爆发开启")
+        else
+            GH_Print("爆发关闭")
+            OverlayY("爆发关闭")
+        end
+    end
 
 end
 
 function rotation:default_action()
 
+    -- debugprofilestart()
+
     if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
     
     self:rest();
     
-    local spell_haste = GetHaste("player")/100
-    local time = (GetTime() - Y.data["Combat Started"]) or 0
-    local gcd = getGCD()
+    -- local spell_haste = GetHaste("player")/100
+    -- local time = (GetTime() - Y.data["Combat Started"]) or 0
+    gcd = nil
     local charges_fractional = getChargesFrac
     local regen = select(2,GetPowerRegen("player"))
 	local focus = getRealMana("player")
@@ -458,13 +536,18 @@ function rotation:default_action()
     local tgtype = self.settings.targets --目标选择
     local zlsyz = self.settings.zlsyz --治疗石
     local lgsh = self.settings.lgsh --灵龟守护
+    local yqff = self.settings.yqff --意气风发
     local ddyz = self.settings.ddyz --打断
     local pethp = self.settings.pethp --宠物治疗
     local spsolt = self.settings.spsolt --饰品
     local wd = self.settings.wd --误导
+    local ydebug = self.settings.ydebug--调试信息
 
     
     local bestial_wrath = 19574 --狂野怒火
+    if baofa ~= true then
+        bestial_wrath = 1
+    end
     local ancestral_call = 274738 --
 	local fireblood = 265221
 	local lights_judgment = 247427
@@ -473,7 +556,10 @@ function rotation:default_action()
 	local a_murder_of_crows = 131894 --夺命黑鸦
 	local spitting_cobra = 194407 --喷毒眼镜蛇
 	local stampede = 201430  --群兽奔腾
-	local aspect_of_the_wild = 193530 --野性守护
+    local aspect_of_the_wild = 193530 --野性守护
+    if baofa ~= true then
+        aspect_of_the_wild = 1
+    end
 	local beast_cleave = 115939  --野兽顺劈
 	local multishot = 2643 --多重射击
 	local chimaera_shot = 53209 --奇美拉射击
@@ -524,27 +610,58 @@ function rotation:default_action()
     local spell_targets = active_enemies
 
 
+    local bf = string.byte(self.settings.Touch_of_Death.value) --爆发
+
+    
+
+    if isKeyDown(bf) and GetTime() - tt > 1 then
+        baofa = not baofa
+        tt = GetTime()
+        if baofa then
+            GH_Print("爆发开启")
+            OverlayY("爆发开启")
+        else
+            GH_Print("爆发关闭")
+            OverlayY("爆发关闭")
+        end
+    end
+
+
     ---------------------------------------------------------
     --保命模块
     --治疗石
     if getHP("player") <= zlsyz.value and canUse(5512) then
         useItem(5512)
+        return 0
     end
     self:rest();
     --灵龟守护
     if lgsh.is_enabled and getHP("player") <= lgsh.value and canCast(186265) then
         castSpell("player",186265)
+        return 0
+    end
+    self:rest();
+    --意气风发
+    if yqff.is_enabled and getHP("player") <= yqff.value and canCast(109304) then
+        castSpell("player",109304)
+        return 0
     end
     self:rest();
     --治疗宠物
     if getHP("pet") <= pethp.value and canCast(136) then
         castSpell("pet",136)
+        return 0
     end
     self:rest();
     ---------------------------------------------------------
 
     if wd.is_enabled and canCast(34477) and wd.value == "宠物" then
         castSpell("pet",34477)
+        return 0
+    end
+    if wd.is_enabled and canCast(34477) and wd.value == "当前T" and UnitExists(Y.nTank[1]) then
+        castSpell(Y.nTank[1],34477)
+        return 0
     end
     -- actions=auto_shot
     -- AttackTarget()
@@ -553,7 +670,10 @@ function rotation:default_action()
     -- actions+=/counter_shot,if=equipped.sephuzs_secret&target.debuff.casting.react&cooldown.buff_sephuzs_secret.up&!buff.sephuzs_secret.up
     if ddyz.is_enabled and canCast(counter_shot) and canInterrupt(tg,1,ddyz.value) then
         if castSpell(tg,counter_shot) then
-            print(100)
+            if ydebug.is_enabled then
+                print(100)
+                return 0
+            end
         end
     end
     self:rest();
@@ -561,16 +681,20 @@ function rotation:default_action()
     if spsolt.is_enabled then
         if spsolt.value == "全部" then
             if canUse(13) and useItem(13) then
+                return 0
             end
             if canUse(14) and useItem(14) then
+                return 0
             end
         end
         if spsolt.value == "第一栏位" then
             if canUse(13) and useItem(13) then
+                return 0
             end
         end
         if spsolt.value == "第二栏位" then
             if canUse(14) and useItem(14) then
+                return 0
             end
         end
     end
@@ -580,107 +704,194 @@ function rotation:default_action()
     -- actions+=/ancestral_call,if=cooldown.bestial_wrath.remains>30
     if getSpellCD(bestial_wrath)>30 then
         if castSpell(tg,ancestral_call) then
-            print(101)
+            if ydebug.is_enabled then
+                print(101)
+                return 0
+            else
+                return 0
+            end
         end
     end
     self:rest();
     -- actions+=/fireblood,if=cooldown.bestial_wrath.remains>30
     if getSpellCD(bestial_wrath)>30 then
         if castSpell(tg,fireblood) then
-            print(102)
+            if ydebug.is_enabled then
+                print(102)
+                return 0
+            else
+                return 0
+            end
         end
     end
     self:rest();
     -- actions+=/lights_judgment
     if castSpell(tg,lights_judgment) then
-        print(103)
+        if ydebug.is_enabled then
+            print(103)
+            return 0
+        else
+            return 0
+        end
     end
     self:rest();
     -- actions+=/potion,if=buff.bestial_wrath.up&buff.aspect_of_the_wild.up
     -- actions+=/barbed_shot,if=pet.cat.buff.frenzy.up&pet.cat.buff.frenzy.remains<=gcd.max
-    if UnitBuffID("pet",frenzy) and getBuffRemain("pet",frenzy)<=gcd then
+    if UnitBuffID("pet",frenzy) and getBuffRemain("pet",frenzy) <= getGCD() then
         if getCharges(barbed_shot)>=1 and castSpell(tg,barbed_shot) then
-            print(104)
+            if ydebug.is_enabled then
+                print(104)
+                return 0
+            else
+                return 0
+            end
         end
     end
     self:rest();
     -- actions+=/a_murder_of_crows
     if focus>=30 and castSpell(tg,a_murder_of_crows) then
-        print(105)
+        if ydebug.is_enabled then
+            print(105)
+            return 0
+        else
+            return 0
+        end
     end
     self:rest();
     -- actions+=/spitting_cobra
     if canCast(spitting_cobra) and castSpell(tg,spitting_cobra) then
-        print(106)
+        if ydebug.is_enabled then
+            print(106)
+            return 0
+        else
+            return 0
+        end
     end
     self:rest();
     -- actions+=/stampede,if=buff.bestial_wrath.up|cooldown.bestial_wrath.remains<gcd|target.time_to_die<15
-    if UnitBuffID("player",bestial_wrath) or getSpellCD(bestial_wrath)<gcd or getTimeToDie(tg)<15 then
+    if UnitBuffID("player",bestial_wrath) or getSpellCD(bestial_wrath)<getGCD() or getTimeToDie(tg)<15 then
         if canCast(stampede) and castSpell(tg,stampede) then
-            print(107)
+            if ydebug.is_enabled then
+                print(107)
+                return 0
+            else
+                return 0
+            end
         end
     end
     self:rest();
     -- actions+=/aspect_of_the_wild
     if canCast(aspect_of_the_wild) and castSpell("player",aspect_of_the_wild) then
-        print(108)
+        if ydebug.is_enabled then
+            print(108)
+            return 0
+        else
+            return 0
+        end
     end
     self:rest();
     -- actions+=/bestial_wrath,if=!buff.bestial_wrath.up
     if not UnitBuffID("player",bestial_wrath) then
         if castSpell(tg,bestial_wrath) then
-            print(109)
+            if ydebug.is_enabled then
+                print(109)
+                return 0
+            else
+                return 0
+            end
         end
     end
     self:rest();
     -- actions+=/multishot,if=spell_targets>2&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
-    if spell_targets>2 and (getBuffRemain("pet",beast_cleave)<gcd or not UnitBuffID("pet",beast_cleave)) then
+    if spell_targets>2 and (getBuffRemain("pet",beast_cleave)<getGCD() or not UnitBuffID("pet",beast_cleave)) then
         if focus>= 40 and castSpell(tg,multishot) then
-            print(110)
+            if ydebug.is_enabled then
+                print(110)
+                return 0
+            else
+                return 0
+            end
         end
     end
     self:rest();
     -- actions+=/chimaera_shot
     if canCast(chimaera_shot) and castSpell(tg,chimaera_shot) then
-        print(111)
+        if ydebug.is_enabled then
+            print(111)
+            return 0
+        else
+            return 0
+        end
     end
     self:rest();
     -- actions+=/kill_command
     if focus>=30 and canCast(kill_command) and castSpell(tg,kill_command) then
-        print(112)
+        if ydebug.is_enabled then
+            print(112)
+            return 0
+        else
+            return 0
+        end
     end
     self:rest();
     -- actions+=/dire_beast
     if focus>=25 and canCast(dire_beast) and castSpell(tg,dire_beast) then
-        print(113)
+        if ydebug.is_enabled then
+            print(113)
+            return 0
+        else
+            return 0
+        end
     end
     self:rest();
     -- actions+=/barbed_shot,if=pet.cat.buff.frenzy.down&charges_fractional>1.4|full_recharge_time<gcd.max|target.time_to_die<9
-    if UnitBuffID("pet",frenzy) and charges_fractional(barbed_shot)>1.4 or getRecharge(barbed_shot) < gcd or getTimeToDie(tg)<9 then
+    if UnitBuffID("pet",frenzy) and charges_fractional(barbed_shot)>1.4 or getRecharge(barbed_shot) < getGCD() or getTimeToDie(tg)<9 then
         if getCharges(barbed_shot)>=1 and castSpell(tg,barbed_shot) then
-            print(114)
+            if ydebug.is_enabled then
+                print(114)
+                return 0
+            else
+                return 0
+            end
         end
     end
     self:rest();
     -- actions+=/barrage
     if canCast(barrage) and focus>=60 and castSpell(tg,barrage) then
-        print(115)
+        if ydebug.is_enabled then
+            print(115)
+            return 0
+        else
+            return 0
+        end
     end
     self:rest();
     -- actions+=/multishot,if=spell_targets>1&(pet.cat.buff.beast_cleave.remains<gcd.max|pet.cat.buff.beast_cleave.down)
-    if spell_targets>1 and (getBuffRemain("pet",beast_cleave)<gcd or not UnitBuffID("pet",beast_cleave)) then
+    if spell_targets>1 and (getBuffRemain("pet",beast_cleave)<getGCD() or not UnitBuffID("pet",beast_cleave)) then
         if focus>=40 and castSpell(tg,multishot) then
-            print(116)
+            if ydebug.is_enabled then
+                print(116)
+                return 0
+            else
+                return 0
+            end
         end
     end
     self:rest();
     -- actions+=/cobra_shot,if=(active_enemies<2|cooldown.kill_command.remains>focus.time_to_max)&(buff.bestial_wrath.up&active_enemies>1|cooldown.kill_command.remains>1+gcd&cooldown.bestial_wrath.remains>focus.time_to_max|focus-cost+focus.regen*(cooldown.kill_command.remains-1)>action.kill_command.cost)
-    if (active_enemies<2 or getSpellCD("player",kill_command)>getTimeToMax("player")) and (UnitBuffID("player",bestial_wrath) and active_enemies>1 or getSpellCD(kill_command)>1+gcd and getSpellCD(bestial_wrath)>getTimeToMax("player") or getRealMana("player")-35+regen*(getSpellCD(kill_command)-1)>30) then
+    if (active_enemies<2 or getSpellCD("player",kill_command)>getTimeToMax("player")) and (UnitBuffID("player",bestial_wrath) and active_enemies>1 or getSpellCD(kill_command)>1+getGCD() and getSpellCD(bestial_wrath)>getTimeToMax("player") or getRealMana("player")-35+regen*(getSpellCD(kill_command)-1)>30) then
         if focus>=35 and castSpell(tg,cobra_shot) then
-            print(116)
+            if ydebug.is_enabled then
+                print(116)
+                return 0
+            else
+                return 0
+            end
         end
     end
     self:rest();
+
+    -- print(debugprofilestop())
     
 end
 
