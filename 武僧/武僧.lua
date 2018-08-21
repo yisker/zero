@@ -395,9 +395,9 @@ do
             Y.spelllist = {};
             -- Y.data["GCD"] = getGCD();
             -- SetupTables()
-            if self.settings.ydebug.is_enabled then
-                GH_Print(" or cffFF0000离开战斗，重置参数")
-            end
+            -- if self.settings.ydebug.is_enabled then
+            --     GH_Print(" or cffFF0000离开战斗，重置参数")
+            -- end
         
         end
     end
