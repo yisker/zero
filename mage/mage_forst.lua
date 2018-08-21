@@ -320,7 +320,7 @@ function rotation:precombat_action()
     --     print(UnitName(tg))
     -- end
     -- castSpell(tg,116)
-    hbpz = self.settings.hbpz --寒冰屏障
+    hbht = self.settings.hbht --寒冰屏障
     if hbht.is_enabled and getHP(zj) <= hbht.value and canCast(11426) and not UnitBuffID("player",11426) and not isBused("player") then
         if castSpell(zj,11426) then
         end
