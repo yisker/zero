@@ -2,7 +2,7 @@
 -- 模块属性
 -----------------------------------------------------------
 -- 定义循环的唯一ID，可以去https://1024tools.com/uuid生成，保证每次都不一样，宇宙唯一。
-local rotation_id = "933bcedd-ea4b-498a-82e2-4303d6fc61b5";
+local rotation_id = "47bf9781-e0b2-43d5-94e8-9bfd128054c4";
 -- 定义循环的英文名称。
 local rotation_name = "Druid Restoration v1.02";
 Scorpio("zeus."..rotation_name)("");
