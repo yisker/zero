@@ -15,17 +15,17 @@ if L then
     L["condition_yes_message"] = "N/A"
     L["condition_no_message"] = "N/A"
     L["macro"] = "NDHSZ"
-    L["DefaultValue_03"] = 3
-    L["DefaultValue_06"] = 6
-    L["DefaultValue_25"] = 25
-    L["DefaultValue_30"] = 30
-    L["DefaultValue_50"] = 50
-    L["DefaultValue_70"] = 70
-    L["DefaultValue_75"] = 75
-    L["DefaultValue_80"] = 80
-    L["DefaultValue_95"] = 95
-    L["DefaultValue_99"] = 99
-    L["GeneralWidth_65"] = 65
+    -- 3 = "3"
+    -- 6 = "6"
+    -- 25 = "25"
+    -- 30 = "30"
+    -- 50 = "50"
+    -- 70 = "70"
+    -- 75 = "75"
+    -- 80 = "80"
+    -- 95 = "95"
+    -- 99 = "99"
+    -- L["GeneralWidth_65"] = "65"
     L["HealthValidator01-999"] = "请输入 0.1 - 99.9 的有效生命值"
     L["HealthValidator1-40"] = "请输入 1 - 40 的有效生命值"
     L["SpellOrItemCDValidator1-60"] = "请输入 1 - 60 的有效冷却时间" 
@@ -72,13 +72,13 @@ if L then
     L["TranquilitySetting"] = "智能保护宁静"
     L["TranquilitySettingDescription"] = "设置保护玩家施放宁静"
     L["WildGrowthPartySetting"] = "智能野性成长(小队)"
-    L["WildGrowthPartySettingDescription"] = "设置小队中自动使用野性成长目标数\n默认：" ..L["DefaultValue_03"].. " 个"
+    L["WildGrowthPartySettingDescription"] = "设置小队中自动使用野性成长目标数\n默认：" .."3".. " 个"
     L["WildGrowthPartyHPSetting"] = "智能野性成长阈值(小队)"
-    L["WildGrowthPartyHPSettingDescription"] = "设置小队中自动使用野性成长目标的生命值百分比\n默认：" ..L["DefaultValue_70"].. " %"
+    L["WildGrowthPartyHPSettingDescription"] = "设置小队中自动使用野性成长目标的生命值百分比\n默认：" ..'70'.. " %"
     L["WildGrowthRaidSetting"] = "智能野性成长(团队)"
-    L["WildGrowthRaidSettingDescription"] = "设置团队中自动使用野性成长目标数\n默认：" ..L["DefaultValue_06"].." 个"
+    L["WildGrowthRaidSettingDescription"] = "设置团队中自动使用野性成长目标数\n默认：" ..'6'.." 个"
     L["WildGrowthRaidHPSetting"] = "智能野性成长阈值(团队)"
-    L["WildGrowthRaidHPSettingDescription"] = "设置团队中自动使用野性成长目标的生命值百分比\n默认：" ..L["DefaultValue_70"].. " %"
+    L["WildGrowthRaidHPSettingDescription"] = "设置团队中自动使用野性成长目标的生命值百分比\n默认：" ..'70'.. " %"
     L["EfflorescenceSetting"] = "智能百花齐放"
     L["EfflorescenceSettingOptionalValue1"] = "智能"
     L["EfflorescenceSettingOptionalValue2"] = "坦克"
@@ -147,7 +147,7 @@ MountSetting.default_value = nil
 MountSetting.optional_values = nil
 MountSetting.can_enable_disable = true
 MountSetting.is_enabled_by_default = true
-MountSetting.value_width = L["GeneralWidth_65"]
+MountSetting.value_width = 65
 -----------------------------------------------------------------------------
 local OutSetting = GeneralSetting:create_setting("Out71")
 OutSetting.display_name = L["OutSetting"]
@@ -157,7 +157,7 @@ OutSetting.default_value = nil
 OutSetting.optional_values = nil
 OutSetting.can_enable_disable = true
 OutSetting.is_enabled_by_default = true
-OutSetting.value_width = L["GeneralWidth_65"]
+OutSetting.value_width = 65
 -----------------------------------------------------------------------------
 local UnAssistingSetting = rotation:create_setting_category("UnAssisting325")
 UnAssistingSetting.display_name = L["Category2"]
@@ -170,39 +170,39 @@ ProwlSetting.default_value = nil
 ProwlSetting.optional_values = nil
 ProwlSetting.can_enable_disable = true
 ProwlSetting.is_enabled_by_default = true
-ProwlSetting.value_width = L["GeneralWidth_65"]
+ProwlSetting.value_width = 65
 -----------------------------------------------------------------------------
 local HealthStoneSetting = UnAssistingSetting:create_setting("HealthStone991")
 HealthStoneSetting.display_name = L["HealthStoneSetting"]
 HealthStoneSetting.description = L["HealthStoneSettingDescription"]
 HealthStoneSetting.value_type = rotation_setting_type.number
-HealthStoneSetting.default_value = L["DefaultValue_25"]
+HealthStoneSetting.default_value = 25
 HealthStoneSetting.optional_values = nil
 HealthStoneSetting.can_enable_disable = true
 HealthStoneSetting.is_enabled_by_default = true
-HealthStoneSetting.value_width = L["GeneralWidth_65"]
+HealthStoneSetting.value_width = 65
 HealthStoneSetting.validator = function(self, value) return value >= 0.1 and value <= 99.9  or false,L["HealthValidator01-999"] end
 -----------------------------------------------------------------------------
-local RenewalSetting = UnAssistingSetting:create_setting("Renewal981")
+local RenewalSetting = UnAssistingSetting:create_setting("Renewal9811")
 RenewalSetting.display_name = L["RenewalSetting"]
 RenewalSetting.description = L["RenewalSettingDescription"]
 RenewalSetting.value_type = rotation_setting_type.number
-RenewalSetting.default_value = L["DefaultValue_25"]
+RenewalSetting.default_value = 25
 RenewalSetting.optional_values = nil
 RenewalSetting.can_enable_disable = true
 RenewalSetting.is_enabled_by_default = true
-RenewalSetting.value_width = L["GeneralWidth_65"]
+RenewalSetting.value_width = 65
 RenewalSetting.validator = function(self, value) return value >= 0.1 and value <= 99.9  or false,L["HealthValidator01-999"] end
 -----------------------------------------------------------------------------
-local BarkskinSetting = UnAssistingSetting:create_setting("Renewal981")
+local BarkskinSetting = UnAssistingSetting:create_setting("Renewal9812")
 BarkskinSetting.display_name = L["BarkskinSetting"]
 BarkskinSetting.description = L["BarkskinSettingDescription"]
 BarkskinSetting.value_type = rotation_setting_type.number
-BarkskinSetting.default_value = L["DefaultValue_30"]
+BarkskinSetting.default_value = 30
 BarkskinSetting.optional_values = nil
 BarkskinSetting.can_enable_disable = true
 BarkskinSetting.is_enabled_by_default = true
-BarkskinSetting.value_width = L["GeneralWidth_65"]
+BarkskinSetting.value_width = 65
 BarkskinSetting.validator = function(self, value) return value >= 0.1 and value <= 99.9  or false,L["HealthValidator01-999"] end
 -----------------------------------------------------------------------------
 local AssistingSetting = rotation:create_setting_category("Assisting12222")
@@ -212,11 +212,11 @@ local BearSetting = AssistingSetting:create_setting("Bear_LowHealth110999")
 BearSetting.display_name = L["BearSetting"]
 BearSetting.description = L["BearSettingDescription"]
 BearSetting.value_type = rotation_setting_type.number
-BearSetting.default_value = L["DefaultValue_30"]
+BearSetting.default_value = 30
 BearSetting.optional_values = nil
 BearSetting.can_enable_disable = true
 BearSetting.is_enabled_by_default = true
-BearSetting.value_width = L["GeneralWidth_65"]
+BearSetting.value_width = 65
 BearSetting.validator = function(self, value) return value >= 0.1 and value <= 99.9 or false,L["HealthValidator01-999"] end
 -----------------------------------------------------------------------------
 local BearFormRotationSetting = AssistingSetting:create_setting("BearFormRotation87Y")
@@ -227,7 +227,7 @@ BearFormRotationSetting.default_value = nil
 BearFormRotationSetting.optional_values = nil
 BearFormRotationSetting.can_enable_disable = true
 BearFormRotationSetting.is_enabled_by_default = true
-BearFormRotationSetting.value_width = L["GeneralWidth_65"]
+BearFormRotationSetting.value_width = 65
 -----------------------------------------------------------------------------
 local IronbarkSetting = AssistingSetting:create_setting("IronbarkM12P")
 IronbarkSetting.display_name = L["IronbarkSetting"]
@@ -241,17 +241,17 @@ IronbarkSetting.optional_values =  {
 }
 IronbarkSetting.can_enable_disable = true
 IronbarkSetting.is_enabled_by_default = true
-IronbarkSetting.value_width = L["GeneralWidth_65"]
+IronbarkSetting.value_width = 65
 -----------------------------------------------------------------------------
 local IronbarkHPSetting = AssistingSetting:create_setting("IronbarkM12Q")
 IronbarkHPSetting.display_name = L["IronbarkHPSetting"]
 IronbarkHPSetting.description = L["IronbarkHPSettingDescription"]
 IronbarkHPSetting.value_type = rotation_setting_type.number
-IronbarkHPSetting.default_value = L["DefaultValue_30"]
+IronbarkHPSetting.default_value = 30
 IronbarkHPSetting.optional_values = nil
 IronbarkHPSetting.can_enable_disable = true
 IronbarkHPSetting.is_enabled_by_default = true
-IronbarkHPSetting.value_width = L["GeneralWidth_65"]
+IronbarkHPSetting.value_width = 65
 -----------------------------------------------------------------------------
 local InnervateSetting = AssistingSetting:create_setting("Innervate9TTA8")
 InnervateSetting.display_name = L["InnervateSetting"]
@@ -261,7 +261,7 @@ InnervateSetting.default_value = nil
 InnervateSetting.optional_values = nil
 InnervateSetting.can_enable_disable = true
 InnervateSetting.is_enabled_by_default = true
-InnervateSetting.value_width = L["GeneralWidth_65"]
+InnervateSetting.value_width = 65
 -----------------------------------------------------------------------------
 local FlourishSetting = AssistingSetting:create_setting("Flourish9H211")
 FlourishSetting.display_name = L["FlourishSetting"]
@@ -276,7 +276,7 @@ FlourishSetting.optional_values =  {
 }
 FlourishSetting.can_enable_disable = true
 FlourishSetting.is_enabled_by_default = true
-FlourishSetting.value_width = L["GeneralWidth_65"]
+FlourishSetting.value_width = 65
 -----------------------------------------------------------------------------
 local MultipleAssistingSetting = rotation:create_setting_category("MultipleAssisting88A")
 MultipleAssistingSetting.display_name = L["Category4"]
@@ -289,50 +289,50 @@ TranquilitySetting.default_value = nil
 TranquilitySetting.optional_values = nil
 TranquilitySetting.can_enable_disable = true
 TranquilitySetting.is_enabled_by_default = true
-TranquilitySetting.value_width = L["GeneralWidth_65"]
+TranquilitySetting.value_width = 65
 -----------------------------------------------------------------------------
 local WildGrowthPartySetting = MultipleAssistingSetting:create_setting("WildGrowthParty1222")
 WildGrowthPartySetting.display_name = L["WildGrowthPartySetting"]
 WildGrowthPartySetting.description = L["WildGrowthPartySettingDescription"]
 WildGrowthPartySetting.value_type = rotation_setting_type.number
-WildGrowthPartySetting.default_value = L["DefaultValue_03"]
+WildGrowthPartySetting.default_value = 3
 WildGrowthPartySetting.optional_values = nil
 WildGrowthPartySetting.can_enable_disable = true
 WildGrowthPartySetting.is_enabled_by_default = true
-WildGrowthPartySetting.value_width = L["GeneralWidth_65"]
+WildGrowthPartySetting.value_width = 65
 WildGrowthPartySetting.validator = function(self, value) return value >= 1 and value <= 40 or false,L["HealthValidator1-40"] end
 -----------------------------------------------------------------------------
 local WildGrowthPartyHPSetting = MultipleAssistingSetting:create_setting("WildGrowthPartyHP12222")
 WildGrowthPartyHPSetting.display_name = L["WildGrowthPartyHPSetting"]
 WildGrowthPartyHPSetting.description = L["WildGrowthPartyHPSettingDescription"]
 WildGrowthPartyHPSetting.value_type = rotation_setting_type.number
-WildGrowthPartyHPSetting.default_value = L["DefaultValue_70"]
+WildGrowthPartyHPSetting.default_value = 70
 WildGrowthPartyHPSetting.optional_values = nil
 WildGrowthPartyHPSetting.can_enable_disable = true
 WildGrowthPartyHPSetting.is_enabled_by_default = true
-WildGrowthPartyHPSetting.value_width = L["GeneralWidth_65"]
+WildGrowthPartyHPSetting.value_width = 65
 WildGrowthPartyHPSetting.validator = function(self, value) return value >= 0.1 and value <= 99.9 or false,L["HealthValidator01-999"] end
 -----------------------------------------------------------------------------
 local WildGrowthRaidSetting = MultipleAssistingSetting:create_setting("WildGrowthRaid998")
 WildGrowthRaidSetting.display_name = L["WildGrowthRaidSetting"]
 WildGrowthRaidSetting.description = L["WildGrowthRaidSettingDescription"]
 WildGrowthRaidSetting.value_type = rotation_setting_type.number
-WildGrowthRaidSetting.default_value = L["DefaultValue_06"]
+WildGrowthRaidSetting.default_value = 6
 WildGrowthRaidSetting.optional_values = nil
 WildGrowthRaidSetting.can_enable_disable = true
 WildGrowthRaidSetting.is_enabled_by_default = true
-WildGrowthRaidSetting.value_width = L["GeneralWidth_65"]
+WildGrowthRaidSetting.value_width = 65
 WildGrowthRaidSetting.validator = function(self, value) return value >= 1 and value <= 40 or false,L["HealthValidator1-40"] end
 -----------------------------------------------------------------------------
 local WildGrowthRaidHPSetting = MultipleAssistingSetting:create_setting("WildGrowthRaidHP9998")
 WildGrowthRaidHPSetting.display_name = L["WildGrowthRaidHPSetting"]
 WildGrowthRaidHPSetting.description = L["WildGrowthRaidHPSettingDescription"]
 WildGrowthRaidHPSetting.value_type = rotation_setting_type.number
-WildGrowthRaidHPSetting.default_value = L["DefaultValue_70"]
+WildGrowthRaidHPSetting.default_value = 70
 WildGrowthRaidHPSetting.optional_values = nil
 WildGrowthRaidHPSetting.can_enable_disable = true
 WildGrowthRaidHPSetting.is_enabled_by_default = true
-WildGrowthRaidHPSetting.value_width = L["GeneralWidth_65"]
+WildGrowthRaidHPSetting.value_width = 65
 WildGrowthRaidHPSetting.validator = function(self, value) return value >= 0.1 and value <= 99.9 or false,L["HealthValidator01-999"] end
 -----------------------------------------------------------------------------
 local EfflorescenceSetting = MultipleAssistingSetting:create_setting("EfflorescenceZ111")
@@ -347,7 +347,7 @@ EfflorescenceSetting.optional_values = {
 }
 EfflorescenceSetting.can_enable_disable = true
 EfflorescenceSetting.is_enabled_by_default = true
-EfflorescenceSetting.value_width = L["GeneralWidth_65"]
+EfflorescenceSetting.value_width = 65
 EfflorescenceSetting.validator = nil
 -----------------------------------------------------------------------------
 local SingleAssistingSetting = rotation:create_setting_category("SingleAssisting1A")
@@ -366,10 +366,10 @@ LifeBloomSetting.optional_values = {
 }
 LifeBloomSetting.can_enable_disable = true
 LifeBloomSetting.is_enabled_by_default = true
-LifeBloomSetting.value_width = L["GeneralWidth_65"]
+LifeBloomSetting.value_width = 65
 LifeBloomSetting.validator = nil
 -----------------------------------------------------------------------------
-local CenarionWardSetting = SingleAssistingSetting:create_setting("Flourish9H211")
+local CenarionWardSetting = SingleAssistingSetting:create_setting("Flourish9H2111")
 CenarionWardSetting.display_name = L["CenarionWardSetting"]
 CenarionWardSetting.description = L["CenarionWardSettingDescription"]
 CenarionWardSetting.value_type = rotation_setting_type.text
@@ -381,71 +381,71 @@ CenarionWardSetting.optional_values =  {
 }
 CenarionWardSetting.can_enable_disable = true
 CenarionWardSetting.is_enabled_by_default = true
-CenarionWardSetting.value_width = L["GeneralWidth_65"]
+CenarionWardSetting.value_width = 65
 -----------------------------------------------------------------------------
-local CenarionWardHPSetting = SingleAssistingSetting:create_setting("Flourish9H211")
+local CenarionWardHPSetting = SingleAssistingSetting:create_setting("Flourish9H2112")
 CenarionWardHPSetting.display_name = L["CenarionWardHPSetting"]
 CenarionWardHPSetting.description = L["CenarionWardHPSettingDescription"]
 CenarionWardHPSetting.value_type = rotation_setting_type.number
-CenarionWardHPSetting.default_value = L["DefaultValue_50"]
+CenarionWardHPSetting.default_value = 50
 CenarionWardHPSetting.optional_values =  nil
 CenarionWardHPSetting.can_enable_disable = true
 CenarionWardHPSetting.is_enabled_by_default = true
-CenarionWardHPSetting.value_width = L["GeneralWidth_65"]
+CenarionWardHPSetting.value_width = 65
 -----------------------------------------------------------------------------
 local LifeBloomHPSetting = SingleAssistingSetting:create_setting("LifeBloomHP00CCC")
 LifeBloomHPSetting.display_name = L["LifeBloomHPSetting"]
 LifeBloomHPSetting.description = L["LifeBloomHPSettingDescription"]
 LifeBloomHPSetting.value_type = rotation_setting_type.number
-LifeBloomHPSetting.default_value = L["DefaultValue_99"]
+LifeBloomHPSetting.default_value = 99
 LifeBloomHPSetting.optional_values = nil
 LifeBloomHPSetting.can_enable_disable = true
 LifeBloomHPSetting.is_enabled_by_default = true
-LifeBloomHPSetting.value_width = L["GeneralWidth_65"]
+LifeBloomHPSetting.value_width = 65
 LifeBloomHPSetting.validator = function(self, value) return value >= 0.1 and value <= 99.9 or false,L["HealthValidator01-999"] end
 -----------------------------------------------------------------------------
 local SwiftmendSetting = SingleAssistingSetting:create_setting("Swiftmend09AM")
 SwiftmendSetting.display_name = L["SwiftmendSetting"]
 SwiftmendSetting.description = L["SwiftmendSettingDescription"]
 SwiftmendSetting.value_type = rotation_setting_type.number
-SwiftmendSetting.default_value = L["DefaultValue_70"]
+SwiftmendSetting.default_value = 70
 SwiftmendSetting.optional_values = nil
 SwiftmendSetting.can_enable_disable = true
 SwiftmendSetting.is_enabled_by_default = true
-SwiftmendSetting.value_width = L["GeneralWidth_65"]
+SwiftmendSetting.value_width = 65
 SwiftmendSetting.validator = function(self, value) return value >= 0.1 and value <= 99.9 or false,L["HealthValidator01-999"] end
 -----------------------------------------------------------------------------
 local RegrowthSetting = SingleAssistingSetting:create_setting("Regrowth1ZZZ")
 RegrowthSetting.display_name = L["RegrowthSetting"]
 RegrowthSetting.description = L["RegrowthSettingDescription"]
 RegrowthSetting.value_type = rotation_setting_type.number
-RegrowthSetting.default_value = L["DefaultValue_75"]
+RegrowthSetting.default_value = 75
 RegrowthSetting.optional_values = nil
 RegrowthSetting.can_enable_disable = true
 RegrowthSetting.is_enabled_by_default = true
-RegrowthSetting.value_width = L["GeneralWidth_65"]
+RegrowthSetting.value_width = 65
 RegrowthSetting.validator = function(self, value) return value >= 0.1 and value <= 99.9 or false,L["HealthValidator01-999"] end
 -----------------------------------------------------------------------------
 local AbundanceSetting = SingleAssistingSetting:create_setting("Abundance8ZZ")
 AbundanceSetting.display_name = L["AbundanceSetting"]
 AbundanceSetting.description = L["AbundanceSettingDescription"]
 AbundanceSetting.value_type = rotation_setting_type.number
-AbundanceSetting.default_value = L["DefaultValue_80"]
+AbundanceSetting.default_value = 80
 AbundanceSetting.optional_values = nil
 AbundanceSetting.can_enable_disable = true
 AbundanceSetting.is_enabled_by_default = true
-AbundanceSetting.value_width = L["GeneralWidth_65"]
+AbundanceSetting.value_width = 65
 AbundanceSetting.validator = function(self, value) return value >= 0.1 and value <= 99.9 or false,L["HealthValidator01-999"] end
 -----------------------------------------------------------------------------
 local RejuvenationSetting = SingleAssistingSetting:create_setting("Rejuvenation8YYY")
 RejuvenationSetting.display_name = L["RejuvenationSetting"]
 RejuvenationSetting.description = L["RejuvenationSettingDescription"]
 RejuvenationSetting.value_type = rotation_setting_type.number
-RejuvenationSetting.default_value = L["DefaultValue_95"]
+RejuvenationSetting.default_value = 95
 RejuvenationSetting.optional_values = nil
 RejuvenationSetting.can_enable_disable = true
 RejuvenationSetting.is_enabled_by_default = true
-RejuvenationSetting.value_width = L["GeneralWidth_65"]
+RejuvenationSetting.value_width = 65
 RejuvenationSetting.validator = function(self, value) return value >= 0.1 and value <= 99.9 or false,L["HealthValidator01-999"] end
 -----------------------------------------------------------------------------
 local RotationsSetting = rotation:create_setting_category("Rotations111111")
@@ -459,7 +459,7 @@ MoonFireSetting.default_value = nil
 MoonFireSetting.optional_values = nil
 MoonFireSetting.can_enable_disable = true
 MoonFireSetting.is_enabled_by_default = true
-MoonFireSetting.value_width = L["GeneralWidth_65"]
+MoonFireSetting.value_width = 65
 -----------------------------------------------------------------------------
 local SunFireSetting = RotationsSetting:create_setting("SunFire8UZ")
 SunFireSetting.display_name = L["SunFireSetting"]
@@ -469,7 +469,7 @@ SunFireSetting.default_value = nil
 SunFireSetting.optional_values = nil
 SunFireSetting.can_enable_disable = true
 SunFireSetting.is_enabled_by_default = true
-SunFireSetting.value_width = L["GeneralWidth_65"]
+SunFireSetting.value_width = 65
 -----------------------------------------------------------------------------
 local SolarWrathSetting = RotationsSetting:create_setting("SolarWrath66T")
 SolarWrathSetting.display_name = L["SolarWrathSetting"]
@@ -479,7 +479,7 @@ SolarWrathSetting.default_value = nil
 SolarWrathSetting.optional_values = nil
 SolarWrathSetting.can_enable_disable = true
 SolarWrathSetting.is_enabled_by_default = true
-SolarWrathSetting.value_width = L["GeneralWidth_65"]
+SolarWrathSetting.value_width = 65
 -----------------------------------------------------------------------------
 local Spells = {
     ["熊形态"] = 5487,
