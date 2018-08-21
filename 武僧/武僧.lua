@@ -517,7 +517,6 @@ function rotation:precombat_action()
         end
     end
 end
-
 function rotation:serenity( ... )
     -- body
     -- actions.serenity=fist_of_the_white_tiger,if=buff.bloodlust.up&!buff.serenity.up
@@ -684,7 +683,6 @@ function rotation:serenity( ... )
     self:rest()
     return 0
 end
-
 function rotation:sef( ... )
     -- body
     -- actions.sef=tiger_palm,target_if=debuff.mark_of_the_crane.down,if=!prev_gcd.1.tiger_palm&!prev_gcd.1.energizing_elixir&energy=energy.max&chi<1
@@ -727,7 +725,6 @@ function rotation:sef( ... )
     self:rest()
     return 0
 end
-
 function rotation:cd( ... )
     -- body
     -- actions.cd=invoke_xuen_the_white_tiger
@@ -797,7 +794,6 @@ function rotation:cd( ... )
     self:rest()
     return 0
 end
-
 function rotation:aoe()
 
     -- function getDebuffRemainMin(tb,debuffid)
@@ -1069,7 +1065,6 @@ function rotation:aoe()
     self:rest()
     return 0
 end
-
 function rotation:st( ... )
     -- body
     -- # Default action list
@@ -1336,7 +1331,6 @@ function rotation:st( ... )
     self:rest()
     return 0
 end
-
 function rotation:default_action()
 
     if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
@@ -1546,10 +1540,9 @@ function rotation:default_action()
         self:st()
     end    
     self:rest()
-
+    
 end
 -----------------------------------------------------------
 -- 注册模块（自己手动开启）
 -----------------------------------------------------------
 rotation_manager.instance:register(rotation);
-
