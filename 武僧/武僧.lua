@@ -682,6 +682,7 @@ function rotation:serenity( ... )
         end
     end
     self:rest()
+    return 0
 end
 
 function rotation:sef( ... )
@@ -724,6 +725,7 @@ function rotation:sef( ... )
         self:st()
     end
     self:rest()
+    return 0
 end
 
 function rotation:cd( ... )
@@ -793,7 +795,7 @@ function rotation:cd( ... )
         end
     end
     self:rest()
-
+    return 0
 end
 
 function rotation:aoe()
@@ -1065,7 +1067,7 @@ function rotation:aoe()
         end
     end
     self:rest()
-
+    return 0
 end
 
 function rotation:st( ... )
@@ -1332,23 +1334,22 @@ function rotation:st( ... )
         end
     end
     self:rest()
+    return 0
 end
 
 function rotation:default_action()
 
     if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
-    
-    self:rest();
-    
-    spell_haste = GetHaste("player")/100
+    --------------------------------------------------------------
+    self:rest();    
+    -- spell_haste = GetHaste("player")/100
     time = (GetTime() - Y.data["Combat Started"]) or 0
     gcd = getGCD()
     charges_fractional = getChargesFrac
     -- local regen = select(2,GetPowerRegen("player"))
 	-- local focus = getRealMana("player")
     castSpell = csi
-
-
+    --------------------------------------------------------------
     tgtype = self.settings.targets --目标选择
     zlsyz = self.settings.zlsyz --治疗石
     -- local lgsh = self.settings.lgsh --灵龟守护
@@ -1360,8 +1361,7 @@ function rotation:default_action()
     bf = self.settings.Touch_of_Death.value --爆发
     tiaoshi = self.settings.ydebug --调试信息
     ybzc = self.settings.ybzc--业报之触
-
-
+    --------------------------------------------------------------
     if isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
         tt = GetTime()
@@ -1372,15 +1372,11 @@ function rotation:default_action()
             GH_Print("爆发关闭")
             OverlayY("爆发关闭")
         end
-    end
-    
-    
-
-    
+    end 
+    --------------------------------------------------------------   
     --获得第一个符合条件的目标
     if tgtype.value == "智能" then
-        tg = getOneEnemy(5,filler_unit)
-        
+        tg = getOneEnemy(5,filler_unit)        
         --如果有当前目标，并且当前目标可以攻击，则对当前目标攻击
         if UnitExists("target") and isAlive("target") and UnitCanAttack("player","target") then
             tg = "target"
@@ -1394,16 +1390,14 @@ function rotation:default_action()
     if tg then
         TargetUnit(tg)
     end
-
-    active_enemies = getNumEnemies(tg,8)
+    --------------------------------------------------------------
+    active_enemies = getNumEnemies("player",8)
     spell_targets = active_enemies
     zj = "player"
     tb = getEnemy(5,filler_unit)
     tier21_4pc = false
     tier19_2pc = false
-
-
-
+    --------------------------------------------------------------
     function getDebuffRemainMin(tb,debuffid)
         -- body
         if tb ~= nil and UnitExists(tb[1]) then 
@@ -1412,7 +1406,9 @@ function rotation:default_action()
                 return tb[1]
             end
             for i=1,#tb do
-                if UnitExists(tb[i]) and getDebuffRemain(tgg,debuffid) > getDebuffRemain(tb[i],debuffid) then
+                if UnitExists(tb[i]) and not UnitDebuffID(tb[i],debuffid) then
+                    return tb[i]                
+                elseif UnitExists(tb[i]) and getDebuffRemain(tgg,debuffid) > getDebuffRemain(tb[i],debuffid) then
                     tgg = tb[i]
                     self:rest()
                 end
@@ -1420,13 +1416,8 @@ function rotation:default_action()
             return tgg
         end
         return "target"
-    end
-
-    if time < 2 then
-        AttackTarget()
-    end
-
-    
+    end    
+    --------------------------------------------------------------    
     spear_hand_strike = 116705--切喉手
     touch_of_karma = 122470--业报之触
     touch_of_death = 115080--轮回之触
@@ -1464,12 +1455,13 @@ function rotation:default_action()
     hidden_masters_forbidden_touch = 213112
     bloodlust = 2825--嗜血
     rushing_jade_wind = 261715--碧玉疾风
-
+    --------------------------------------------------------------
     if not UnitExists(tg) then
         return 
     end
+    --------------------------------------------------------------    
     -- actions=auto_attack
-    if time < 2 and UnitExists(tg) then
+    if time < 5 and UnitExists(tg) then
         StartAttack(tg)
     end
     -- actions+=/spear_hand_strike,if=target.debuff.casting.react
