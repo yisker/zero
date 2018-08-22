@@ -703,7 +703,7 @@ end
 
 function rotation:danshua()
 
-    GH_Print(Nova[1])
+    -- GH_Print(Nova[1])
 
     local tgtype = self.settings.targets --治疗目标选择
     local tgtypeem = self.settings.targetsem --输出目标选择
@@ -738,11 +738,11 @@ function rotation:danshua()
     else
         local ht = Nova[1]
     end
-    print(ht)
+    -- print(ht)
     self:rest();
     if UnitExists(ht) then
         -- 当队友的血低于多少时，则打算当前施法，除非是治疗之涌的读条，释放治疗之涌8004（设置阈值，默认40）
-        if getHP(ht) <= zlzy.value and canCast(61295) and csi(ht,61295) then
+        if getHP(ht) <= zlzy.value and canCast(8004) and csi(ht,8004) then
             if ydebug.is_enabled then
                 print(202)
                 return 0
@@ -917,7 +917,7 @@ function rotation:default_action()
     self:rest();
     
     -- print(Nova[1])  
-    self:rest();
+    -- self:rest();
     -- 小队多少人血量低于多少时（设置阈值，默认3人，血量默认70）
     -- 团长多少人血量低于多少时（设置阈值，默认5人，血量默认80）
     if ( type == "party" and UnitExists(Nova[aoenum1.value]) and getHP(Nova[aoenum1.value]) <= aoehp1.value ) or ( type == "raid" and UnitExists(Nova[aoenum2.value]) and getHP(Nova[aoenum2.value]) <= aoehp1.value ) and not jxslbz then
