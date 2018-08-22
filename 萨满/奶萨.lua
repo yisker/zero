@@ -11,7 +11,7 @@ Scorpio("zeus."..rotation_name)("");
 local L = _Locale("zhCN", true);
 if L then
     -- 简体中文系列。
-    L[rotation_name] = "奶萨测试";
+    L[rotation_name] = "萨满-恢复";
     L["Welcome to use test module."] = "欢迎使用奶萨测试模块！";    
 end
 -- L = _Locale("zhTW");
@@ -438,9 +438,9 @@ function rotation:prepause_action()
     -- 编写模块暂停前脚本。
     print("pause now!");
 end
-function rotation:prestop_action()
+function rotation:prezkmp_action()
     -- 编写模块停止前脚本。
-    print("stop now!");
+    print("zkmp now!");
 end
 function rotation:precombat_action() 
 
@@ -492,7 +492,7 @@ local function filler_unit(Unit)
     end
 end
 local function filterfunction2(unit)
-    return UnitExists(unit) and not UnitIsDeadOrGhost(unit) and UnitIsVisible(unit) and UnitCanAssist("player",unit) and (UnitInParty(unit) or UnitInRaid(unit))
+    return UnitExists(unit) and not UnitIsDeadOrGhost(unit) and UnitIsVisible(unit) and getLineOfSight("player",unit) and UnitCanAssist("player",unit) and (UnitInParty(unit) or UnitInRaid(unit))
 end
 
 
@@ -501,72 +501,6 @@ if sorttime == nil then
     sorttime = 0
 end
 
-
-function rotation:default_action()
-
-      
-
-    if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
-
-    if Nova == nil or GetTime() - sorttime > 1.5 then
-        Nova = getFriend(40,filterfunction2,true)
-        sorttime = GetTime()
-    end
-
-    local tgtype = self.settings.targets --治疗目标选择
-    local tgtypeem = self.settings.targetsem --输出目标选择
-    local zlsyz = self.settings.zlsyz --治疗石    
-    local ydebug = self.settings.ydebug--调试信息
-    local aoenum1 = self.settings.aoenum1--小队人数
-    local aoehp1 = self.settings.aoehp1--小队血量    
-    local aoenum2 = self.settings.aoenum2--团队人数
-    local aoehp2 = self.settings.aoehp2--团队血量
-    local byzlrs = self.settings.byzlrs--奔涌之流人数
-    local byzlhp = self.settings.byzlhp--奔涌之流人数
-    local zlzymb = self.settings.zlzymb--治疗之雨
-    local qpdymb = self.settings.qpdymb--倾盆大雨
-    local zll1 = self.settings.zll1--治疗链高蓝
-    local zll2 = self.settings.zll2--治疗链低蓝
-    local bytt = self.settings.bytt--暴雨图腾
-    local xzhytt = self.settings.xzhytt--先祖护佑图腾
-    local ddzqtt = self.settings.ddzqtt--释放大地之墙图腾198838（做开关，默认关）图腾
-    local smsf = self.settings.smsf--生命释放
-    local jlyz = self.settings.jlyz--激流
-    local zlzy = self.settings.zlzy--治疗之涌
-    local jxsl = self.settings.jxsl--极限省蓝
-    local shuchu = self.settings.shuchu--输出
-    local jxslbz = false
-    if jxsl.is_enabled and getMana("player") <= jxsl.value then
-        jxslbz = true
-    end
-    
-    self:rest();    
-
-    --团队类型
-    local type = getGroupType()
-
-    self:rest();
-    
-    print(Nova[1])  
-    self:rest();
-    -- 小队多少人血量低于多少时（设置阈值，默认3人，血量默认70）
-    -- 团长多少人血量低于多少时（设置阈值，默认5人，血量默认80）
-    if ( type == "party" and UnitExists(Nova[aoenum1.value]) and getHP(Nova[aoenum1.value]) <= aoehp1.value ) or ( type == "raid" and UnitExists(Nova[aoenum2.value]) and getHP(Nova[aoenum2.value]) <= aoehp1.value ) and not jxslbz then
-        -- 团刷
-        self:tuanshua()
-        self:rest();       
-    end
-    print(501)
-    self:danshua()
-    self:rest();
-    print(502)
-    if tgtypeem.is_enabled then
-        self:shuchu()
-    end
-
-
-
-end
 function rotation:tuanshua()
     local tgtype = self.settings.targets --治疗目标选择
     local tgtypeem = self.settings.targetsem --输出目标选择
@@ -906,7 +840,7 @@ function rotation:shuchu()
     --     TargetUnit(tg)
     -- end
     -- 当目标有烈焰震击DEBUFF时，则释放熔岩爆裂51505
-    if UnitDebuffID(tg,188838) and canCast(51505) and castSpell(tg,51505) then
+    if UnitExists(tg) and UnitDebuffID(tg,188838) and canCast(51505) and castSpell(tg,51505) then
         if ydebug.is_enabled then
             print(300)
             return 0
@@ -916,7 +850,7 @@ function rotation:shuchu()
     end
     self:rest();
     -- 当目标没有烈焰震击DEBUFF时，则释放烈焰震击188838
-    if not UnitDebuffID(tg,188838) and canCast(188838) and csi(tg,188838) then
+    if UnitExists(tg) and not UnitDebuffID(tg,188838) and canCast(188838) and csi(tg,188838) then
         if ydebug.is_enabled then
             print(301)
             return 0
@@ -926,7 +860,7 @@ function rotation:shuchu()
     end
     self:rest();
     -- 释放闪电箭403
-    if canCast(403) and castSpell(tg,403) then
+    if UnitExists(tg) and canCast(403) and castSpell(tg,403) then
         if ydebug.is_enabled then
             print(302)
             return 0
@@ -939,7 +873,69 @@ function rotation:shuchu()
 
 
 end
+function rotation:default_action()      
 
+    if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
+
+    if Nova == nil or GetTime() - sorttime > 1.5 then
+        Nova = getFriend(40,filterfunction2,true)
+        sorttime = GetTime()
+    end
+
+    local tgtype = self.settings.targets --治疗目标选择
+    local tgtypeem = self.settings.targetsem --输出目标选择
+    local zlsyz = self.settings.zlsyz --治疗石    
+    local ydebug = self.settings.ydebug--调试信息
+    local aoenum1 = self.settings.aoenum1--小队人数
+    local aoehp1 = self.settings.aoehp1--小队血量    
+    local aoenum2 = self.settings.aoenum2--团队人数
+    local aoehp2 = self.settings.aoehp2--团队血量
+    local byzlrs = self.settings.byzlrs--奔涌之流人数
+    local byzlhp = self.settings.byzlhp--奔涌之流人数
+    local zlzymb = self.settings.zlzymb--治疗之雨
+    local qpdymb = self.settings.qpdymb--倾盆大雨
+    local zll1 = self.settings.zll1--治疗链高蓝
+    local zll2 = self.settings.zll2--治疗链低蓝
+    local bytt = self.settings.bytt--暴雨图腾
+    local xzhytt = self.settings.xzhytt--先祖护佑图腾
+    local ddzqtt = self.settings.ddzqtt--释放大地之墙图腾198838（做开关，默认关）图腾
+    local smsf = self.settings.smsf--生命释放
+    local jlyz = self.settings.jlyz--激流
+    local zlzy = self.settings.zlzy--治疗之涌
+    local jxsl = self.settings.jxsl--极限省蓝
+    local shuchu = self.settings.shuchu--输出
+    local jxslbz = false
+    if jxsl.is_enabled and getMana("player") <= jxsl.value then
+        jxslbz = true
+    end
+    
+    self:rest();    
+
+    --团队类型
+    local type = getGroupType()
+
+    self:rest();
+    
+    -- print(Nova[1])  
+    self:rest();
+    -- 小队多少人血量低于多少时（设置阈值，默认3人，血量默认70）
+    -- 团长多少人血量低于多少时（设置阈值，默认5人，血量默认80）
+    if ( type == "party" and UnitExists(Nova[aoenum1.value]) and getHP(Nova[aoenum1.value]) <= aoehp1.value ) or ( type == "raid" and UnitExists(Nova[aoenum2.value]) and getHP(Nova[aoenum2.value]) <= aoehp1.value ) and not jxslbz then
+        -- 团刷
+        self:tuanshua()
+        self:rest();       
+    end
+    -- print(501)
+    self:danshua()
+    self:rest();
+    -- print(502)
+    if tgtypeem.is_enabled then
+        self:shuchu()
+    end
+
+
+
+end
 -----------------------------------------------------------
 -- 注册模块（自己手动开启）
 -----------------------------------------------------------

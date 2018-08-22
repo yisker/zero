@@ -455,7 +455,7 @@ function rotation:aoe()
     end
     self:rest()
     -- actions.aoe+=/glacial_spike
-    if canCast(glacial_spike) and castSpell(tg,glacial_spike) then
+    if canCast(glacial_spike) and getBuffStacks("player",icicles) >= 5 and castSpell(tg,glacial_spike) then
         if ydebug.is_enabled then
             print(109)
             return 0
@@ -756,7 +756,7 @@ function rotation:single()
     self:rest()
     -- actions.single+=/glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|active_enemies>1&talent.splitting_ice.enabled
     if UnitBuffID("player",brain_freeze) or lastSpellCast == ebonbolt or active_enemies > 1 and getTalent(6,2) then
-        if canCast(glacial_spike) and castSpell(tg,glacial_spike) then
+        if canCast(glacial_spike) and getBuffStacks("player",icicles) >= 5 and castSpell(tg,glacial_spike) then
             if ydebug.is_enabled then
                 print(310)
                 return 0
