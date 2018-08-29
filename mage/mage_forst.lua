@@ -253,8 +253,8 @@ do
     end; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     daduan_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
-    local Touch_of_Death_setting = rotation.default_setting_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    Touch_of_Death_setting.display_name = L["Touch_of_Death"];
+    local Touch_of_Death_setting = dps_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    Touch_of_Death_setting.display_name = L["爆发"];
     Touch_of_Death_setting.description = "按下这个键切换爆发状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     Touch_of_Death_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
     Touch_of_Death_setting.default_value = "E"; -- 变量默认值
@@ -361,6 +361,9 @@ function rotation:precombat_action()
             OverlayY("爆发关闭")
         end
     end
+	if not UnitBuffID("player",1459) then
+	castSpell("player",1459)
+	end
     self:rest();
 end
 
