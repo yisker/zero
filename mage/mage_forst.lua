@@ -97,7 +97,7 @@ do
     callpet_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     callpet_setting.value_width = 120; -- 值显示宽度像素（默认为100）
 
------------------------------------------------------------
+    -----------------------------------------------------------
 
 
     -- -- 添加一个自定义类别test_category。
@@ -186,7 +186,7 @@ do
     lgpz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
 
------------------------------------------------------------
+    -----------------------------------------------------------
 
 
 
@@ -253,6 +253,23 @@ do
     end; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     daduan_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
+    local Touch_of_Death_setting = rotation.default_setting_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    Touch_of_Death_setting.display_name = L["Touch_of_Death"];
+    Touch_of_Death_setting.description = "按下这个键切换爆发状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    Touch_of_Death_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    Touch_of_Death_setting.default_value = "E"; -- 变量默认值
+    Touch_of_Death_setting.optional_values = nil -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    Touch_of_Death_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    Touch_of_Death_setting.is_enabled_by_default = true; -- 是否默认启用
+    Touch_of_Death_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (#value == 1 ) then
+            return true;
+        else
+            return false, "没有这个按键";
+        end
+    end; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    Touch_of_Death_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
 
     
 end
@@ -280,9 +297,9 @@ function rotation:macro_handler(argument)
         print("收到宏命令参数：", argument);
     end
     if argument == "baofa" then
-        Y.baofa = not Y.baofa
+        baofa = not baofa
     end
-    if Y.baofa == true then
+    if baofa == true then
         GH_Print("爆发开启")
         OverlayR("爆发开启")
     else
@@ -332,22 +349,19 @@ function rotation:precombat_action()
             castSpell(zj,31687)
         end
     end
-    self:rest();
-end
-
-function full_recharge_time(spellID)
-    local charges,maxCharges,chargeStart,chargeDuration = GetSpellCharges(spellID)
-    if charges then
-        if charges < maxCharges and maxCharges - charges < 1 then
-            chargeEnd = chargeStart + chargeDuration
-            return chargeEnd - GetTime()
+    local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发    
+    if isKeyDown(bf) and GetTime() - tt > 1 then
+        baofa = not baofa
+        tt = GetTime()
+        if baofa then
+            GH_Print("爆发开启")
+            OverlayY("爆发开启")
+        else
+            GH_Print("爆发关闭")
+            OverlayY("爆发关闭")
         end
-        if maxCharges - charges > 1 then
-            chargeEnd = chargeStart + chargeDuration
-            return chargeEnd - GetTime() + chargeDuration
-        end
-        return 0
     end
+    self:rest();
 end
 
 function rotation:aoe()
@@ -455,7 +469,7 @@ function rotation:aoe()
     end
     self:rest()
     -- actions.aoe+=/glacial_spike
-    if canCast(glacial_spike) and getBuffStacks("player",icicles) >= 5 and castSpell(tg,glacial_spike) then
+    if canCast(glacial_spike) and castSpell(tg,glacial_spike) then
         if ydebug.is_enabled then
             print(109)
             return 0
@@ -756,7 +770,7 @@ function rotation:single()
     self:rest()
     -- actions.single+=/glacial_spike,if=buff.brain_freeze.react|prev_gcd.1.ebonbolt|active_enemies>1&talent.splitting_ice.enabled
     if UnitBuffID("player",brain_freeze) or lastSpellCast == ebonbolt or active_enemies > 1 and getTalent(6,2) then
-        if canCast(glacial_spike) and getBuffStacks("player",icicles) >= 5 and castSpell(tg,glacial_spike) then
+        if canCast(glacial_spike) and castSpell(tg,glacial_spike) then
             if ydebug.is_enabled then
                 print(310)
                 return 0
@@ -810,7 +824,20 @@ end
 
 
 
-function rotation:default_action()    
+function rotation:default_action()
+
+    local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发    
+    if isKeyDown(bf) and GetTime() - tt > 1 then
+        baofa = not baofa
+        tt = GetTime()
+        if baofa then
+            GH_Print("爆发开启")
+            OverlayY("爆发开启")
+        else
+            GH_Print("爆发关闭")
+            OverlayY("爆发关闭")
+        end
+    end    
     -- 不打断施法
     if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
 
@@ -827,7 +854,7 @@ function rotation:default_action()
     hbht = self.settings.hbht --寒冰护体
     lgpz = self.settings.lgpz --棱光屏障
     daduan = self.settings.daduan --打断
-    baofa = Y.baofa --爆發
+    -- baofa = Y.baofa --爆發
 
     if isbus.is_enabled and isBused("player") then return; end
 
@@ -895,6 +922,13 @@ function rotation:default_action()
     
     charges_fractional = getChargesFrac
     castSpell = csi
+
+    --确保黑冰剑和大冰刺之后接冰风暴
+    if getLastSpell() == glacial_spike or getLastSpell() == ebonbolt then
+        if canCast(flurry) and castSpell(tg,flurry) then
+            return 0
+        end
+    end
 
 
     --水元素
