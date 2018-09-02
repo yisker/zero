@@ -189,6 +189,17 @@ do
     end;
     ybzc_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
+    local lhzc_setting = rotation.default_setting_category:create_setting("lhzc"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    lhzc_setting.display_name = L["轮回之触"];
+    lhzc_setting.description = "设置是否启用轮回之触"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    lhzc_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    lhzc_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    lhzc_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    lhzc_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    lhzc_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    lhzc_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    lhzc_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
     -- local pethp_setting = rotation.default_setting_category:create_setting("pethp"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     -- pethp_setting.display_name = L["pethp"];
     -- pethp_setting.description = "设置是否启用打断"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
@@ -758,7 +769,7 @@ function rotation:cd( ... )
     local tg2 = getDebuffRemainMin(tb,touch_of_death)
     --print(tg2)
     if hasEquiped(hidden_masters_forbidden_touch) and not (getLastSpell() == touch_of_death) then
-        if UnitExists(tg2) and canCast(touch_of_death) and castSpell(tg2,touch_of_death) then
+        if lhzc.is_enabled and UnitExists(tg2) and canCast(touch_of_death) and castSpell(tg2,touch_of_death) then
             if tiaoshi.is_enabled then
                 print(303)
                 return 0
@@ -770,7 +781,7 @@ function rotation:cd( ... )
     self:rest()    
     -- actions.cd+=/touch_of_death,target_if=min:dot.touch_of_death.remains,if=((talent.serenity.enabled&cooldown.serenity.remains<=1)&cooldown.fists_of_fury.remains<=4)&cooldown.rising_sun_kick.remains<7&!prev_gcd.1.touch_of_death
     if (( getTalent(7,3) and getSpellCD(serenity) <= 1) and getSpellCD(fists_of_fury) <= 4) and getSpellCD(rising_sun_kick) < 7 and not (getLastSpell() == touch_of_death) then
-        if UnitExists(tg2) and canCast(touch_of_death) and castSpell(tg2,touch_of_death) then
+        if lhzc.is_enabled and UnitExists(tg2) and canCast(touch_of_death) and castSpell(tg2,touch_of_death) then
             if tiaoshi.is_enabled then
                 print(304)
                 return 0
@@ -782,7 +793,7 @@ function rotation:cd( ... )
     self:rest()  
     -- actions.cd+=/touch_of_death,target_if=min:dot.touch_of_death.remains,if=((!talent.serenity.enabled&cooldown.storm_earth_and_fire.remains<=1)|chi>=2)&cooldown.fists_of_fury.remains<=4&cooldown.rising_sun_kick.remains<7&!prev_gcd.1.touch_of_death
     if (( not getTalent(7,3) and getSpellCD(storm_earth_and_fire) <= 1) or getChi() >= 2) and getSpellCD(fists_of_fury) <= 4 and getSpellCD(rising_sun_kick) < 7 and not getLastSpell() == touch_of_death then
-        if UnitExists(tg2) and canCast(touch_of_death) and castSpell(tg2,touch_of_death) then
+        if lhzc.is_enabled and UnitExists(tg2) and canCast(touch_of_death) and castSpell(tg2,touch_of_death) then
             if tiaoshi.is_enabled then
                 print(305)
                 return 0
@@ -1355,6 +1366,7 @@ function rotation:default_action()
     bf = self.settings.Touch_of_Death.value --爆发
     tiaoshi = self.settings.ydebug --调试信息
     ybzc = self.settings.ybzc--业报之触
+    lhzc = self.settings.lhzc--业报之触
     --------------------------------------------------------------
     if isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
@@ -1494,7 +1506,7 @@ function rotation:default_action()
     self:rest()
     -- actions+=/potion,if=buff.serenity.up|buff.storm_earth_and_fire.up|(!talent.serenity.enabled&trinket.proc.agility.react)|buff.bloodlust.react|target.time_to_die<=60
     -- actions+=/touch_of_death,if=target.time_to_die<=9
-    if canCast(touch_of_death) and getTimeToDie(tg) <= 9 then
+    if lhzc.is_enabled and canCast(touch_of_death) and getTimeToDie(tg) <= 9 then
         if castSpell(tg,touch_of_death) then
             if tiaoshi.is_enabled then
                 print(104)
