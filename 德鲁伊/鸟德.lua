@@ -38,6 +38,7 @@ half_moon = 274282
 full_moon = 274283
 dawning_sun = 276152--破晓之阳
 sunblaze = 274397
+power_of_the_moon = 273367
 
 
 
