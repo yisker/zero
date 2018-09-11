@@ -270,6 +270,18 @@ do
     end; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     Touch_of_Death_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local orb_setting = hps_category:create_setting("orb"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    orb_setting.display_name = L["溜溜球"]; -- 变量在界面上显示的名字
+    orb_setting.description = "自动溜溜球"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    orb_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    orb_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    orb_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    orb_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    orb_setting.is_enabled_by_default = true; -- 是否默认启用（勾选框默认选中）
+    orb_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    orb_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
 
     
 end
@@ -280,6 +292,20 @@ local function filler_unit(Unit)
         return true
     else
         return false
+    end
+end
+local function full_recharge_time(spellID)
+    local charges,maxCharges,chargeStart,chargeDuration = GetSpellCharges(spellID)
+    if charges then
+        if charges < maxCharges and maxCharges - charges < 1 then
+            chargeEnd = chargeStart + chargeDuration
+            return chargeEnd - GetTime()
+        end
+        if maxCharges - charges > 1 then
+            chargeEnd = chargeStart + chargeDuration
+            return chargeEnd - GetTime() + chargeDuration
+        end
+        return 0
     end
 end
 if Y == nil then Y = {};end
@@ -370,7 +396,7 @@ end
 function rotation:aoe()
     
     -- actions.aoe=frozen_orb
-    if canCast(frozen_orb) and castSpell(tg,frozen_orb) then
+    if orb.is_enabled and canCast(frozen_orb) and castSpell(tg,frozen_orb) then
         if ydebug.is_enabled then
             print(101)
             return 0
@@ -522,7 +548,8 @@ end
 
 function rotation:cooldowns()
     -- body
-    -- actions.cooldowns=icy_veins
+    -- actions.cooldowns=time_warp
+    -- actions.cooldowns+=/icy_veins
     if baofa and canCast(icy_veins) and castSpell(zj,icy_veins) then
         if ydebug.is_enabled then
             print(201)
@@ -542,8 +569,8 @@ function rotation:cooldowns()
         end
     end
     self:rest()
-    -- actions.cooldowns+=/rune_of_power,if=time_to_die>10+cast_time&time_to_die<25
-    if getTimeToDie(tg) > 10 + getCastTime(rune_of_power) and getTimeToDie(tg) < 25 then
+    -- actions.cooldowns+=/rune_of_power,if=prev_gcd.1.frozen_orb|time_to_die>10+cast_time&time_to_die<20
+    if getLastSpell() == frozen_orb or getTimeToDie(tg) > 10 + getCastTime(rune_of_power) and getTimeToDie(tg) < 20 then
         if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
             if ydebug.is_enabled then
                 print(203)
@@ -553,43 +580,48 @@ function rotation:cooldowns()
             end
         end
     end
-    self:rest()    
-    -- actions.cooldowns+=/rune_of_power,if=active_enemies=1&talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time)
-    if active_enemies == 1 and getTalent(7,3) and getBuffStacks("player",icicles) == 5 and ( UnitBuffID("player",brain_freeze) or getTalent(4,3) and getSpellCD(ebonbolt) < getCastTime(rune_of_power)) then    
-        if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
-            if ydebug.is_enabled then
-                print(204)
-                return 0
-            else
-                return 0
-            end
-        end
+    self:rest()
+    -- actions.cooldowns+=/call_action_list,name=talent_rop,if=talent.rune_of_power.enabled&active_enemies=1&cooldown.rune_of_power.full_recharge_time<cooldown.frozen_orb.remains    
+    if getTalent(3,3) and active_enemies == 1 and full_recharge_time(rune_of_power) < getSpellCD(frozen_orb) then
+        self:talent_rop()
     end
     self:rest()
-    -- actions.cooldowns+=/rune_of_power,if=active_enemies=1&!talent.glacial_spike.enabled&(prev_gcd.1.frozen_orb|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
-    if active_enemies == 1 and not getTalent(7,3) and (lastSpellCast == frozen_orb or getTalent(4,3) and getSpellCD(ebonbolt) < getCastTime(rune_of_power) or getTalent(6,3) and getSpellCD(comet_storm) < getCastTime(rune_of_power) or getTalent(7,2) and getSpellCD(ray_of_frost) < getCastTime(rune_of_power) or charges_fractional(rune_of_power) > 1.9) then
-        if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
-            if ydebug.is_enabled then
-                print(205)
-                return 0
-            else
-                return 0
-            end
-        end
-    end
-    self:rest()
-    -- actions.cooldowns+=/rune_of_power,if=active_enemies>1&prev_gcd.1.frozen_orb
-    if active_enemies > 1 and lastSpellCast == frozen_orb then
-        if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
-            if ydebug.is_enabled then
-                print(206)
-                return 0
-            else
-                return 0
-            end
-        end
-    end
-    self:rest()
+    -- -- actions.cooldowns+=/rune_of_power,if=active_enemies=1&talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time)
+    -- if active_enemies == 1 and getTalent(7,3) and getBuffStacks("player",icicles) == 5 and ( UnitBuffID("player",brain_freeze) or getTalent(4,3) and getSpellCD(ebonbolt) < getCastTime(rune_of_power)) then    
+    --     if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
+    --         if ydebug.is_enabled then
+    --             print(204)
+    --             return 0
+    --         else
+    --             return 0
+    --         end
+    --     end
+    -- end
+    -- self:rest()
+    -- -- actions.cooldowns+=/rune_of_power,if=active_enemies=1&!talent.glacial_spike.enabled&(prev_gcd.1.frozen_orb|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
+    -- if active_enemies == 1 and not getTalent(7,3) and (lastSpellCast == frozen_orb or getTalent(4,3) and getSpellCD(ebonbolt) < getCastTime(rune_of_power) or getTalent(6,3) and getSpellCD(comet_storm) < getCastTime(rune_of_power) or getTalent(7,2) and getSpellCD(ray_of_frost) < getCastTime(rune_of_power) or charges_fractional(rune_of_power) > 1.9) then
+    --     if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
+    --         if ydebug.is_enabled then
+    --             print(205)
+    --             return 0
+    --         else
+    --             return 0
+    --         end
+    --     end
+    -- end
+    -- self:rest()
+    -- -- actions.cooldowns+=/rune_of_power,if=active_enemies>1&prev_gcd.1.frozen_orb
+    -- if active_enemies > 1 and lastSpellCast == frozen_orb then
+    --     if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
+    --         if ydebug.is_enabled then
+    --             print(206)
+    --             return 0
+    --         else
+    --             return 0
+    --         end
+    --     end
+    -- end
+    -- self:rest()
     -- actions.cooldowns+=/potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
     -- actions.cooldowns+=/use_items
     if baofa and canUse(13) and useItem(13) then
@@ -692,7 +724,7 @@ function rotation:single()
     end
     self:rest()
     -- actions.single+=/frozen_orb
-    if canCast(frozen_orb) and castSpell(tg,frozen_orb) then
+    if orb.is_enabled and canCast(frozen_orb) and castSpell(tg,frozen_orb) then
         if ydebug.is_enabled then
             print(304)
             return 0
@@ -759,8 +791,8 @@ function rotation:single()
         end
     end
     self:rest()
-    -- actions.single+=/blizzard,if=cast_time=0|active_enemies>1|buff.zannesu_journey.stack=5&buff.zannesu_journey.remains>cast_time
-    if getCastTime(blizzard) == 0 or active_enemies > 1 or getBuffStacks("player",zannesu_journey) == 5 and getBuffRemain("player",zannesu_journey) > getCastTime(blizzard) then
+    -- actions.single+=/blizzard,if=cast_time=0|active_enemies>1    
+    if getCastTime(blizzard) == 0 or active_enemies > 1 then
         if canCast(blizzard) and castSpell(tg,blizzard) then
             if ydebug.is_enabled then
                 print(311)
@@ -825,7 +857,33 @@ function rotation:single()
 
 end
 
-
+function rotation:talent_rop( ... )
+    -- body
+    -- actions.talent_rop=rune_of_power,if=talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time)
+    if getTalent(7,3) and getBuffStacks("player",icicles) == 5 and ( UnitBuffID("player",brain_freeze) or getTalent(4,3) and getSpellCD(ebonbolt) < getCastTime(rune_of_power) ) then
+        if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
+            if ydebug.is_enabled then
+                print(401)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    self:rest()
+    -- actions.talent_rop+=/rune_of_power,if=!talent.glacial_spike.enabled&(talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
+    if not getTalent(7,3) and ( getTalent(4,3) and getSpellCD(ebonbolt) < getCastTime(rune_of_power) or getTalent(6,3) and getSpellCD(comet_storm) < getCastTime(rune_of_power) or getTalent(7,2) and getSpellCD(ray_of_frost) < getCastTime(rune_of_power) or charges_fractional(rune_of_power) > 1.9 ) then
+        if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
+            if ydebug.is_enabled then
+                print(402)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    self:rest()
+end
 
 function rotation:default_action()
 
@@ -857,6 +915,7 @@ function rotation:default_action()
     hbht = self.settings.hbht --寒冰护体
     lgpz = self.settings.lgpz --棱光屏障
     daduan = self.settings.daduan --打断
+    orb = self.settings.orb --溜溜球
     -- baofa = Y.baofa --爆發
 
     if isbus.is_enabled and isBused("player") then return; end
