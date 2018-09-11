@@ -585,43 +585,7 @@ function rotation:cooldowns()
     if getTalent(3,3) and active_enemies == 1 and full_recharge_time(rune_of_power) < getSpellCD(frozen_orb) then
         self:talent_rop()
     end
-    self:rest()
-    -- -- actions.cooldowns+=/rune_of_power,if=active_enemies=1&talent.glacial_spike.enabled&buff.icicles.stack=5&(buff.brain_freeze.react|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time)
-    -- if active_enemies == 1 and getTalent(7,3) and getBuffStacks("player",icicles) == 5 and ( UnitBuffID("player",brain_freeze) or getTalent(4,3) and getSpellCD(ebonbolt) < getCastTime(rune_of_power)) then    
-    --     if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
-    --         if ydebug.is_enabled then
-    --             print(204)
-    --             return 0
-    --         else
-    --             return 0
-    --         end
-    --     end
-    -- end
-    -- self:rest()
-    -- -- actions.cooldowns+=/rune_of_power,if=active_enemies=1&!talent.glacial_spike.enabled&(prev_gcd.1.frozen_orb|talent.ebonbolt.enabled&cooldown.ebonbolt.remains<cast_time|talent.comet_storm.enabled&cooldown.comet_storm.remains<cast_time|talent.ray_of_frost.enabled&cooldown.ray_of_frost.remains<cast_time|charges_fractional>1.9)
-    -- if active_enemies == 1 and not getTalent(7,3) and (lastSpellCast == frozen_orb or getTalent(4,3) and getSpellCD(ebonbolt) < getCastTime(rune_of_power) or getTalent(6,3) and getSpellCD(comet_storm) < getCastTime(rune_of_power) or getTalent(7,2) and getSpellCD(ray_of_frost) < getCastTime(rune_of_power) or charges_fractional(rune_of_power) > 1.9) then
-    --     if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
-    --         if ydebug.is_enabled then
-    --             print(205)
-    --             return 0
-    --         else
-    --             return 0
-    --         end
-    --     end
-    -- end
-    -- self:rest()
-    -- -- actions.cooldowns+=/rune_of_power,if=active_enemies>1&prev_gcd.1.frozen_orb
-    -- if active_enemies > 1 and lastSpellCast == frozen_orb then
-    --     if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
-    --         if ydebug.is_enabled then
-    --             print(206)
-    --             return 0
-    --         else
-    --             return 0
-    --         end
-    --     end
-    -- end
-    -- self:rest()
+    self:rest()    
     -- actions.cooldowns+=/potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
     -- actions.cooldowns+=/use_items
     if baofa and canUse(13) and useItem(13) then
