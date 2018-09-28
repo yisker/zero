@@ -619,37 +619,40 @@ do
     -- 通过访问_nNova获得列表，
     -- 
     -------------------------------------------------------------------------------------------------------------------
-    -- local updateHealingTable = CreateFrame("frame", nil)
-    -- updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
-    -- updateHealingTable:SetScript("OnEvent", function()
-    -- table.wipe(Y.nNove)
-    -- table.wipe(Y.nTank)  
-    -- SetupTables()
-    -- end)
+    function SetupTables()    
     
-    --  -- if Y.nNove == nil then
-    --      -- SetupTables()
-    --  -- end
-    
-    -- function SetupTables()    
-    
-    --     table.wipe(Y.nNove)
-    --     table.wipe(Y.nTank)
-    --     local group =  IsInRaid() and "raid" or "party" 
-    --     local groupSize = IsInRaid() and GetNumGroupMembers() or 
-    --     GetNumGroupMembers() - 1
+        table.wipe(Y.nNove)
+        table.wipe(Y.nTank)
+        local group =  IsInRaid() and "raid" or "party" 
+        local groupSize = IsInRaid() and GetNumGroupMembers() or GetNumGroupMembers() - 1
 
-    --     for i=1, groupSize do 
-    --         local groupUnit = group..i      
-    --         if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
-    --         if UnitExists(groupUnit) and (UnitGroupRolesAssigned(groupUnit) == "TANK" or UnitName(groupUnit) == "防御者欧图") then table.insert(Y.nTank, groupUnit); end
-    --     end
+        if group == "party" then table.insert(Y.nNove, "player");end
 
-    --     table.insert(Y.nNove, "player")
+        for i=1, groupSize do 
+            local groupUnit = group..i      
+            if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
+            if UnitExists(groupUnit) and (UnitGroupRolesAssigned(groupUnit) == "TANK" or UnitName(groupUnit) == "防御者欧图") then table.insert(Y.nTank, groupUnit); end
+        end
+
+        -- table.insert(Y.nNove, "player")
 		
-	-- -- print("治疗队列更新")
+	-- print("治疗队列更新")
     
-    -- end
+    end
+
+    local updateHealingTable = CreateFrame("frame", nil)
+    updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
+    updateHealingTable:SetScript("OnEvent", function()
+    table.wipe(Y.nNove)
+    table.wipe(Y.nTank)  
+    SetupTables()
+    end)
+    
+     -- if Y.nNove == nil then
+         -- SetupTables()
+     -- end
+    
+    
 end
 -----------------------------------------------------------
 
@@ -779,23 +782,23 @@ end
 function filterfunction2(unit)
     return UnitExists(unit) and not UnitIsDeadOrGhost(unit) and UnitIsVisible(unit) and getLineOfSight("player",unit) and UnitCanAssist("player",unit) and (UnitInParty(unit) or UnitInRaid(unit))
 end
-function SetupTables()    
+-- function SetupTables()    
     
     
-    local group =  getFriend(40,filterfunction2,true) 
-    local groupSize = #group
+--     local group =  getFriend(40,filterfunction2,true) 
+--     local groupSize = #group
 
-    for i=1, groupSize do 
-        local groupUnit = group[i]      
-        if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
-        if UnitExists(groupUnit) and (UnitGroupRolesAssigned(groupUnit) == "TANK" or UnitName(groupUnit) == "防御者欧图") then table.insert(Y.nTank, groupUnit); end
-    end
+--     for i=1, groupSize do 
+--         local groupUnit = group[i]      
+--         if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
+--         if UnitExists(groupUnit) and (UnitGroupRolesAssigned(groupUnit) == "TANK" or UnitName(groupUnit) == "防御者欧图") then table.insert(Y.nTank, groupUnit); end
+--     end
 
-    table.insert(Y.nNove, "player")
+--     table.insert(Y.nNove, "player")
     
--- print("治疗队列更新")
+-- -- print("治疗队列更新")
 
-end
+-- end
 
 
 if sorttime == nil then
@@ -1209,14 +1212,15 @@ function rotation:default_action()
     if Nova == nil or pd == nil or GetTime() - sorttime > 1.5 then
         buff = self.settings.buff
         buffstacks = self.settings.buffstacks        
-        Nova = getFriend(40,filterfunction2)
+        -- Nova = getFriend(40,filterfunction2)
+        Nova = Y.nNove
         Tank = Y.nTank
         if Nova and buff.is_enabled then
             for i=1,#Nova do
-                -- if not ( UnitExists(Nova[i]) and not UnitIsDeadOrGhost(Nova[i]) and UnitIsVisible(Nova[i]) and getLineOfSight("player",Nova[i]) and UnitCanAssist("player",Nova[i]) and (UnitInParty(Nova[i]) or UnitInRaid(Nova[i])) ) then
-                --     table.remove(Nova,i)                    
-                --     self:rest()
-                -- end
+                if not ( UnitExists(Nova[i]) and not UnitIsDeadOrGhost(Nova[i]) and UnitIsVisible(Nova[i]) and getLineOfSight("player",Nova[i]) and UnitCanAssist("player",Nova[i]) and (UnitInParty(Nova[i]) or UnitInRaid(Nova[i])) ) then
+                    table.remove(Nova,i)                    
+                    self:rest()
+                end
                 if buff.is_enabled and buff.value and buffstacks.value then
                     if UnitDebuffID(Nova[i],buff.value) and getDebuffStacks(Nova[i],buff.value) >= buffstacks.value then
                         table.remove(Nova,i) 
@@ -1232,10 +1236,11 @@ function rotation:default_action()
         pd = getEnemy(40,filler_unit) 
         self:rest()       
         sorttime = GetTime() 
-        if UnitExists(Nova[1]) then print("ht:"..UnitName(Nova[1]));end
+        
         for i,v in ipairs(Nova) do
             print(i,v)
         end
+        if UnitExists(Nova[1]) then print("ht:"..UnitName(Nova[1]));end
         if UnitExists(Tank[1]) then print("MT:"..UnitName(Tank[1]));end     
     end
 
