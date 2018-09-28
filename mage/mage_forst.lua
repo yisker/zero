@@ -200,8 +200,8 @@ do
     aoetg_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
     aoetg_setting.default_value = "智能"; -- 变量默认值
     aoetg_setting.optional_values = {"智能", "自己", "小队T", "焦点", "鼠标", "当前目标"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
-    aoetg_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    aoetg_setting.is_enabled_by_default = false; -- 是否默认启用
+    aoetg_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    aoetg_setting.is_enabled_by_default = true; -- 是否默认启用
     aoetg_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     aoetg_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
@@ -406,7 +406,7 @@ function rotation:aoe()
     end
     self:rest()
     -- actions.aoe+=/blizzard    
-    if canCast(blizzard) then
+    if aoe_blizzard.is_enabled and canCast(blizzard) then
         if aoe_blizzard.value == "智能" then
             local tg1 = getBiggestUnitCluster(30,10,filler_unit)
             if not UnitExists(tg1) then tg1 = "player";end
@@ -548,8 +548,8 @@ end
 
 function rotation:cooldowns()
     -- body
-    -- actions.cooldowns=time_warp
-    -- actions.cooldowns+=/icy_veins
+    
+    -- actions.cooldowns=icy_veins
     if baofa and canCast(icy_veins) and castSpell(zj,icy_veins) then
         if ydebug.is_enabled then
             print(201)
@@ -698,7 +698,7 @@ function rotation:single()
     end
     self:rest()
     -- actions.single+=/blizzard,if=active_enemies>2|active_enemies>1&cast_time=0&buff.fingers_of_frost.react<2
-    if active_enemies > 2 or active_enemies > 1 and getCastTime(blizzard) == 0 and getBuffRemain("player",fingers_of_frost) < 2 then
+    if aoe_blizzard.is_enabled and active_enemies > 2 or active_enemies > 1 and getCastTime(blizzard) == 0 and getBuffRemain("player",fingers_of_frost) < 2 then
         if canCast(blizzard) and castSpell(tg,blizzard) then
             if ydebug.is_enabled then
                 print(305)
@@ -756,7 +756,7 @@ function rotation:single()
     end
     self:rest()
     -- actions.single+=/blizzard,if=cast_time=0|active_enemies>1    
-    if getCastTime(blizzard) == 0 or active_enemies > 1 then
+    if aoe_blizzard.is_enabled and getCastTime(blizzard) == 0 or active_enemies > 1 then
         if canCast(blizzard) and castSpell(tg,blizzard) then
             if ydebug.is_enabled then
                 print(311)
