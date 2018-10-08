@@ -198,6 +198,8 @@ do
     text1_category.display_name = L["|cff00FFFFAOE情况下手动开黑魂有惊喜"]; -- 类别在界面上显示的名字
     local text2_category = rotation:create_setting_category("text2"); -- 指定类别的名字，目前没啥用，但是还是写上吧
     text2_category.display_name = L["|cff00FFFF不支持打木桩，请进本测试"]; -- 类别在界面上显示的名字
+    local text3_category = rotation:create_setting_category("text3"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+    text3_category.display_name = L["|cff00FFFF天赋推荐3302023"]; -- 类别在界面上显示的名字
 
 end
 -----------------------------------------------------------
