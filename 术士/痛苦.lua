@@ -183,20 +183,14 @@ do
     Touch_of_Death_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
     local sudden_onset_setting = dps_category:create_setting("sudden_onset"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    sudden_onset_setting.display_name = L["点出几个钻心剧痛"];
-    sudden_onset_setting.description = "填写点出几个钻心剧痛特质"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    sudden_onset_setting.value_type = rotation_setting_type.number; -- 变量值类型（text类型）
+    sudden_onset_setting.display_name = L["是否点出钻心剧痛"];
+    sudden_onset_setting.description = "填写是否点出钻心剧痛特质"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    sudden_onset_setting.value_type = rotation_setting_type.plain; -- 变量值类型（text类型）
     sudden_onset_setting.default_value = 0; -- 变量默认值
     sudden_onset_setting.optional_values = nil -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
-    sudden_onset_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    sudden_onset_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
     sudden_onset_setting.is_enabled_by_default = true; -- 是否默认启用
-    sudden_onset_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
-        if (value > 0 ) then
-            return true;
-        else
-            return false, "数字错误";
-        end
-    end; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    sudden_onset_setting.validator = nil -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     sudden_onset_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
     -- -- 添加一个自定义类别test_category。
@@ -417,6 +411,16 @@ function sortdebuff_shadow_embrace(a,b)
     end
     return getDebuffRemain(a,32390,"player") < getDebuffRemain(b,32390,"player")
 end
+function sortdebuff_agony(a,b)
+    -- body
+    if a == nil then
+        return false
+    end
+    if b == nil then
+        return true
+    end
+    return getDebuffRemain(a,980,"player") < getDebuffRemain(b,980,"player")
+end
 function contagion( Unit )
     -- body   
     local y = {}
@@ -543,9 +547,9 @@ function rotation:precombat_action()
 end
 
 function rotation:fillers( ... )
-    -- body
-    -- actions.fillers=agony,if=remains<18&cooldown.summon_darkglare.remains>=30+gcd&cooldown.deathbolt.remains<=gcd&!prev_gcd.1.summon_darkglare&!prev_gcd.1.agony&(azerite.sudden_onset.rank>1|azerite.sudden_onset.rank=1&!talent.siphon_life.enabled)
-    if getDebuffRemain(tg,agony,"player") < 18 and getSpellCD(summon_darkglare) >= 30 + gcd and getSpellCD(deathbolt) <= gcd and not ( getLastSpell() == summon_darkglare ) and not ( getLastSpell() == agony ) and ( sudden_onset.value > 1 or sudden_onset.value == 1 and not getTalent(2,3) ) then
+    -- body  
+    -- actions.fillers=agony,if=talent.deathbolt.enabled&cooldown.summon_darkglare.remains>=30+gcd&cooldown.deathbolt.remains<=gcd&!prev_gcd.1.summon_darkglare&!prev_gcd.1.agony&talent.writhe_in_agony.enabled&azerite.sudden_onset.enabled&remains<duration*0.5
+    if getTalent(1,3) and getSpellCD(summon_darkglare) >= 30 + gcd and getSpellCD(deathbolt) <= gcd and not( getLastSpell() == summon_darkglare ) and not ( getLastSpell() == agony ) and getTalent(2,1) and sudden_onset.is_enabled and getDebuffRemain(tg,agony,"player") < 13 * 0.5 then
         if canCast(agony) and castSpell(tg,agony) then
             if ydebug.is_enabled then
                 print(200)
@@ -555,6 +559,16 @@ function rotation:fillers( ... )
             end
         end
     end
+    -- if getDebuffRemain(tg,agony,"player") < 18 and getSpellCD(summon_darkglare) >= 30 + gcd and getSpellCD(deathbolt) <= gcd and not ( getLastSpell() == summon_darkglare ) and not ( getLastSpell() == agony ) and ( sudden_onset.value > 1 or sudden_onset.value == 1 and not getTalent(2,3) ) then
+    --     if canCast(agony) and castSpell(tg,agony) then
+    --         if ydebug.is_enabled then
+    --             print(200)
+    --             return 0
+    --         else
+    --             return 0
+    --         end
+    --     end
+    -- end
     self:rest()
     -- actions.fillers+=/deathbolt,if=cooldown.summon_darkglare.remains>=30+gcd|cooldown.summon_darkglare.remains>140
     if getSpellCD(summon_darkglare) >= 30 + gcd or getSpellCD(summon_darkglare) > 140 then
@@ -629,6 +643,7 @@ function rotation:fillers( ... )
     end
     self:rest()
     -- actions.fillers+=/drain_soul,interrupt_global=1,chain=1,cycle_targets=1,if=target.time_to_die<=gcd
+    -- actions.fillers+=/drain_soul,interrupt_global=1,chain=1,interrupt=1,cycle_targets=1,if=target.time_to_die<=gcd
     if getTalent(1,2) then
         for i=1,#pd do
             if getTimeToDie(pd[i]) <= gcd  then
@@ -645,6 +660,9 @@ function rotation:fillers( ... )
         end
     end
     self:rest()
+    -- actions.fillers+=/drain_soul,target_if=min:debuff.shadow_embrace.remains,chain=1,interrupt_if=ticks_remain<5,interrupt_global=1,if=talent.shadow_embrace.enabled&active_enemies=2&!debuff.shadow_embrace.remains
+    -- actions.fillers+=/drain_soul,target_if=min:debuff.shadow_embrace.remains,chain=1,interrupt_if=ticks_remain<5,interrupt_global=1,if=talent.shadow_embrace.enabled&active_enemies=2
+    -- actions.fillers+=/drain_soul,interrupt_global=1,chain=1,interrupt=1
     -- actions.fillers+=/drain_soul,interrupt_global=1,chain=1
     if canCast(drain_soul) and castSpell(tg,drain_soul) then
         self:rest()
@@ -844,6 +862,40 @@ function rotation:default_action()
         end
     end
     self:rest()
+    -- actions.fillers+=/drain_soul,interrupt_global=1,chain=1,interrupt=1
+    -- actions+=/drain_soul,target_if=min:debuff.shadow_embrace.remains,interrupt_immediate=1,interrupt_if=ticks_remain<5,if=talent.shadow_embrace.enabled&active_enemies<=2&debuff.shadow_embrace.remains&debuff.shadow_embrace.remains<=gcd*2
+    if getTalent(1,2) and not isCastingSpell("player", drain_soul) then
+        table.sort( pd, sortdebuff_shadow_embrace )
+        self:rest()
+        if getTalent(6,1) and #pd <= 2 and UnitDebuffID(pd[1],shadow_embrace_debuff,"player") and getDebuffRemain(pd[1],shadow_embrace_debuff,"player") <= gcd*2 then
+            SpellStopCasting()
+            if canCast(drain_soul) and castSpell(pd[1],drain_soul) then
+                self:rest()
+                if ydebug.is_enabled then
+                    print(101)
+                    -- return 
+                else
+                    -- return 
+                end
+            end
+        end    
+    end
+    -- actions.fillers+=/drain_soul,target_if=min:debuff.shadow_embrace.remains,chain=1,interrupt_if=ticks_remain<5,interrupt_global=1,if=talent.shadow_embrace.enabled&active_enemies=2&!debuff.shadow_embrace.remains
+    if getTalent(1,2) and isCastingSpell("player", drain_soul) and getCastTimeRemain("player") < 2 and getTalent(6,1) and #pd == 2 and not UnitDebuffID(pd[1],shadow_embrace_debuff,"player") then
+        SpellStopCasting()
+        if canCast(drain_soul) and castSpell(pd[1],drain_soul) then
+            self:rest()
+            if ydebug.is_enabled then
+                print(101)
+                -- return 
+            else
+                -- return 
+            end
+        end
+    end
+    -- actions.fillers+=/drain_soul,target_if=min:debuff.shadow_embrace.remains,chain=1,interrupt_if=ticks_remain<5,interrupt_global=1,if=talent.shadow_embrace.enabled&active_enemies=2
+    
+
     -- 不打断施法
     if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
 
@@ -926,25 +978,34 @@ function rotation:default_action()
         end
     end 
     self:rest()
-    -- actions+=/agony,cycle_targets=1,if=remains<=gcd
-    for i=1,#pd do
-        if getDebuffRemain(pd[i],agony,"player") <= gcd then
-            if castSpell(pd[i],agony) then
-                self:rest()
-                if ydebug.is_enabled then
-                    print(104)
-                    -- return 0
-                else
-                    -- return 0
-                end
+    -- actions+=/agony,target_if=min:dot.agony.remains,if=remains<=gcd+action.shadow_bolt.execute_time
+    table.sort( pd, sortdebuff_agony )
+    self:rest()
+    if UnitExists(tg) and getDebuffRemain(tg,agony,"player") <= gcd + getCastTime(shadow_bolt) then
+        pd[1] = tg
+    end
+    -- for i=1,#pd do
+    if UnitExists(pd[1]) and getDebuffRemain(pd[1],agony,"player") <= gcd + getCastTime(shadow_bolt) then
+        if castSpell(pd[1],agony) then
+            self:rest()
+            if ydebug.is_enabled then
+                print(104)
+                -- return 0
+            else
+                -- return 0
             end
         end
     end
+    -- end
     self:rest()
-    -- actions+=/shadow_bolt,target_if=min:debuff.shadow_embrace.remains,if=talent.shadow_embrace.enabled&talent.absolute_corruption.enabled&active_enemies=2&debuff.shadow_embrace.remains&debuff.shadow_embrace.remains<=execute_time*2+travel_time&!action.shadow_bolt.in_flight
+    -- actions+=/drain_soul,target_if=min:debuff.shadow_embrace.remains,interrupt_immediate=1,interrupt_if=ticks_remain<5,if=talent.shadow_embrace.enabled&active_enemies<=2&debuff.shadow_embrace.remains&debuff.shadow_embrace.remains<=gcd*2
+    
+    
+    -- actions+=/shadow_bolt,target_if=min:debuff.shadow_embrace.remains,if=talent.shadow_embrace.enabled&talent.absolute_corruption.enabled&active_enemies=2&debuff.shadow_embrace.remains&debuff.shadow_embrace.remains<=execute_time*2+travel_time&!action.shadow_bolt.in_flight 
+    -- actions+=/shadow_bolt,target_if=min:debuff.shadow_embrace.remains,if=talent.shadow_embrace.enabled&talent.absolute_corruption.enabled&active_enemies<=2&debuff.shadow_embrace.remains&debuff.shadow_embrace.remains<=execute_time*2+travel_time&!action.shadow_bolt.in_flight   
     table.sort( pd, sortdebuff_shadow_embrace )
     self:rest()
-    if getTalent(6,1) and getTalent(2,2) and #pd == 2 and getDebuffRemain(pd[1],shadow_embrace_debuff,"player") > 0 and getDebuffRemain(pd[1],shadow_embrace_debuff,"player") <= getCastTime(shadow_bolt)*2 + 1.5 and not ( getOneMyMissile() == shadow_bolt ) then
+    if getTalent(6,1) and getTalent(2,2) and #pd <= 2 and getDebuffRemain(pd[1],shadow_embrace_debuff,"player") > 0 and getDebuffRemain(pd[1],shadow_embrace_debuff,"player") <= getCastTime(shadow_bolt)*2 + 1.5 and not ( getOneMyMissile() == shadow_bolt ) then
         if canCast(shadow_bolt) and castSpell(pd[1],shadow_bolt) then
             if ydebug.is_enabled then
                 print(105)
