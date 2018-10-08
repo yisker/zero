@@ -370,7 +370,7 @@ function getGCD()
 end
 --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
 function filler_unit(Unit)
-    if (UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) then
+    if (UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) and not isLongTimeCCed(Unit) then
         return true
     else
         return false
@@ -585,6 +585,16 @@ function rotation:default_action()
     -- actions+=/lights_judgment,if=buff.celestial_alignment.up|buff.incarnation.up
     -- actions+=/fireblood,if=buff.celestial_alignment.up|buff.incarnation.up
     -- actions+=/ancestral_call,if=buff.celestial_alignment.up|buff.incarnation.up
+    -- actions+=/use_item,name=azurethos_singed_plumage,if=equipped.161377&(cooldown.incarnation.remains>30|cooldown.celestial_alignment.remains>30)
+    if baofa and hasEquiped(161377) and ( getSpellCD(incarnation) > 30 or getSpellCD(celestial_alignment) > 30 ) then
+        if canUse(161377) and useItem(161377) then
+        end
+    end
+    -- actions+=/use_item,name=dread_gladiators_badge,if=equipped.161902&(cooldown.incarnation.remains>30|cooldown.celestial_alignment.remains>30)
+    if baofa and hasEquiped(161902) and ( getSpellCD(incarnation) > 30 or getSpellCD(celestial_alignment) > 30 ) then
+        if canUse(161902) and useItem(161902) then
+        end
+    end
     -- actions+=/use_items
     if baofa then
         if canUse(13) and useItem(13) then

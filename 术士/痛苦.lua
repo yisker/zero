@@ -400,7 +400,7 @@ end
 -----------------------------------------------------------
 --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
 function filler_unit(Unit)
-    if --[[(UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and]] getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) and isAlive(Unit) and UnitCanAttack("player",Unit) and getDistance("player",Unit) <= 40 then
+    if --[[(UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and]] getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) and isAlive(Unit) and UnitCanAttack("player",Unit) then
         return true
     else
         return false
@@ -757,7 +757,7 @@ function rotation:default_action()
     gcd = getGCD()
     if pd == nil or GetTime() - sorttime > gcd then
         -- makeZMTable(40)
-        pd = getEnemy(50,filler_unit)
+        pd = getEnemy(40,filler_unit)
         self:rest()
         -- local tg2,emnum1 = getBiggestUnitCluster(40,10,isInCombat) --
         

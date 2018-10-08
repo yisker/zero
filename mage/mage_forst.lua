@@ -862,7 +862,9 @@ function rotation:default_action()
             GH_Print("爆发关闭")
             OverlayY("爆发关闭")
         end
-    end    
+    end  
+    
+    
     -- 不打断施法
     if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
 
@@ -952,6 +954,13 @@ function rotation:default_action()
     --确保黑冰剑和大冰刺之后接冰风暴
     if getLastSpell() == glacial_spike or getLastSpell() == ebonbolt then
         if canCast(flurry) and castSpell(tg,flurry) then
+            return 0
+        end
+    end
+
+    --确保冰风暴后接冰枪
+    if getLastSpell() == flurry then
+        if canCast(ice_lance) and castSpell(tg,ice_lance) then
             return 0
         end
     end
