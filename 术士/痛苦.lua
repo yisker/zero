@@ -396,7 +396,7 @@ end
 -----------------------------------------------------------
 --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
 function filler_unit(Unit)
-    if --[[(UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and]] getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) and isAlive(Unit) and UnitCanAttack("player",Unit) then
+    if --[[(UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and]] (getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) and isAlive(Unit) and UnitCanAttack("player",Unit)) or isDummy(Unit) then
         return true
     else
         return false
@@ -534,17 +534,20 @@ function rotation:precombat_action()
             GH_Print("爆发关闭")
             OverlayY("爆发关闭")
         end
-    end  
-    ZDzhaobb = self.settings.ZDzhaobb.is_enabled  -- 自动自动招宝宝    
-    BB = self.settings.BB.value
-    if _t1==nil then _t1=GetTime(); end
-    if ZDzhaobb == true and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then
-        if BB == "小鬼" and getPetNum()~=1 then rm("/cast 召唤小鬼") end
-        if BB == "虚空行者" and getPetNum()~=2 then rm("/cast 召唤虚空行者") end
-        if BB == "地狱猎犬" and getPetNum()~=3 then rm("/cast 召唤地狱猎犬") end
-        if BB == "魅魔" and getPetNum()~=4 then rm("/cast 召唤魅魔") end
-        _t1=GetTime()+ 5
-    end      
+    end
+    isbus = self.settings.isbus --坐骑  
+    if isbus.is_enabled and not isBused("player") then 
+        ZDzhaobb = self.settings.ZDzhaobb.is_enabled  -- 自动自动招宝宝    
+        BB = self.settings.BB.value
+        if _t1==nil then _t1=GetTime(); end
+        if ZDzhaobb == true and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then
+            if BB == "小鬼" and getPetNum()~=1 then rm("/cast 召唤小鬼") end
+            if BB == "虚空行者" and getPetNum()~=2 then rm("/cast 召唤虚空行者") end
+            if BB == "地狱猎犬" and getPetNum()~=3 then rm("/cast 召唤地狱猎犬") end
+            if BB == "魅魔" and getPetNum()~=4 then rm("/cast 召唤魅魔") end
+            _t1=GetTime()+ 5
+        end  
+    end    
 
 end
 
