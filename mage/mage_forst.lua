@@ -370,11 +370,19 @@ function rotation:precombat_action()
     end
     local callpet = self.settings.callpet --坐骑
     --水元素
-    if callpet.is_enabled and not isBused("player") then
-        if not UnitExists("pet") or not isAlive("pet") then
-            castSpell(zj,31687)
-        end
-    end
+    local isbus = self.settings.isbus --坐骑  
+    if isbus.is_enabled and not isBused("player") then 
+        
+        if _t1==nil then _t1=GetTime(); end
+        if callpet.is_enabled and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then            
+            if not UnitExists("pet") or not isAlive("pet") then
+                castSpell(zj,31687)
+            end
+        end    
+        _t1=GetTime()+ 5
+         
+    end    
+    
     local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发    
     if isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
