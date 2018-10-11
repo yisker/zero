@@ -1044,7 +1044,7 @@ function rotation:default_action()
     if not baofa then
         energizing_elixir = 1
     end
-    arcane_torrent = 25046
+    arcane_torrent = 129597
     whirling_dragon_punch = 152175--升龙霸
     chi_burst = 123986--真气爆裂
     bok_proc = 116768--免费幻灭
@@ -1159,9 +1159,11 @@ function rotation:default_action()
     if active_enemies >= aoenum.value then
         self:aoe()
     end
-    self:rest()
-    if Y.spelllist_success[tiger_palm].target ~= tg then
-        castSpell(tg,tiger_palm)
+    self:rest()	
+    if Y.lastspell_cast == tiger_palm and GetTime() - Y.lastspell_time > gcd*2 then
+        if castSpell(tg,tiger_palm) then
+		GH_Print("记录一下，看一局能打出多少提示")
+	end
     end
     self:rest()
 end
