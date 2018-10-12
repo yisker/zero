@@ -79,6 +79,17 @@ do
     aszh_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     aszh_setting.value_width = 120; -- 值显示宽度像素（默认为100）
 
+    local preheat_setting = jc_category:create_setting("preheat"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    preheat_setting.display_name = L["是否点出273331特质"]; -- 变量在界面上显示的名字
+    preheat_setting.description = "是否点出273331特质"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    preheat_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    preheat_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    preheat_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    preheat_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    preheat_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    preheat_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    preheat_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
     -- -- 添加一个自定义类别test_category。
     local hps_category = rotation:create_setting_category("hps_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
     hps_category.display_name = L["|cff00FFFF治疗设置"]; -- 类别在界面上显示的名字
@@ -274,6 +285,7 @@ function rotation:default_action()
     local hbpz_setting = self.settings.hbpz --烈焰护体
     local lgpz_setting = self.settings.lgpz --烈焰护体
     local isbus_setting = self.settings.isbus --zuoqi
+    local preheat = self.settings.preheat --273331
 
 
     if isbus_setting.is_enabled and isBused("player") then return; end
@@ -372,6 +384,14 @@ function rotation:default_action()
                 return true
             end
         end
+        -- actions.active_talents+=/dragons_breath,if=talent.alexstraszas_fury.enabled&!buff.hot_streak.react
+        if getTalent(4,2) and not UnitBuffID("player",hot_streak) then
+            if canCast(dragons_breath) and getDistance(tg,"player") <= 12 and isFacing("player",tg) and castSpell("player",dragons_breath) then
+                print(103)
+                return true
+            end
+        end
+
         -- print(31)
         -- actions.active_talents+=/
         -- if  getSpellCD(combustion) < getCastTime(cinderstorm) and ( UnitBuffID("player",rune_of_power_buff) or not  getTalent(3,2) ) or  getSpellCD(combustion) > 10 * spell_haste and  not  (getBuffRemain("player",combustion) > 0) then
@@ -382,12 +402,12 @@ function rotation:default_action()
         -- end
         -- print(32)
         -- actions.active_talents+=/dragons_breath,if=equipped.132863|(talent.alexstraszas_fury.enabled&!buff.hot_streak.react)
-        if  hasEquiped(132863) or ( getTalent(4,2)  and  not  UnitBuffID("player",hot_streak) ) then
-            if canCast(dragons_breath) and getDistance(tg,"player") <= 12 and isFacing("player",tg) and castSpell("player",dragons_breath) then
-                print(103)
-                return true
-            end
-        end
+        -- if  hasEquiped(132863) or ( getTalent(4,2)  and  not  UnitBuffID("player",hot_streak) ) then
+        --     if canCast(dragons_breath) and getDistance(tg,"player") <= 12 and isFacing("player",tg) and castSpell("player",dragons_breath) then
+        --         print(103)
+        --         return true
+        --     end
+        -- end
         -- print(33)
         -- actions.active_talents+=/living_bomb,if=active_enemies>1&buff.combustion.down
         if active_enemies > 1 and getBuffRemain("player",combustion) <= 0 then
@@ -440,13 +460,20 @@ function rotation:default_action()
             end
         end
         -- print(13)
-        -- actions.combustion_phase+=/pyroblast,if=(buff.kaelthas_ultimate_ability.react|buff.pyroclasm.react)&buff.combustion.remains>execute_time
-        if ( UnitAuraID("player",kaelthas_ultimate_ability) or UnitAuraID("player",pyroclasm)) and getBuffRemain("player",combustion) > getCastTime(pyroblast) then
+        -- actions.combustion_phase+=/pyroblast,if=buff.pyroclasm.react&buff.combustion.remains>execute_time
+        if UnitAuraID("player",pyroclasm) and getBuffRemain("player",combustion) > getCastTime(pyroblast) then
             if castSpell(tg,pyroblast,false,false) then
                 print(206)
                 return true
             end
         end
+        -- actions.combustion_phase+=/pyroblast,if=(buff.kaelthas_ultimate_ability.react|buff.pyroclasm.react)&buff.combustion.remains>execute_time
+        -- if ( UnitAuraID("player",kaelthas_ultimate_ability) or UnitAuraID("player",pyroclasm)) and getBuffRemain("player",combustion) > getCastTime(pyroblast) then
+        --     if castSpell(tg,pyroblast,false,false) then
+        --         print(206)
+        --         return true
+        --     end
+        -- end
         -- print(14)
         -- actions.combustion_phase+=/pyroblast,if=buff.hot_streak.react
         if UnitAuraID("player",hot_streak) then
@@ -465,6 +492,7 @@ function rotation:default_action()
         end
         -- print(16)
         -- actions.combustion_phase+=/phoenixs_flames
+        -- actions.combustion_phase+=/phoenix_flames
         if getCharges(phoenixs_flames) >= 1 and castSpell(tg,phoenixs_flames,false,false) then
             print(209)
             return true
@@ -486,13 +514,20 @@ function rotation:default_action()
             end
         end
         -- print(19)
-        -- actions.combustion_phase+=/scorch,if=target.health.pct<=30&(equipped.132454|talent.searing_touch.enabled)
-        if  getHP("target") <= 30 and  (hasEquiped(132454) or getTalent(1,3)) then
+        -- actions.combustion_phase+=/scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+        if getHP("target") <= 30 and getTalent(1,3) then
             if castSpell(tg,scorch,false,false) then
                 print(212)
                 return true
             end
         end
+        -- actions.combustion_phase+=/scorch,if=target.health.pct<=30&(equipped.132454|talent.searing_touch.enabled)
+        -- if  getHP("target") <= 30 and  (hasEquiped(132454) or getTalent(1,3)) then
+        --     if castSpell(tg,scorch,false,false) then
+        --         print(212)
+        --         return true
+        --     end
+        -- end
 
         -- if hasEquiped(132454) then
         --   for i=1,40 do
@@ -533,12 +568,12 @@ function rotation:default_action()
             return true
         end
         -- actions.rop_phase+=/pyroblast,if=buff.kaelthas_ultimate_ability.react&execute_time<buff.kaelthas_ultimate_ability.remains&buff.rune_of_power.remains>cast_time
-        if  UnitAuraID("player",kaelthas_ultimate_ability) and getCastTime(pyroblast) < getBuffRemain("player",kaelthas_ultimate_ability) and getBuffRemain("player",rune_of_power_buff) > getCastTime(pyroblast) then
-            if castSpell(tg,pyroblast,false,false) then
-                print(305)
-                return true
-            end
-        end
+        -- if  UnitAuraID("player",kaelthas_ultimate_ability) and getCastTime(pyroblast) < getBuffRemain("player",kaelthas_ultimate_ability) and getBuffRemain("player",rune_of_power_buff) > getCastTime(pyroblast) then
+        --     if castSpell(tg,pyroblast,false,false) then
+        --         print(305)
+        --         return true
+        --     end
+        -- end
         -- actions.rop_phase+=/pyroblast,if=buff.pyroclasm.react&execute_time<buff.pyroclasm.remains&buff.rune_of_power.remains>cast_time
         if UnitAuraID("player",pyroclasm) and getCastTime(pyroblast) < getBuffRemain("player",pyroclasm) and getBuffRemain("player",rune_of_power_buff) > getCastTime(pyroblast) then
             if castSpell(tg,pyroblast,false,false) then
@@ -576,13 +611,20 @@ function rotation:default_action()
                 return true
             end
         end
-        -- actions.rop_phase+=/scorch,if=target.health.pct<=30&(equipped.132454|talent.searing_touch.enabled)
-        if  getHP("target") <= 30 and  (hasEquiped(132454) or getTalent(1,3)) then
+        -- actions.rop_phase+=/scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+        if getHP("target") <= 30 and getTalent(1,3) then
             if castSpell(tg,scorch,false,false) then
                 print(311)
                 return true
             end
         end
+        -- actions.rop_phase+=/scorch,if=target.health.pct<=30&(equipped.132454|talent.searing_touch.enabled)
+        -- if  getHP("target") <= 30 and  (hasEquiped(132454) or getTalent(1,3)) then
+        --     if castSpell(tg,scorch,false,false) then
+        --         print(311)
+        --         return true
+        --     end
+        -- end
         -- if hasEquiped(132454) then
         --   for i=1,40 do
         --     if UnitExists(nNove[i]) and UnitExists(nNove[i].."target") and UnitCanAttack("player",nNove[i].."target") and getHP(nNove[i].."target") <= 30 then
@@ -650,26 +692,33 @@ function rotation:default_action()
         end
         -- print(23)
         -- actions.standard_rotation+=/pyroblast,if=buff.hot_streak.react&(!prev_gcd.1.pyroblast|action.pyroblast.in_flight)
-        if UnitAuraID("player",hot_streak) and (not _G.lastspell_cast == pyroblast --[[or action.pyroblast.in_flight]]) then
+        if UnitAuraID("player",hot_streak) and (not _G.lastspell_cast == pyroblast or getOneMyMissile() == pyroblast ) then
             if castSpell(tg,pyroblast,false,false) then
                 print(405)
                 return true
             end
         end
-        -- actions.standard_rotation+=/pyroblast,if=buff.hot_streak.react&target.health.pct<=30&equipped.132454
-        if  UnitAuraID("player",hot_streak) and  getHP("target") <= 30 and  hasEquiped(132454) then
+        -- actions.standard_rotation+=/pyroblast,if=buff.hot_streak.react&target.health.pct<=30&talent.searing_touch.enabled
+        if UnitAuraID("player",hot_streak) and  getHP("target") <= 30 and getTalent(1,3) then
             if castSpell(tg,pyroblast,false,false) then
                 print(406)
                 return true
             end
         end
+        -- actions.standard_rotation+=/pyroblast,if=buff.hot_streak.react&target.health.pct<=30&equipped.132454
+        -- if  UnitAuraID("player",hot_streak) and  getHP("target") <= 30 and  hasEquiped(132454) then
+        --     if castSpell(tg,pyroblast,false,false) then
+        --         print(406)
+        --         return true
+        --     end
+        -- end
         -- actions.standard_rotation+=/pyroblast,if=buff.kaelthas_ultimate_ability.react&execute_time<buff.kaelthas_ultimate_ability.remains
-        if  UnitAuraID("player",kaelthas_ultimate_ability) and getCastTime(pyroblast) < getBuffRemain("player",kaelthas_ultimate_ability) then
-            if castSpell(tg,pyroblast,false,false) then
-                print(407)
-                return true
-            end
-        end
+        -- if  UnitAuraID("player",kaelthas_ultimate_ability) and getCastTime(pyroblast) < getBuffRemain("player",kaelthas_ultimate_ability) then
+        --     if castSpell(tg,pyroblast,false,false) then
+        --         print(407)
+        --         return true
+        --     end
+        -- end
         -- actions.standard_rotation+=/pyroblast,if=buff.pyroclasm.react&execute_time<buff.pyroclasm.remains
         if  UnitAuraID("player",pyroclasm) and getCastTime(pyroblast) < getBuffRemain("player",pyroclasm) then
             if castSpell(tg,pyroblast,false,false) then
@@ -728,13 +777,21 @@ function rotation:default_action()
             end
         end
         -- print(29.3)
-        -- actions.standard_rotation+=/scorch,if=target.health.pct<=30&(equipped.132454|talent.searing_touch.enabled)
-        if getHP(tg) <= 30 and ( hasEquiped(132454) or getTalent(1,3) ) then
+        -- actions.standard_rotation+=/scorch,if=(target.health.pct<=30&talent.searing_touch.enabled)|(azerite.preheat.enabled&debuff.preheat.down)
+        if ( getHP(tg) <= 30 and getTalent(1,3)) or ( preheat.is_enabled and not UnitAuraID(tg,273331) ) then
             if castSpell(tg,scorch,false,false) then
                 print(415)
                 return true
             end
         end
+
+        -- actions.standard_rotation+=/scorch,if=target.health.pct<=30&(equipped.132454|talent.searing_touch.enabled)
+        -- if getHP(tg) <= 30 and ( hasEquiped(132454) or getTalent(1,3) ) then
+        --     if castSpell(tg,scorch,false,false) then
+        --         print(415)
+        --         return true
+        --     end
+        -- end
         -- actions.standard_rotation+=/flamestrike,
         -- if ( getTalent(6,3)  and active_enemies>3) or active_enemies>5 then
         --     rm("/cast [@cursor]烈焰风暴")
@@ -786,10 +843,14 @@ function rotation:default_action()
     end
     -- print(3)
     -- # RoP use while using Legendary Items.
-    -- actions+=/rune_of_power,if=((buff.kaelthas_ultimate_ability.react|buff.pyroclasm.react)&(cooldown.combustion.remains>40|action.rune_of_power.charges>1))|(buff.erupting_infernal_core.up&(cooldown.combustion.remains>40|action.rune_of_power.charges>1))
-    if (( UnitAuraID("player",kaelthas_ultimate_ability) or UnitAuraID("player",pyroclasm)) and ( getSpellCD(combustion) > 40 or getCharges(rune_of_power) >1)) or ( UnitAuraID("player",erupting_infernal_core_buff) and ( getSpellCD(combustion) > 40 or getCharges(rune_of_power) >1)) then
+    -- actions+=/rune_of_power,if=buff.pyroclasm.react&(cooldown.combustion.remains>40|action.rune_of_power.charges>1)
+    if UnitAuraID("player",pyroclasm) and (getSpellCD(combustion) > 40 or getCharges(rune_of_power) > 1 ) then
         castSpell("player",rune_of_power)
     end
+    -- actions+=/rune_of_power,if=((buff.kaelthas_ultimate_ability.react|buff.pyroclasm.react)&(cooldown.combustion.remains>40|action.rune_of_power.charges>1))|(buff.erupting_infernal_core.up&(cooldown.combustion.remains>40|action.rune_of_power.charges>1))
+    -- if (( UnitAuraID("player",kaelthas_ultimate_ability) or UnitAuraID("player",pyroclasm)) and ( getSpellCD(combustion) > 40 or getCharges(rune_of_power) >1)) or ( UnitAuraID("player",erupting_infernal_core_buff) and ( getSpellCD(combustion) > 40 or getCharges(rune_of_power) >1)) then
+    --     castSpell("player",rune_of_power)
+    -- end
     -- print(1)
     -- actions+=/call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!firestarter.active|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
     local x1 = 0;
