@@ -45,7 +45,7 @@ rotation.condition_yes_message = L["Welcome to use test module."];
 -- 定义循环加载并不可用时的消息，填入"N/A"则不显示。
 rotation.condition_no_message = "N/A";
 -- 定义循环的执行间隔（秒），如果不设默认是0.1。
-rotation.interval = 0.1;
+rotation.interval = 0.01;
 -- 定义模块专用宏命令，下面的例子会定义出：/zeus test [argument]。如果不需要宏控制，则删除下面一行。
 rotation.macro = "bingfa";
 -----------------------------------------------------------
@@ -442,7 +442,7 @@ function rotation:aoe()
     end
     self:rest()
     -- actions.aoe+=/comet_storm
-    if canCast(comet_storm) and castSpell(tg,comet_storm) then
+    if canCast(comet_storm) and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) ) and castSpell(tg,comet_storm) then
         if ydebug.is_enabled then
             print(102)
             return 0
@@ -730,7 +730,7 @@ function rotation:single()
     end
     self:rest()    
     -- actions.single+=/comet_storm
-    if canCast(comet_storm) and castSpell(tg,comet_storm) then
+    if canCast(comet_storm) and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) )  and castSpell(tg,comet_storm) then
         if ydebug.is_enabled then
             print(308)
             return 0
@@ -874,7 +874,7 @@ function rotation:default_action()
     
     
     -- 不打断施法
-    if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
+    if UnitCastingInfo("player") or UnitChannelInfo("player") and getSpellCD(61304) > 0 then return; end;
 
     --获得变量
     aoe_blizzard = self.settings.aoetg --暴风雪
@@ -959,8 +959,15 @@ function rotation:default_action()
     charges_fractional = getChargesFrac
     castSpell = csi
 
+    --确保5层冰刺用黑冰箭之后跟大冰川
+    if getBuffStacks("player",icicles) == 5 and getLastSpell() == ebonbolt then
+        if canCast(glacial_spike) and castSpell(tg,glacial_spike) then
+            return
+        end
+    end
+
     --确保黑冰剑和大冰刺之后接冰风暴
-    if getLastSpell() == glacial_spike or getLastSpell() == ebonbolt then
+    if getLastSpell() == glacial_spike or  (getLastSpell() == ebonbolt and getBuffStacks("player",icicles) ~= 5) then
         if canCast(flurry) and castSpell(tg,flurry) then
             return 0
         end
@@ -1009,6 +1016,14 @@ function rotation:default_action()
         if castSpell(zj,235450) then
         end
     end
+
+    -- 移动时寒冰箭
+    if isMoving("player") then
+        if castSpell(tg,ice_lance) then
+            return
+        end
+    end
+
 
     -- # Executed every time the actor is available.
     -- actions=counterspell
