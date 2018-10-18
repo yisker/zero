@@ -671,30 +671,66 @@ function rotation:single()
         end
     end
     self:rest()
+    -- actions.single+=/flurry,if=talent.ebonbolt.enabled&prev_gcd.1.ebonbolt&(!talent.glacial_spike.enabled|buff.icicles.stack<4|buff.brain_freeze.react)
+    if getTalent(4,3) and getLastSpell() == ebonbolt and ( not getTalent(7,3) or getBuffStacks("player",icicles) < 4 or UnitBuffID("player",brain_freeze) ) then
+        if canCast(flurry) and castSpell(tg,flurry) then
+            if ydebug.is_enabled then
+                print(3022)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    self:rest()
+    -- actions.single+=/flurry,if=talent.glacial_spike.enabled&prev_gcd.1.glacial_spike&buff.brain_freeze.react
+    if getTalent(7,3) and getLastSpell() == glacial_spike and UnitBuffID("player",brain_freeze) then
+        if canCast(flurry) and castSpell(tg,flurry) then
+            if ydebug.is_enabled then
+                print(3021)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    self:rest()
+    -- actions.single+=/flurry,if=prev_gcd.1.frostbolt&buff.brain_freeze.react&(!talent.glacial_spike.enabled|buff.icicles.stack<4)
+    if getLastSpell() == frostbolt and UnitBuffID("player",brain_freeze) and ( not  getTalent(7,3) or getBuffStacks("player",icicles) < 4 ) then
+        if canCast(flurry) and castSpell(tg,flurry) then
+            if ydebug.is_enabled then
+                print(3023)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    self:rest()
     -- actions.single+=/flurry,if=!talent.glacial_spike.enabled&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&prev_gcd.1.frostbolt)
-    if not getTalent(7,3) and (lastSpellCast == ebonbolt or UnitBuffID("player",brain_freeze) and lastSpellCast== frostbolt) then
-        if canCast(flurry) and castSpell(tg,flurry) then
-            if ydebug.is_enabled then
-                print(302)
-                return 0
-            else
-                return 0
-            end
-        end
-    end
-    self:rest()
+    -- if not getTalent(7,3) and (lastSpellCast == ebonbolt or UnitBuffID("player",brain_freeze) and lastSpellCast== frostbolt) then
+    --     if canCast(flurry) and castSpell(tg,flurry) then
+    --         if ydebug.is_enabled then
+    --             print(302)
+    --             return 0
+    --         else
+    --             return 0
+    --         end
+    --     end
+    -- end
+    -- self:rest()
     -- actions.single+=/flurry,if=talent.glacial_spike.enabled&buff.brain_freeze.react&(prev_gcd.1.frostbolt&buff.icicles.stack<4|prev_gcd.1.glacial_spike|prev_gcd.1.ebonbolt)
-    if getTalent(7,3) and UnitBuffID("player",brain_freeze) and (lastSpellCast == frostbolt and getBuffStacks("player",icicles) < 4 or lastSpellCast == glacial_spike or lastSpellCast == ebonbolt) then
-        if canCast(flurry) and castSpell(tg,flurry) then
-            if ydebug.is_enabled then
-                print(303)
-                return 0
-            else
-                return 0
-            end
-        end
-    end
-    self:rest()
+    -- if getTalent(7,3) and UnitBuffID("player",brain_freeze) and (lastSpellCast == frostbolt and getBuffStacks("player",icicles) < 4 or lastSpellCast == glacial_spike or lastSpellCast == ebonbolt) then
+    --     if canCast(flurry) and castSpell(tg,flurry) then
+    --         if ydebug.is_enabled then
+    --             print(303)
+    --             return 0
+    --         else
+    --             return 0
+    --         end
+    --     end
+    -- end
+    -- self:rest()
     -- actions.single+=/frozen_orb
     if orb.is_enabled and canCast(frozen_orb) and castSpell(tg,frozen_orb) then
         if ydebug.is_enabled then
@@ -729,7 +765,7 @@ function rotation:single()
         end
     end
     self:rest()    
-    -- actions.single+=/comet_storm
+    -- actions.single+=/comet_storm 修改了一下，咒术4层以上才打
     if canCast(comet_storm) and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) )  and castSpell(tg,comet_storm) then
         if ydebug.is_enabled then
             print(308)
@@ -740,14 +776,24 @@ function rotation:single()
     end
     self:rest()
     -- actions.single+=/ebonbolt,if=!talent.glacial_spike.enabled|buff.icicles.stack=5&!buff.brain_freeze.react
-    if not getTalent(7,3) or getBuffStacks("player",icicles) == 5 and not UnitBuffID("player",brain_freeze) then
-        if canCast(ebonbolt) and castSpell(tg,ebonbolt) then
-            if ydebug.is_enabled then
-                print(309)
-                return 0
-            else
-                return 0
-            end
+    -- if not getTalent(7,3) or getBuffStacks("player",icicles) == 5 and not UnitBuffID("player",brain_freeze) then
+    --     if canCast(ebonbolt) and castSpell(tg,ebonbolt) then
+    --         if ydebug.is_enabled then
+    --             print(309)
+    --             return 0
+    --         else
+    --             return 0
+    --         end
+    --     end
+    -- end
+    -- self:rest()
+    -- actions.single+=/ebonbolt
+    if canCast(ebonbolt) and castSpell(tg,ebonbolt) then
+        if ydebug.is_enabled then
+            print(309)
+            return 0
+        else
+            return 0
         end
     end
     self:rest()
