@@ -1,5 +1,6 @@
 ----------------------------------------------
 -- 模块属性
+-- from simc 20181017
 -----------------------------------------------------------
 -- 定义循环的唯一ID，可以去https://1024tools.com/uuid生成，保证每次都不一样，宇宙唯一。
 local rotation_id = "0c02decd-b730-4509-b5bf-259d28ca3c28";
@@ -223,12 +224,11 @@ do
     end;
     aoenum_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
-
     local hxfb_setting = dps_category:create_setting("hxfb"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    hxfb_setting.display_name = L["hxfb"];
-    hxfb_setting.description = "超过设定人数，进入AOE循环"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    hxfb_setting.display_name = L["AOE彗星风暴人数"];
+    hxfb_setting.description = "AOE情况下超过设定人数，打彗星风暴"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     hxfb_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
-    hxfb_setting.default_value = 1; -- 变量默认值
+    hxfb_setting.default_value = 3; -- 变量默认值
     hxfb_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
     hxfb_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
     hxfb_setting.is_enabled_by_default = true; -- 是否默认启用
@@ -240,6 +240,7 @@ do
         end
     end;
     hxfb_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
 
 
     -- 在类别test_category下添加配置变量test5
@@ -419,8 +420,7 @@ function rotation:precombat_action()
     self:rest();
 end
 
-function rotation:aoe()
-    
+function rotation:aoe()    
     -- actions.aoe=frozen_orb
     if orb.is_enabled and canCast(frozen_orb) and castSpell(tg,frozen_orb) then
         if ydebug.is_enabled then
@@ -459,8 +459,8 @@ function rotation:aoe()
         end
     end
     self:rest()
-    -- actions.aoe+=/comet_storm
-    if hxfb.is_enabled and active_enemies >= hxfb.value and canCast(comet_storm) and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) ) and castSpell(tg,comet_storm) then
+    -- actions.aoe+=/comet_storm --此处增加彗星风暴的使用条件
+    if canCast(comet_storm) and hxfb.is_enabled and active_enemies >= hxfb.value and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) ) and castSpell(tg,comet_storm) then
         if ydebug.is_enabled then
             print(102)
             return 0
@@ -572,9 +572,7 @@ function rotation:aoe()
     return 0
 end
 
-function rotation:cooldowns()
-    -- body
-    
+function rotation:cooldowns()    
     -- actions.cooldowns=icy_veins
     if baofa and canCast(icy_veins) and castSpell(zj,icy_veins) then
         if ydebug.is_enabled then
@@ -633,7 +631,7 @@ function rotation:cooldowns()
     end
     self:rest()
     -- actions.cooldowns+=/blood_fury
-    if canCast(blood_fury) and castSpell(zj,blood_fury) then
+    if baofa and canCast(blood_fury) and castSpell(zj,blood_fury) then
         if ydebug.is_enabled then
             print(209)
             return 0
@@ -643,7 +641,7 @@ function rotation:cooldowns()
     end
     self:rest()
     -- actions.cooldowns+=/berserking
-    if canCast(berserking) and castSpell(zj,berserking) then
+    if baofa and canCast(berserking) and castSpell(zj,berserking) then
         if ydebug.is_enabled then
             print(210)
             return 0
@@ -659,7 +657,6 @@ function rotation:cooldowns()
 end
 
 function rotation:movement()
-    -- body
     -- actions.movement=blink,if=movement.distance>10
     -- actions.movement+=/ice_floes,if=buff.ice_floes.down
     if not UnitBuffID("player",ice_floes) then
@@ -676,9 +673,8 @@ function rotation:movement()
 end
 
 function rotation:single()
-    -- body
     -- actions.single=ice_nova,if=cooldown.ice_nova.ready&debuff.winters_chill.up
-    if getSpellCD(ice_nova) == 0 and UnitExists(tg) and UnitDebuffID(tg,winters_chill) then
+    if getSpellCD(ice_nova) <= 0 and UnitExists(tg) and UnitDebuffID(tg,winters_chill) then
         if canCast(ice_nova) and castSpell(tg,ice_nova) then
             if ydebug.is_enabled then
                 print(301)
@@ -693,18 +689,6 @@ function rotation:single()
     if getTalent(4,3) and getLastSpell() == ebonbolt and ( not getTalent(7,3) or getBuffStacks("player",icicles) < 4 or UnitBuffID("player",brain_freeze) ) then
         if canCast(flurry) and castSpell(tg,flurry) then
             if ydebug.is_enabled then
-                print(3022)
-                return 0
-            else
-                return 0
-            end
-        end
-    end
-    self:rest()
-    -- actions.single+=/flurry,if=talent.glacial_spike.enabled&prev_gcd.1.glacial_spike&buff.brain_freeze.react
-    if getTalent(7,3) and getLastSpell() == glacial_spike and UnitBuffID("player",brain_freeze) then
-        if canCast(flurry) and castSpell(tg,flurry) then
-            if ydebug.is_enabled then
                 print(3021)
                 return 0
             else
@@ -713,8 +697,20 @@ function rotation:single()
         end
     end
     self:rest()
+    -- actions.single+=/flurry,if=talent.glacial_spike.enabled&prev_gcd.1.glacial_spike&buff.brain_freeze.react
+    if getTalent(7,3) and lastSpellCast == glacial_spike and UnitBuffID("player",brain_freeze) then
+        if canCast(flurry) and castSpell(tg,flurry) then
+            if ydebug.is_enabled then
+                print(3022)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    self:rest()
     -- actions.single+=/flurry,if=prev_gcd.1.frostbolt&buff.brain_freeze.react&(!talent.glacial_spike.enabled|buff.icicles.stack<4)
-    if getLastSpell() == frostbolt and UnitBuffID("player",brain_freeze) and ( not  getTalent(7,3) or getBuffStacks("player",icicles) < 4 ) then
+    if lastSpellCast == frostbolt and UnitBuffID("player",brain_freeze) and ( not getTalent(7,3) or getBuffStacks("player",icicles) < 4 ) then
         if canCast(flurry) and castSpell(tg,flurry) then
             if ydebug.is_enabled then
                 print(3023)
@@ -725,6 +721,11 @@ function rotation:single()
         end
     end
     self:rest()
+
+
+
+
+
     -- actions.single+=/flurry,if=!talent.glacial_spike.enabled&(prev_gcd.1.ebonbolt|buff.brain_freeze.react&prev_gcd.1.frostbolt)
     -- if not getTalent(7,3) and (lastSpellCast == ebonbolt or UnitBuffID("player",brain_freeze) and lastSpellCast== frostbolt) then
     --     if canCast(flurry) and castSpell(tg,flurry) then
@@ -760,7 +761,7 @@ function rotation:single()
     end
     self:rest()
     -- actions.single+=/blizzard,if=active_enemies>2|active_enemies>1&cast_time=0&buff.fingers_of_frost.react<2
-    if aoe_blizzard.is_enabled and active_enemies > 2 or active_enemies > 1 and getCastTime(blizzard) == 0 and getBuffRemain("player",fingers_of_frost) < 2 then
+    if aoe_blizzard.is_enabled and  ( active_enemies > 2 or active_enemies > 1 and getCastTime(blizzard) <= 0 and getBuffRemain("player",fingers_of_frost) < 2 ) then
         if canCast(blizzard) and castSpell(tg,blizzard) then
             if ydebug.is_enabled then
                 print(305)
@@ -783,10 +784,20 @@ function rotation:single()
         end
     end
     self:rest()    
-    -- actions.single+=/comet_storm 修改了一下，咒术4层以上才打
-    if hxfb.is_enabled and ( active_enemies >= hxfb.value or active_enemies == 1 ) and canCast(comet_storm) and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) )  and castSpell(tg,comet_storm) then
+    -- actions.single+=/comet_storm
+    if canCast(comet_storm) and hxfb.is_enabled and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) )  and castSpell(tg,comet_storm) then
         if ydebug.is_enabled then
             print(308)
+            return 0
+        else
+            return 0
+        end
+    end
+    self:rest()
+    -- actions.single+=/ebonbolt
+    if canCast(ebonbolt) and castSpell(tg,ebonbolt) then
+        if ydebug.is_enabled then
+            print(3091)
             return 0
         else
             return 0
@@ -805,16 +816,6 @@ function rotation:single()
     --     end
     -- end
     -- self:rest()
-    -- actions.single+=/ebonbolt
-    if canCast(ebonbolt) and castSpell(tg,ebonbolt) then
-        if ydebug.is_enabled then
-            print(309)
-            return 0
-        else
-            return 0
-        end
-    end
-    self:rest()
     -- actions.single+=/ray_of_frost,if=!action.frozen_orb.in_flight&ground_aoe.frozen_orb.remains=0
     if getOneMyMissile() ~= frozen_orb and active_enemies < 2 then
         if canCast(ray_of_frost) and castSpell(tg,ray_of_frost) then
@@ -961,6 +962,8 @@ function rotation:default_action()
 
     -- 本地化
     lastSpellCast = getLastSpell()
+
+
     
     
     --获得第一个符合条件的目标
@@ -1032,7 +1035,7 @@ function rotation:default_action()
     end
 
     --确保黑冰剑和大冰刺之后接冰风暴
-    if getLastSpell() == glacial_spike or  (getLastSpell() == ebonbolt and getBuffStacks("player",icicles) ~= 5) then
+    if  ( getLastSpell() == glacial_spike or  (getLastSpell() == ebonbolt and getBuffStacks("player",icicles) ~= 5)) and UnitBuffID("player",brain_freeze) then
         if canCast(flurry) and castSpell(tg,flurry) then
             return 0
         end
@@ -1047,11 +1050,19 @@ function rotation:default_action()
 
 
     --水元素
-    if callpet.is_enabled then
+    -- if callpet.is_enabled then
+    --     if not UnitExists("pet") or not isAlive("pet") then
+    --         castSpell(zj,31687)
+    --     end
+    -- end
+
+    if _t1==nil then _t1=GetTime(); end
+    if callpet.is_enabled and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then            
         if not UnitExists("pet") or not isAlive("pet") then
             castSpell(zj,31687)
         end
-    end
+    end    
+    _t1=GetTime()+ 5
 
     -- 石头
     if getHP(zj) <= zlsyz.value and canUse(5512) then
