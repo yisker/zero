@@ -1,5 +1,6 @@
 ----------------------------------------------
 -- 模块属性
+-- from simc 20181005
 -----------------------------------------------------------
 -- 定义循环的唯一ID，可以去https://1024tools.com/uuid生成，保证每次都不一样，宇宙唯一。
 local rotation_id = "c7cba9a6-34e9-458a-a77d-bba64d6310ac";
@@ -1162,8 +1163,8 @@ function rotation:default_action()
     self:rest()	
     if Y.lastspell_cast == tiger_palm and GetTime() - Y.lastspell_time > gcd*2 then
         if castSpell(tg,tiger_palm) then
-		GH_Print("记录一下，看一局能打出多少提示")
-	end
+		    GH_Print("记录一下，看一局能打出多少提示")
+	    end
     end
     self:rest()
 end
