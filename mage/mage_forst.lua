@@ -224,6 +224,24 @@ do
     aoenum_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
 
+    local hxfb_setting = dps_category:create_setting("hxfb"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    hxfb_setting.display_name = L["hxfb"];
+    hxfb_setting.description = "超过设定人数，进入AOE循环"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    hxfb_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    hxfb_setting.default_value = 1; -- 变量默认值
+    hxfb_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    hxfb_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    hxfb_setting.is_enabled_by_default = true; -- 是否默认启用
+    hxfb_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0) then
+            return true;
+        else
+            return false, "The number is too small.";
+        end
+    end;
+    hxfb_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+
     -- 在类别test_category下添加配置变量test5
     local targets_setting = dps_category:create_setting("targets"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     targets_setting.display_name = L["targets"];
@@ -442,7 +460,7 @@ function rotation:aoe()
     end
     self:rest()
     -- actions.aoe+=/comet_storm
-    if canCast(comet_storm) and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) ) and castSpell(tg,comet_storm) then
+    if hxfb.is_enabled and active_enemies >= hxfb.value and canCast(comet_storm) and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) ) and castSpell(tg,comet_storm) then
         if ydebug.is_enabled then
             print(102)
             return 0
@@ -766,7 +784,7 @@ function rotation:single()
     end
     self:rest()    
     -- actions.single+=/comet_storm 修改了一下，咒术4层以上才打
-    if canCast(comet_storm) and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) )  and castSpell(tg,comet_storm) then
+    if hxfb.is_enabled and ( active_enemies >= hxfb.value or active_enemies == 1 ) and canCast(comet_storm) and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) )  and castSpell(tg,comet_storm) then
         if ydebug.is_enabled then
             print(308)
             return 0
@@ -936,6 +954,7 @@ function rotation:default_action()
     lgpz = self.settings.lgpz --棱光屏障
     daduan = self.settings.daduan --打断
     orb = self.settings.orb --溜溜球
+    hxfb = self.settings.hxfb --彗星风暴
     -- baofa = Y.baofa --爆發
 
     if isbus.is_enabled and isBused("player") then return; end
