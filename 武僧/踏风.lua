@@ -1010,9 +1010,9 @@ function rotation:default_action()
                 return tb[1]
             end
             for i=1,#tb do
-                if UnitExists(tb[i]) and not UnitDebuffID(tb[i],debuffid) then
+                if tb[i] and UnitExists(tb[i]) and isAlive(tb[i]) and not UnitDebuffID(tb[i],debuffid) then
                     return tb[i]                
-                elseif UnitExists(tb[i]) and getDebuffRemain(tgg,debuffid) > getDebuffRemain(tb[i],debuffid) then
+                elseif tb[i] and UnitExists(tb[i]) and isAlive(tb[i]) and getDebuffRemain(tgg,debuffid) > getDebuffRemain(tb[i],debuffid) then
                     tgg = tb[i]
                     self:rest()
                 end
