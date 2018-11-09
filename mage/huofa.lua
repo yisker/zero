@@ -271,7 +271,9 @@ function rotation:precombat_action()
 end
 
 function rotation:default_action()
-    -- if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
+
+
+    if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
     
     
 
@@ -367,7 +369,11 @@ function rotation:default_action()
         end
     end
 
-
+    if UnitBuffID("player",hot_streak) and getBuffStacks("player",116267) >= 5 then
+        if castspell(tg,pyroblast) then
+            print("hahaha")
+        end
+    end
 
     local function active_talents( ... )
         -- actions.active_talents=blast_wave,if=(buff.combustion.down)|(buff.combustion.up&action.fire_blast.charges<1)
