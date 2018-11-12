@@ -392,13 +392,21 @@ function rotation:precombat_action()
     local isbus = self.settings.isbus --坐骑  
     if isbus.is_enabled and not isBused("player") then 
         
+        -- if _t1==nil then _t1=GetTime(); end
+        -- if callpet.is_enabled and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then            
+        --     if not UnitExists("pet") or not isAlive("pet") then
+        --         castSpell(zj,31687)
+        --     end
+        -- end    
+        -- _t1=GetTime()+ 5
         if _t1==nil then _t1=GetTime(); end
-        if callpet.is_enabled and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then            
-            if not UnitExists("pet") or not isAlive("pet") then
-                castSpell(zj,31687)
+        if callpet.is_enabled then
+            if not UnitExists("pet") or not isAlive("pet") and GetTime() >= _t1 then
+                if castSpell(zj,31687) then
+                    _t1=GetTime()+ 5
+                end
             end
-        end    
-        _t1=GetTime()+ 5
+        end
          
     end    
     
@@ -1037,32 +1045,48 @@ function rotation:default_action()
     --确保黑冰剑和大冰刺之后接冰风暴
     if  ( getLastSpell() == glacial_spike or  (getLastSpell() == ebonbolt and getBuffStacks("player",icicles) ~= 5)) and UnitBuffID("player",brain_freeze) then
         if canCast(flurry) and castSpell(tg,flurry) then
-            return 0
+            return
         end
     end
 
     --确保冰风暴后接冰枪
     if getLastSpell() == flurry then
         if canCast(ice_lance) and castSpell(tg,ice_lance) then
-            return 0
+            return
+        end
+    end
+    
+    -- 确保彗星风暴以后接冰冻术
+    if getLastSpell() == comet_storm and UnitExists("pet") and isAlive("pet") then
+        if canCast(33395) and castSpell(tg,33395) then
+            return
         end
     end
 
+    -- 不能接冰冻术接冰环
+    if getLastSpell() == comet_storm and  ( not canCast(33395) or not UnitExists("pet") or not isAlive("pet") )  then
+        if getDistance("player",tg) <= 12 and canCast(122) and castSpell("player",122) then
+            return
+        end
+    end
 
     --水元素
-    -- if callpet.is_enabled then
+    if _t1==nil then _t1=GetTime(); end
+    if callpet.is_enabled then
+        if not UnitExists("pet") or not isAlive("pet") and GetTime() >= _t1 then
+            if castSpell(zj,31687) then
+                _t1=GetTime() + 5
+            end
+        end
+    end
+
+    -- if _t1==nil then _t1=GetTime(); end
+    -- if callpet.is_enabled and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then            
     --     if not UnitExists("pet") or not isAlive("pet") then
     --         castSpell(zj,31687)
     --     end
-    -- end
-
-    if _t1==nil then _t1=GetTime(); end
-    if callpet.is_enabled and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then            
-        if not UnitExists("pet") or not isAlive("pet") then
-            castSpell(zj,31687)
-        end
-    end    
-    _t1=GetTime()+ 5
+    -- end    
+    -- _t1=GetTime()+ 5
 
     -- 石头
     if getHP(zj) <= zlsyz.value and canUse(5512) then
