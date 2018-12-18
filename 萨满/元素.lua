@@ -252,10 +252,30 @@ function rotation:single_target()
         end
     end
     -- actions.single_target+=/ascendance, 
-    if  getTalent(7,3)  and ( time >= 60 or   getBuffRemain(zj, bloodlust)  > 0) and  getSpellCD() .lava_burst.remains>0 and  not  getTalent(4,2)  
-    -- actions.single_target+=/ascendance, if  getTalent(7,3)   and (time>=60 or   getBuffRemain(zj, )    bloodlust.up) and  getSpellCD() .lava_burst.remains>0 and  getSpellCD() .storm_elemental.remains<=120
+    if  getTalent(7,3)  and ( time >= 60 or   getBuffRemain(zj, bloodlust)  > 0) and  getSpellCD(lava_burst) > 0 and  not  getTalent(4,2)  then
+        if canCast(ascendance) and castSpell(zj,ascendance) then
+            if ydebug.is_enabled then
+                print(302)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- actions.single_target+=/ascendance, 
+    if  getTalent(7,3)   and (time>=60 or   getBuffRemain(zj, bloodlust) > 0 ) and  getSpellCD(lava_burst) >0 and  getSpellCD(storm_elemental) <=120 then
+        if canCast(ascendance) and castSpell(zj,ascendance) then
+            if ydebug.is_enabled then
+                print(302)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
     -- # Don't use Elemental Blast if you could cast a Master of the Elements empowered Earth Shock instead.
-    -- actions.single_target+=/elemental_blast, if  getTalent(1,3)   and (talent.master_of_the_elements.enabled and   getBuffRemain(zj, )    master_of_the_elements.up and maelstrom<60 or  not talent.master_of_the_elements.enabled)
+    -- actions.single_target+=/elemental_blast, 
+    if  getTalent(1,3)   and (talent.master_of_the_elements.enabled and   getBuffRemain(zj, )    master_of_the_elements.up and maelstrom<60 or  not talent.master_of_the_elements.enabled)
     -- # Keep SK for large or soon add waves.
     -- actions.single_target+=/stormkeeper, if  getTalent(7,2)   and (raid_event.adds.count<3 or raid_event.adds.in>50)
     -- actions.single_target+=/liquid_magma_totem, if  getTalent(4,3)   and (raid_event.adds.count<3 or raid_event.adds.in>50)
