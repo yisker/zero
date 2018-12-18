@@ -936,8 +936,9 @@ function rotation:default_action()
     
     
     -- actions=variable,name=spammable_seed,value=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>=3|talent.siphon_life.enabled&spell_targets.seed_of_corruption>=5|spell_targets.seed_of_corruption>=8
+    -- actions=variable,name=use_seed,value=talent.sow_the_seeds.enabled&spell_targets.seed_of_corruption_aoe>=3+raid_event.invulnerable.up|talent.siphon_life.enabled&spell_targets.seed_of_corruption>=5+raid_event.invulnerable.up|spell_targets.seed_of_corruption>=8+raid_event.invulnerable.up
     spammable_seed = getTalent(4,1) and emnum1 >= 3 or getTalent(2,3) and emnum1 >= 5 or emnum1 >= 8
-
+    use_seed = getTalent(4,1) and emnum1 >= 3 
     -- actions+=/variable,name=padding,op=set,value=action.shadow_bolt.execute_time*azerite.cascading_calamity.enabled
     azerite_cascading_calamity_enabled = 0
     if cascading_calamity.is_enabled then azerite_cascading_calamity_enabled = 1;end
