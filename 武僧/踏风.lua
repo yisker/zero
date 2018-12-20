@@ -139,6 +139,58 @@ do
     end;
     zlsyz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
+    local smg_setting = rotation.default_setting_category:create_setting("smg"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    smg_setting.display_name = L["散魔功"];
+    smg_setting.description = "低于阈值且散魔功可用，使用散魔功疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    smg_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    smg_setting.default_value = 50; -- 变量默认值
+    smg_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    smg_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    smg_setting.is_enabled_by_default = false; -- 是否默认启用
+    smg_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    smg_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+    local qbh_setting = rotation.default_setting_category:create_setting("qbh"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    qbh_setting.display_name = L["躯不坏"];
+    qbh_setting.description = "低于阈值且躯不坏可用，使用躯不坏疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    qbh_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    qbh_setting.default_value = 50; -- 变量默认值
+    qbh_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    qbh_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    qbh_setting.is_enabled_by_default = false; -- 是否默认启用
+    qbh_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    qbh_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+
+    local zdj_setting = rotation.default_setting_category:create_setting("zdj"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    zdj_setting.display_name = L["壮胆酒"];
+    zdj_setting.description = "低于阈值且壮胆酒可用，使用壮胆酒疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    zdj_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    zdj_setting.default_value = 50; -- 变量默认值
+    zdj_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    zdj_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    zdj_setting.is_enabled_by_default = false; -- 是否默认启用
+    zdj_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    zdj_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
     -- local lgsh_setting = rotation.default_setting_category:create_setting("lgsh"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     -- lgsh_setting.display_name = L["lgsh"];
     -- lgsh_setting.description = "低于阈值且灵龟守护可用，使用灵龟守护疗伤"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
@@ -201,16 +253,111 @@ do
     lhzc_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     lhzc_setting.value_width = 120; -- 值显示宽度像素（默认为100）
 
-    local swift_roundhouse_setting = rotation.default_setting_category:create_setting("swift_roundhouse"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    swift_roundhouse_setting.display_name = L["277669"];
-    swift_roundhouse_setting.description = "设置是否启用277669"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    swift_roundhouse_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
-    swift_roundhouse_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
-    swift_roundhouse_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
-    swift_roundhouse_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    swift_roundhouse_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
-    swift_roundhouse_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-    swift_roundhouse_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+    local zqb_setting = rotation.default_setting_category:create_setting("zqb"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    zqb_setting.display_name = L["真气波"];
+    zqb_setting.description = "设置是否启用轮回之触"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    zqb_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    zqb_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    zqb_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    zqb_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    zqb_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    zqb_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    zqb_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+
+    local bhq_setting = rotation.default_setting_category:create_setting("bhq"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    bhq_setting.display_name = L["白虎拳"];
+    bhq_setting.description = "设置是否启用轮回之触"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    bhq_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    bhq_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    bhq_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    bhq_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    bhq_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    bhq_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    bhq_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+    local hnj_setting = rotation.default_setting_category:create_setting("hnj"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    hnj_setting.display_name = L["豪能酒"];
+    hnj_setting.description = "在开启爆发的前提下，是否启用豪能酒，低于阈值释放"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    hnj_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    hnj_setting.default_value = 40; -- 变量默认值
+    hnj_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    hnj_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    hnj_setting.is_enabled_by_default = false; -- 是否默认启用
+    hnj_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    hnj_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+
+    local hyj_setting = rotation.default_setting_category:create_setting("hyj"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    hyj_setting.display_name = L["虎眼酒"];
+    hyj_setting.description = "是否启用豪能酒，高于阈值释放"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    hyj_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    hyj_setting.default_value = 10; -- 变量默认值
+    hyj_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    hyj_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    hyj_setting.is_enabled_by_default = false; -- 是否默认启用
+    hyj_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 10) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    hyj_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+
+    local bhxf_setting = rotation.default_setting_category:create_setting("bhxf"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    bhxf_setting.display_name = L["白虎下凡"];
+    bhxf_setting.description = "在开启爆发的前提下，确定白虎下凡的释放方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    bhxf_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    bhxf_setting.default_value = "BOSS及AOE"; -- 变量默认值
+    bhxf_setting.optional_values = {"卡CD", "BOSS及AOE"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    bhxf_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    bhxf_setting.is_enabled_by_default = false; -- 是否默认启用
+    bhxf_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    bhxf_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
+    local slb_setting = rotation.default_setting_category:create_setting("slb"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    slb_setting.display_name = L["升龙霸"];
+    slb_setting.description = "在开启爆发的前提下，确定升龙霸的释放方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    slb_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    slb_setting.default_value = "卡CD"; -- 变量默认值
+    slb_setting.optional_values = {"卡CD", "BOSS及AOE"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    slb_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    slb_setting.is_enabled_by_default = false; -- 是否默认启用
+    slb_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    slb_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
+    local bqns_setting = rotation.default_setting_category:create_setting("bqns"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    bqns_setting.display_name = L["屏气凝神"];
+    bqns_setting.description = "在开启爆发的前提下，确定屏气凝神的释放方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    bqns_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    bqns_setting.default_value = "BOSS及AOE"; -- 变量默认值
+    bqns_setting.optional_values = {"卡CD", "BOSS及AOE"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    bqns_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    bqns_setting.is_enabled_by_default = false; -- 是否默认启用
+    bqns_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    bqns_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
+
+
+    -- local swift_roundhouse_setting = rotation.default_setting_category:create_setting("swift_roundhouse"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    -- swift_roundhouse_setting.display_name = L["277669"];
+    -- swift_roundhouse_setting.description = "设置是否启用277669"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    -- swift_roundhouse_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    -- swift_roundhouse_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    -- swift_roundhouse_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    -- swift_roundhouse_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    -- swift_roundhouse_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    -- swift_roundhouse_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    -- swift_roundhouse_setting.value_width = 120; -- 值显示宽度像素（默认为100）
 
     -- local pethp_setting = rotation.default_setting_category:create_setting("pethp"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     -- pethp_setting.display_name = L["pethp"];
@@ -254,7 +401,7 @@ do
 
     local Touch_of_Death_setting = rotation.default_setting_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     Touch_of_Death_setting.display_name = L["Touch_of_Death"];
-    Touch_of_Death_setting.description = "按下这个键切换爆发状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    Touch_of_Death_setting.description = "按下这个键和左ctrl键切换爆发状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     Touch_of_Death_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
     Touch_of_Death_setting.default_value = "Q"; -- 变量默认值
     Touch_of_Death_setting.optional_values = nil -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
@@ -344,10 +491,7 @@ do
                         if Y.spelllist_failed[spell] == nil then 
                             Y.spelllist_failed[spell] = {};
                         end
-                        table.insert(Y.spelllist_failed[spell],{name = spellName, target = destination, stime = Y.lastspell_failedtime})
-                        -- if source == guid then
-                            --print(spellName.." 失败原因: "..spellType)
-                        -- end
+                        table.insert(Y.spelllist_failed[spell],{name = spellName, target = destination, stime = Y.lastspell_failedtime})                        
                         if spell == Y.lastspell_start then
                             Y.lastspell_start = 0
                         end
@@ -463,7 +607,7 @@ do
 end
 -----------------------------------------------------------
 --全局函数
-function getGCD()
+local function getGCD()
     local start, duration, enabled, modRate = GetSpellCooldown(61304)
     if GCD == nil then
       GCD = 1.5 / ((UnitSpellHaste("player")/100)+1);
@@ -474,7 +618,7 @@ function getGCD()
     return GCD
 end
 --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
-function filler_unit(Unit)
+local function filler_unit(Unit)
     if (UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) then
         return true
     else
@@ -553,9 +697,9 @@ function rotation:serenity( ... )
             end
         end
     end
-    self:rest()
-    -- actions.serenity+=/fists_of_fury,if=(buff.bloodlust.up&prev_gcd.1.rising_sun_kick&!azerite.swift_roundhouse.enabled)|buff.serenity.remains<1|(active_enemies>1&active_enemies<5)
-    if ( getBuffRemain("player",bloodlust) > 0 and getLastSpell() == rising_sun_kick and not swift_roundhouse.is_enabled ) or getBuffRemain("player",serenity) < 1 or ( active_enemies > 1 and active_enemies < 5 ) then
+    self:rest()    
+    -- actions.serenity+=/fists_of_fury,if=(buff.bloodlust.up&prev_gcd.1.rising_sun_kick)|buff.serenity.remains<1|(active_enemies>1&active_enemies<5)
+    if ( getBuffRemain("player",bloodlust) > 0 and getLastSpell() == rising_sun_kick ) or getBuffRemain("player",serenity) < 1 or ( active_enemies > 1 and active_enemies < 5 ) then
         if canCast(fists_of_fury) and (UnitBuffID("player",serenity) or getChi() >= 3) and castSpell(tg,fists_of_fury) then
             if tiaoshi.is_enabled then
                 print(5061)
@@ -594,14 +738,26 @@ end
 function rotation:cd( ... )
     -- body
     -- actions.cd=invoke_xuen_the_white_tiger
-    if canCast(invoke_xuen_the_white_tiger) and castSpell(tg,invoke_xuen_the_white_tiger) then
-        if tiaoshi.is_enabled then
-            print(3011)
-            return 0
-        else
-            return 0
+    if bhxf.is_enabled and bhxf.value == "卡CD" then
+        if  canCast(invoke_xuen_the_white_tiger) and castSpell(tg,invoke_xuen_the_white_tiger) then
+            if tiaoshi.is_enabled then
+                print(3011)
+                return 0
+            else
+                return 0
+            end
         end
+    elseif  bhxf.is_enabled and bhxf.value == "BOSS及AOE" and (isBoss(tg) or active_enemies >= aoenum.value) then
+        if  canCast(invoke_xuen_the_white_tiger) and castSpell(tg,invoke_xuen_the_white_tiger) then
+            if tiaoshi.is_enabled then
+                print(3011)
+                return 0
+            else
+                return 0
+            end
+        end    
     end
+    
     self:rest()
     -- actions.cd+=/use_item,name=lustrous_golden_plumage
     if canUse(159617) and useItem(159617) then
@@ -650,7 +806,7 @@ function rotation:cd( ... )
     self:rest()
     -- actions.cd+=/serenity,if=cooldown.rising_sun_kick.remains<=2|target.time_to_die<=12
     if getSpellCD(rising_sun_kick) <= 2 or getTimeToDie(tg) <= 12 then
-        if canCast(serenity) and castSpell(zj,serenity) then
+        if bqns.is_enabled and (active_enemies >= aoenum.value or isBoss(tg)) and canCast(serenity) and castSpell(zj,serenity) then
             if tiaoshi.is_enabled then
                 print(5041)
                 return 0
@@ -663,8 +819,21 @@ function rotation:cd( ... )
     return 0
 end
 function rotation:aoe()
+    -- actions.aoe=rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains<5)&cooldown.fists_of_fury.remains>3    
+    if ( getTalent(7,2) and getSpellCD(whirling_dragon_punch) < 5 ) and getSpellCD(fists_of_fury) > 3 then
+        if UnitExists(tg1) and canCast(rising_sun_kick) and getChi() >= 2 and castSpell(tg1,rising_sun_kick) then
+            if tiaoshi.is_enabled then
+                print(2061)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    self:rest()
+
     -- actions.aoe=whirling_dragon_punch
-    if canCast(whirling_dragon_punch) and getSpellCD(fists_of_fury) > 0 and getSpellCD(rising_sun_kick) > 0 then
+    if slb.is_enabled and (active_enemies >= aoenum.value or isBoss(tg)) and canCast(whirling_dragon_punch) and getSpellCD(fists_of_fury) > 0 and getSpellCD(rising_sun_kick) > 0 then
         if castSpell(tg,whirling_dragon_punch) then
             if tiaoshi.is_enabled then
                 print(2051)
@@ -677,7 +846,7 @@ function rotation:aoe()
     self:rest()
     -- actions.aoe+=/energizing_elixir,if=!prev_gcd.1.tiger_palm&chi<=1&energy<50
     if not (getLastSpell() == tiger_palm) and getRealMana("player") < 50 then
-        if canCast(energizing_elixir) and castSpell("player",energizing_elixir) then
+        if hnj.is_enabled and getRealMana("player") <= hnj.value and canCast(energizing_elixir) and castSpell("player",energizing_elixir) then
             if tiaoshi.is_enabled then
                 print(2011)
                 return 0
@@ -700,7 +869,7 @@ function rotation:aoe()
     end
     self:rest()
     -- actions.aoe+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&energy.time_to_max>1
-    if getBuffRemain("player",rushing_jade_wind) <= 0 and getTimeToMax("player") > 1 then
+    if getBuffRemain("player",rushing_jade_wind) <= 0 then
         if canCast(rushing_jade_wind) and castSpell(tg,rushing_jade_wind) then
             if tiaoshi.is_enabled then
                 print(6031)
@@ -711,18 +880,7 @@ function rotation:aoe()
         end
     end
     self:rest() 
-    -- actions.aoe+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=(talent.whirling_dragon_punch.enabled&cooldown.whirling_dragon_punch.remains<5)&cooldown.fists_of_fury.remains>3
-    if ( getTalent(7,2) and getSpellCD(whirling_dragon_punch) < 5 ) and getSpellCD(fists_of_fury) > 3 then
-        if UnitExists(tg1) and canCast(rising_sun_kick) and getChi() >= 2 and castSpell(tg1,rising_sun_kick) then
-            if tiaoshi.is_enabled then
-                print(2061)
-                return 0
-            else
-                return 0
-            end
-        end
-    end
-    self:rest()
+    
     -- actions.aoe+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&(((chi>3|cooldown.fists_of_fury.remains>6)&(chi>=5|cooldown.fists_of_fury.remains>2))|energy.time_to_max<=3)
     if not (getLastSpell() ==  spinning_crane_kick) and ((( getChi() > 3 or getSpellCD(fists_of_fury) > 6 ) and ( getChi() >= 5 or getSpellCD(fists_of_fury) > 2 )) or getTimeToMax("player") <=3 ) then
         if canCast(spinning_crane_kick) and getChi() >= 2 and castSpell(tg,spinning_crane_kick) then
@@ -749,7 +907,7 @@ function rotation:aoe()
     self:rest()
     -- actions.aoe+=/fist_of_the_white_tiger,if=chi.max-chi>=3&(energy>46|buff.rushing_jade_wind.down)
     if UnitPowerMax("player",12) - getChi() >= 3 and ( getRealMana("player") > 46 or getBuffRemain("player",rushing_jade_wind) <= 0 ) then
-        if canCast(fist_of_the_white_tiger) and getRealMana("player") >= 40 and castSpell(tg,fist_of_the_white_tiger) then
+        if bhq.is_enabled and canCast(fist_of_the_white_tiger) and getRealMana("player") >= 40 and castSpell(tg,fist_of_the_white_tiger) then
             if tiaoshi.is_enabled then
                 print(6071)
                 return 0
@@ -758,9 +916,9 @@ function rotation:aoe()
             end
         end
     end 
-    self:rest()  
-    -- actions.aoe+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=2&(energy>56|buff.rushing_jade_wind.down)&(!talent.hit_combo.enabled|!prev_gcd.1.tiger_palm)
-    if UnitPowerMax("player",12) - getChi() >= 2 and ( getRealMana("player") > 56 or getBuffRemain("player",rushing_jade_wind) <= 0 ) and ( not getTalent(6,1) or not (getLastSpell() == tiger_palm) ) then
+    self:rest()      
+    -- actions.aoe+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=chi.max-chi>=2&(!talent.hit_combo.enabled|!prev_gcd.1.tiger_palm)
+    if UnitPowerMax("player",12) - getChi() >= 2 and ( not getTalent(6,1) or not (getLastSpell() == tiger_palm) ) then
         if UnitExists(tg1) and canCast(tiger_palm) and getRealMana("player") >= 50 and castSpell(tg1,tiger_palm) then
             if tiaoshi.is_enabled then
                 print(2161)
@@ -772,7 +930,7 @@ function rotation:aoe()
     end  
     self:rest() 
     -- actions.aoe+=/chi_wave
-    if canCast(chi_wave) and castSpell(tg,chi_wave) then
+    if zqb.is_enabled and canCast(chi_wave) and castSpell(tg,chi_wave) then
         if tiaoshi.is_enabled then
             print(218)
             return 0
@@ -798,14 +956,8 @@ function rotation:aoe()
 end
 function rotation:st( ... )
     -- body
-    -- actions.st=cancel_buff,name=rushing_jade_wind,if=active_enemies=1&(!talent.serenity.enabled|cooldown.serenity.remains>3)
-    if active_enemies == 1 and ( not getTalent(7,3) or getSpellCD(serenity) > 3 ) then
-        if UnitBuffID("player",rushing_jade_wind) then
-            cancelBuff(rushing_jade_wind)
-        end
-    end
-    -- actions.st+=/whirling_dragon_punch
-    if canCast(whirling_dragon_punch) and getSpellCD(fists_of_fury) > 0 and getSpellCD(rising_sun_kick) > 0 then
+    -- actions.st=whirling_dragon_punch    
+    if slb.is_enabled and (active_enemies >= aoenum.value or isBoss(tg)) and canCast(whirling_dragon_punch) and getSpellCD(fists_of_fury) > 0 and getSpellCD(rising_sun_kick) > 0 then
         if castSpell(tg,whirling_dragon_punch) then
             if tiaoshi.is_enabled then
                 print(6081)
@@ -816,6 +968,13 @@ function rotation:st( ... )
         end
     end
     self:rest()
+    -- -- actions.st=cancel_buff,name=rushing_jade_wind,if=active_enemies=1&(!talent.serenity.enabled|cooldown.serenity.remains>3)
+    -- if active_enemies == 1 and ( not getTalent(7,3) or getSpellCD(serenity) > 3 ) then
+    --     if UnitBuffID("player",rushing_jade_wind) then
+    --         cancelBuff(rushing_jade_wind)
+    --     end
+    -- end
+    
     -- actions.st+=/rising_sun_kick,target_if=min:debuff.mark_of_the_crane.remains,if=chi>=5
     if getChi() >= 5 then
         if UnitExists(tg5) and canCast(rising_sun_kick) and (UnitBuffID("player",serenity) or getChi() >= 2) then
@@ -854,8 +1013,8 @@ function rotation:st( ... )
         end
     end    
     self:rest()
-    -- actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&energy.time_to_max>1&active_enemies>1
-    if getBuffRemain("player",rushing_jade_wind) <= 0 and getTimeToMax("player") > 1 and active_enemies > 1 then
+    -- actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&active_enemies>1    
+    if getBuffRemain("player",rushing_jade_wind) <= 0 and  active_enemies > 1 then
         if canCast(rushing_jade_wind) and castSpell(tg,rushing_jade_wind) then
             if tiaoshi.is_enabled then
                 print(6031)
@@ -868,7 +1027,7 @@ function rotation:st( ... )
     self:rest() 
     -- actions.st+=/fist_of_the_white_tiger,if=chi<=2&(buff.rushing_jade_wind.down|energy>46)
     if getChi() <= 2 and ( getBuffRemain("player",rushing_jade_wind) <= 0 or getRealMana("player") > 46 ) then
-        if canCast(fist_of_the_white_tiger) and getRealMana("player") >= 40 and castSpell(tg,fist_of_the_white_tiger) then
+        if bhq.is_enabled and canCast(fist_of_the_white_tiger) and getRealMana("player") >= 40 and castSpell(tg,fist_of_the_white_tiger) then
             if tiaoshi.is_enabled then
                 print(6071)
                 return 0
@@ -880,7 +1039,7 @@ function rotation:st( ... )
     self:rest()  
     -- actions.st+=/energizing_elixir,if=chi<=3&energy<50
     if getChi() <= 3 and getRealMana("player") < 50 then
-        if canCast(energizing_elixir) and castSpell("player",energizing_elixir) then
+        if hnj.is_enabled and getRealMana("player") <= hnj.value and canCast(energizing_elixir) and castSpell("player",energizing_elixir) then
             if tiaoshi.is_enabled then
                 print(6041)
                 return 0
@@ -903,7 +1062,7 @@ function rotation:st( ... )
     end   
     self:rest()
     -- actions.st+=/chi_wave
-    if canCast(chi_wave) and castSpell(tg,chi_wave) then
+    if zqb.is_enabled and canCast(chi_wave) and castSpell(tg,chi_wave) then
         if tiaoshi.is_enabled then
             print(615)
             return 0
@@ -925,7 +1084,7 @@ function rotation:st( ... )
     end
     self:rest()
     -- actions.st+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&chi.max-chi>=2&(buff.rushing_jade_wind.down|energy>56)
-    if not (getLastSpell() == tiger_palm) and UnitPowerMax("player",12) - getChi() >= 2 and (getBuffRemain("player",rushing_jade_wind) <= 0 or getRealMana("player") > 56 ) then
+    if not (getLastSpell() == tiger_palm) and UnitPowerMax("player",12) - getChi() >= 2  then
         if UnitExists(tg5) and canCast(tiger_palm) and getRealMana("player") >= 50 and castSpell(tg5,tiger_palm) then
             if tiaoshi.is_enabled then
                 print(6061)
@@ -964,9 +1123,20 @@ function rotation:default_action()
     tiaoshi = self.settings.ydebug --调试信息
     ybzc = self.settings.ybzc--业报之触
     lhzc = self.settings.lhzc--业报之触
-    swift_roundhouse = self.settings.swift_roundhouse--277669
+    -- swift_roundhouse = self.settings.swift_roundhouse--277669
+    zqb = self.settings.zqb--真气波
+    bhq = self.settings.bhq--白虎拳
+    hnj = self.settings.hnj--豪能酒
+    bhxf = self.settings.bhxf--白虎下凡
+    smg = self.settings.smg--散魔功
+    qbh = self.settings.qbh--躯不坏
+    slb = self.settings.slb--升龙霸
+    bqns = self.settings.bqns--屏气凝神
+    zdj = self.settings.zdj--壮胆酒
+    hyj = self.settings.hyj--虎眼酒
+
     --------------------------------------------------------------
-    if isKeyDown(bf) and GetTime() - tt > 1 then
+    if IsLeftControlKeyDown() and isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
         tt = GetTime()
         if baofa then
@@ -1066,7 +1236,34 @@ function rotation:default_action()
     if not UnitExists(tg) then
         return 
     end
-    --------------------------------------------------------------    
+    --------------------------------------------------------------  
+    
+    if smg.is_enabled and getHP("player") <= smg.value then
+        if canCast(122783) and castSpell("player",122783) then
+        end
+    end
+
+    if zdj.is_enabled and getHP("player") <= zdj.value then
+        if canCast(201318) and castSpell("player",201318) then
+        end
+    end
+
+    if qbh.is_enabled and getHP("player") <= qbh.value then
+        if canCast(122278) and castSpell("player",122278) then
+        end
+    end
+
+    if zlsyz.is_enabled and getHP("player") <= zlsyz.value then
+        if canUse(5512) and useItem(5512) then
+        end
+    end
+
+    if hyj.is_enabled and getBuffStacks("player",247483) >= hyj.value and canCast(247383) then
+        if castSpell("player",247483) then
+        end
+    end
+
+    
     -- actions=auto_attack
     if time < 5 and UnitExists(tg) then
         StartAttack(tg)
@@ -1098,6 +1295,7 @@ function rotation:default_action()
     -- actions+=/touch_of_karma,interval=90,pct_health=0.5,if=!talent.Good_Karma.enabled,interval=90,pct_health=0.5
     -- actions+=/touch_of_karma,interval=90,pct_health=1,if=talent.good_karma.enabled,interval=90,pct_health=1
     -- actions+=/touch_of_karma,interval=90,pct_health=1.0
+    -- actions+=/touch_of_karma,interval=90,pct_health=0.5
     if ybzc.is_enabled and canCast(touch_of_karma) and getHP("player") <= ybzc.value then
         if castSpell(tg,touch_of_karma) then
             if tiaoshi.is_enabled then
@@ -1107,7 +1305,7 @@ function rotation:default_action()
                 return 0
             end
         end
-    elseif not ybzc.is_enabled and canCast(touch_of_karma) and getHP(tg) >= 90 then
+    elseif not ybzc.is_enabled and canCast(touch_of_karma) and getHP(tg) >= 50 then
         if castSpell(tg,touch_of_karma) then
             if tiaoshi.is_enabled then
                 print(103)
@@ -1126,7 +1324,7 @@ function rotation:default_action()
     self:rest()
     -- actions+=/fist_of_the_white_tiger,if=(energy.time_to_max<1|(talent.serenity.enabled&cooldown.serenity.remains<2))&chi.max-chi>=3
     if ( getTimeToMax("player") < 1 or ( getTalent(7,3) and getSpellCD(serenity) < 2 ) ) and UnitPowerMax("player",12) - getChi() >= 3 then
-        if canCast(fist_of_the_white_tiger) and getRealMana("player") >= 40 and castSpell(tg,fist_of_the_white_tiger) then
+        if bhq.is_enabled and canCast(fist_of_the_white_tiger) and getRealMana("player") >= 40 and castSpell(tg,fist_of_the_white_tiger) then
             if tiaoshi.is_enabled then
                 print(1031)
                 return 0

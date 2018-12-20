@@ -1116,7 +1116,8 @@ function rotation:default_action()
     self:rest()
     -- -- # If the mage has FoF after casting instant Flurry, we can delay the Ice Lance and use other high priority action, if available.
     -- actions+=/ice_lance,if=prev_gcd.1.flurry&brain_freeze_active&!buff.fingers_of_frost.react
-    if lastSpellCast == flurry and UnitBuffID("player",brain_freeze) and not UnitBuffID("player",fingers_of_frost) then
+    -- actions+=/ice_lance,if=prev_gcd.1.flurry&!buff.fingers_of_frost.react
+    if lastSpellCast == flurry and not UnitBuffID("player",fingers_of_frost) then
         if castSpell(tg,ice_lance) then
             if ydebug.is_enabled then
                 print(1)
