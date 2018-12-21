@@ -2,7 +2,7 @@
 -- 模块属性
 -----------------------------------------------------------
 -- 定义循环的唯一ID，可以去https://1024tools.com/uuid生成，保证每次都不一样，宇宙唯一。
-local rotation_id = "0c02decd-b730-4509-b5bf-259d28ca3c28";
+local rotation_id = "02c09cb8-022d-40b8-b4b2-edcd381e0679";
 -- 定义循环的英文名称。
 local rotation_name = "bing_fa";
 Scorpio("zeus."..rotation_name)("");
@@ -85,7 +85,22 @@ do
     isbus_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     isbus_setting.value_width = 120; -- 值显示宽度像素（默认为100）
 
-    
+    local flx_setting = jc_category:create_setting("flx"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    flx_setting.display_name = L["回蓝循环法力线"];
+    flx_setting.description = "回蓝阶段，以此阈值为目标"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    flx_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    flx_setting.default_value = 60; -- 变量默认值
+    flx_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    flx_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    flx_setting.is_enabled_by_default = false; -- 是否默认启用
+    flx_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    flx_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
     -----------------------------------------------------------
 
@@ -110,6 +125,40 @@ do
         end
     end;
     zlsyz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+    local lgpz_setting = hps_category:create_setting("lgpz"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    lgpz_setting.display_name = L["棱光屏障"];
+    lgpz_setting.description = "低于阈值且棱光屏障可用，使用"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    lgpz_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    lgpz_setting.default_value = 20; -- 变量默认值
+    lgpz_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    lgpz_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    lgpz_setting.is_enabled_by_default = false; -- 是否默认启用
+    lgpz_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    lgpz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+    local hbpz_setting = hps_category:create_setting("hbpz"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    hbpz_setting.display_name = L["寒冰屏障"];
+    hbpz_setting.description = "低于阈值且寒冰屏障可用，使用"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    hbpz_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    hbpz_setting.default_value = 15; -- 变量默认值
+    hbpz_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    hbpz_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    hbpz_setting.is_enabled_by_default = false; -- 是否默认启用
+    hbpz_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0 or value <= 100) then
+            return true;
+        else
+            return false, "The number is not right.";
+        end
+    end;
+    hbpz_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
     
 
@@ -175,16 +224,16 @@ do
     daduan_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
     daduan_setting.is_enabled_by_default = true; -- 是否默认启用
     daduan_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
-        if (value > 0 ) then
+        if (value > 0 and value <= 1 ) then
             return true;
         else
-            return false, "不能填负数";
+            return false, "超出范围0-1";
         end
     end; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     daduan_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
     local Touch_of_Death_setting = dps_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    Touch_of_Death_setting.display_name = L["强制泄蓝"];
+    Touch_of_Death_setting.display_name = L["强制泄蓝 'CTRL+'"];
     Touch_of_Death_setting.description = "按下这个键切换强制泄蓝状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     Touch_of_Death_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
     Touch_of_Death_setting.default_value = "E"; -- 变量默认值
@@ -200,7 +249,69 @@ do
     end; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     Touch_of_Death_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
-    
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local asmc_setting = dps_category:create_setting("asmc"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    asmc_setting.display_name = L["奥术魔宠"]; -- 变量在界面上显示的名字
+    asmc_setting.description = "自动奥术魔宠"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    asmc_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    asmc_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    asmc_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    asmc_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    asmc_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    asmc_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    asmc_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local nlfw_setting = dps_category:create_setting("nlfw"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    nlfw_setting.display_name = L["能量符文"]; -- 变量在界面上显示的名字
+    nlfw_setting.description = "自动能量符文"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    nlfw_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    nlfw_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    nlfw_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    nlfw_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    nlfw_setting.is_enabled_by_default = true; -- 是否默认启用（勾选框默认选中）
+    nlfw_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    nlfw_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local jingxiang_setting = dps_category:create_setting("jingxiang"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    jingxiang_setting.display_name = L["镜像"]; -- 变量在界面上显示的名字
+    jingxiang_setting.description = "自动镜像"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    jingxiang_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    jingxiang_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    jingxiang_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    jingxiang_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    jingxiang_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    jingxiang_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    jingxiang_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local xkfb_setting = dps_category:create_setting("xkfb"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    xkfb_setting.display_name = L["虚空风暴"]; -- 变量在界面上显示的名字
+    xkfb_setting.description = "自动虚空风暴"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    xkfb_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    xkfb_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    xkfb_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    xkfb_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    xkfb_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    xkfb_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    xkfb_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local asbz_setting = dps_category:create_setting("asbz"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    asbz_setting.display_name = L["奥数宝珠"]; -- 变量在界面上显示的名字
+    asbz_setting.description = "自动奥数宝珠"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    asbz_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    asbz_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    asbz_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    asbz_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    asbz_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    asbz_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    asbz_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+    -- -- 添加一个自定义类别test_category。
+    local talent_category = rotation:create_setting_category("talent_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+    talent_category.display_name = L["|cff00FFFF天赋推荐：2032021"]; -- 类别在界面上显示的名字
 
 
     
@@ -247,7 +358,7 @@ end
 function rotation:macro_handler(argument)
     -- 编写执行模块宏对应的处理脚本。
     if (not argument or argument == "") then
-        print("使用宏/"..ADDON_SLASH_COMMAND.." bingfa baofa控制爆发");
+        print("使用宏/"..ADDON_SLASH_COMMAND.." aofa baofa控制爆发");
     else
         print("收到宏命令参数：", argument);
     end
@@ -295,12 +406,16 @@ function rotation:precombat_action()
     --     print(UnitName(tg))
     -- end
     -- castSpell(tg,116)
-
+    local asmc = self.settings.asmc
+    if asmc.is_enabled and getTalent(1,3) and not UnitBuffID("player",210126) then
+        if canCast(205022) and castSpell("player",205022) then
+        end
+    end
 
     
     
     local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发    
-    if isKeyDown(bf) and GetTime() - tt > 1 then
+    if IsControlKeyDown() and  isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
         tt = GetTime()
         if baofa then
@@ -311,11 +426,15 @@ function rotation:precombat_action()
             GH_Print("强制泄蓝关闭")
             OverlayY("强制泄蓝关闭")
         end
-    end
+    end  
 	if not UnitBuffID("player",1459) then
 	    castSpell("player",1459)
     end
     if lk == 0 and UnitExists(tg) and UnitCanAttack("player",tg) and isCastingSpell("player",evocation) then
+        self:burn()
+    end
+
+    if getLastSpell() == rune_of_power and UnitExists(tg) and UnitCanAttack("player",tg) then
         self:burn()
     end
     -- if lk == 1 and UnitExists(tg) and UnitCanAttack("player",tg)  then
@@ -452,7 +571,7 @@ function rotation:burn(args)
         end
     end
     -- actions.burn+=/arcane_explosion,if=active_enemies>=3
-    if active_enemies >= 3 then
+    if active_enemies2 >= 3 then
         if canCast(arcane_explosion) and castSpell(tg,arcane_explosion) then
             if ydebug.is_enabled then
                 print(209)
@@ -501,7 +620,7 @@ function rotation:burn(args)
     -- # For the rare occasion where we go oom before evocation is back up. (Usually because we get very bad rng so the burn is cut very short)
     -- actions.burn+=/arcane_barrage
     if UnitPower("player",16) == 4 and canCast(arcane_barrage) and castSpell(tg,arcane_barrage) then
-        print("离开MP："..getMana("player"))
+        -- print("离开MP："..getMana("player"))
         variable.lk_mana = getMana("player") + 5        
         lk = 1
         if ydebug.is_enabled then
@@ -622,7 +741,7 @@ function rotation:conserve(args)
     end
     -- # Keep 'burning' in aoe situations until conserve_mana pct. After that only cast AE with 3 Arcane charges, since it's almost equal mana cost to a 3 stack AB anyway. At that point AoE rotation will be AB x3->AE->Abarr
     -- actions.conserve+=/arcane_explosion,if=active_enemies>=3&(mana.pct>=variable.conserve_mana|buff.arcane_charge.stack=3)
-    if active_enemies >= 3 and ( getMana("player") >= variable.conserve_mana or UnitPower("player",16) == 3 ) then
+    if active_enemies2 >= 3 and ( getMana("player") >= variable.conserve_mana or UnitPower("player",16) == 3 ) then
         if canCast(arcane_explosion) and castSpell(tg,arcane_explosion) then
             if ydebug.is_enabled then
                 print(310)
@@ -705,7 +824,7 @@ function rotation:default_action()
     if variable.lk_mana == nil or variable.average_burn_length >= 30 then variable.lk_mana = 20;end
     if lk == nil then lk = 0;end
     local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发    
-    if isKeyDown(bf) and GetTime() - tt > 1 then
+    if IsControlKeyDown() and  isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
         tt = GetTime()
         if baofa then
@@ -735,12 +854,18 @@ function rotation:default_action()
     -- jslq = self.settings.jslq --急速冷却
     zlsyz = self.settings.zlsyz --治疗石
     xlms = self.settings.xlms --治疗石
-    -- hbpz = self.settings.hbpz --寒冰屏障
+    hbpz = self.settings.hbpz --寒冰屏障
     -- hbht = self.settings.hbht --寒冰护体
-    -- lgpz = self.settings.lgpz --棱光屏障
-    -- daduan = self.settings.daduan --打断
+    lgpz = self.settings.lgpz --棱光屏障
+    daduan = self.settings.daduan --打断
     -- orb = self.settings.orb --溜溜球
     -- baofa = Y.baofa --爆發
+    asmc = self.settings.asmc --奥术魔宠
+    nlfw = self.settings.nlfw --能量符文
+    jingxiang = self.settings.jingxiang --镜像
+    xkfb = self.settings.xkfb --虚空风暴
+    asbz = self.settings.asbz --奥数宝珠
+    flx = self.settings.flx --法力线
 
     if isbus.is_enabled and isBused("player") then return; end
 
@@ -770,7 +895,8 @@ function rotation:default_action()
         active_enemies = getNumEnemies(tg,8)
     else
         active_enemies = 0
-    end    
+    end 
+    active_enemies2 = getNumEnemies("player",10)   
     
     gcd = getGCD()
 
@@ -778,14 +904,26 @@ function rotation:default_action()
     evocation                   = 12051
     charged_up                  = 205032
     mirror_image                = 55342
+    if jingxiang.is_enabled ~= true then
+        mirror_image = 1
+    end
     nether_tempest              = 114923
+    if xkfb.is_enabled ~= true then
+        nether_tempest = 1
+    end
     rune_of_power_buff          = 116014
     rune_of_power               = 116011
+    if nlfw.is_enabled ~= true then
+        rune_of_power = 1
+    end
     rule_of_threes              = 264774
     arcane_blast                = 30451
     lights_judgment             = 247427
     presence_of_mind            = 205025
     arcane_orb                  = 153626
+    if asbz.is_enabled ~= true then
+        arcane_orb = 1
+    end
     arcane_barrage              = 44425
     arcane_explosion            = 1449
     clearcasting                = 263725
@@ -793,8 +931,34 @@ function rotation:default_action()
     arcane_missiles             = 5143
     supernova                   = 157980
     
+    -----------------------------------------------------------
+    --保命
+    --治疗石
+    if getHP("player") <= zlsyz.value and canUse(5512) then
+        useItem(5512)
+    end
+    --棱光屏障
+    if getHP("player") <= lgpz.value and canCast(235450) then
+        castSpell("player",235450)
+    end
+    --寒冰屏障
+    if getHP("player") <= hbpz.value and canCast(45438) then
+        castSpell("player",45438)
+    end
+    ------------------------------------------------------------
+    --打断
+    if UnitExists(tg) and amac(tg, 1, daduan.value) and canCast(2139) and  daduan.is_enabled
+     then 
+        castSpell(tg, 2139)   
+    end
+
     
-    
+    if asmc.is_enabled and getTalent(1,3) and not UnitBuffID("player",210126) then
+        if canCast(205022) and castSpell("player",205022) then
+        end
+    end
+    -----------------------------------------------------------------------------
+
     -- local tier20_2pc = false  
     
     charges_fractional = getChargesFrac
@@ -825,7 +989,7 @@ function rotation:default_action()
     -- actions.precombat+=/arcane_familiar
     -- # conserve_mana is the mana percentage we want to go down to during conserve. It needs to leave enough room to worst case scenario spam AB only during AP.
     -- actions.precombat+=/variable,name=
-    variable.conserve_mana = 70
+    variable.conserve_mana = flx.value
     -- actions.precombat+=/snapshot_stats
     -- actions.precombat+=/mirror_image
     -- actions.precombat+=/potion
@@ -833,7 +997,7 @@ function rotation:default_action()
     burn_phase = getSpellCD(arcane_power) == 0 and getSpellCD(evocation) <= variable.average_burn_length and ( UnitPower("player",16) == UnitPowerMax("player",16) or ( getTalent(4,2) and getSpellCD(charged_up) == 0 ))
 
     
-    print("LK:"..lk)
+    -- print("LK:"..lk)
     -- actions+=/call_action_list,name=movement
     if isMoving("player") then
         self:movement()
