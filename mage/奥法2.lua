@@ -313,6 +313,17 @@ do
     local talent_category = rotation:create_setting_category("talent_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
     talent_category.display_name = L["|cff00FFFF天赋推荐：2032021"]; -- 类别在界面上显示的名字
 
+    local text1_setting = talent_category:create_setting("text1"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    text1_setting.display_name = L["出现奥术冲击为0是正常情况"]; -- 变量在界面上显示的名字
+    text1_setting.description = "出现奥术冲击为0是正常情况，莫慌"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    text1_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    text1_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    text1_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    text1_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    text1_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    text1_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    text1_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
 
     
 end
@@ -444,6 +455,7 @@ function rotation:precombat_action()
 end
 
 function rotation:burn(args)
+    print("start2")
     lk = 0
     
     
@@ -460,7 +472,7 @@ function rotation:burn(args)
     end
     -- # End the burn phase when we just evocated.
     -- actions.burn+=/stop_burn_phase,if=burn_phase&prev_gcd.1.evocation&target.time_to_die>variable.average_burn_length&burn_phase_duration>0
-    if burn_phase and getLastSpell() == evocation and getTimeToDie(tg) > variable.average_burn_length and burn_phase_duration > 0 then
+    if burn_phase and getLastSpell() == evocation and UnitExists(tg) and getTimeToDie(tg) > variable.average_burn_length and burn_phase_duration > 0 then
         stop_burn_phase = true
         start_burn_phase = false
     end
@@ -487,7 +499,7 @@ function rotation:burn(args)
         end
     end
     -- actions.burn+=/nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
-    if ( getDebuffRemain(tg,nether_tempest) <= 3 ) and UnitPower("player",16) ==  UnitPowerMax("player",16) and getBuffRemain("player",rune_of_power_buff) <= 0 and  getBuffRemain("player",arcane_power) <= 0 then
+    if ( UnitExists(tg) and getDebuffRemain(tg,nether_tempest) <= 3 ) and UnitPower("player",16) ==  UnitPowerMax("player",16) and getBuffRemain("player",rune_of_power_buff) <= 0 and  getBuffRemain("player",arcane_power) <= 0 then
         if canCast(nether_tempest) and castSpell(tg,nether_tempest) then
             if ydebug.is_enabled then
                 print(203)
@@ -632,12 +644,13 @@ function rotation:burn(args)
     end  
     
     
-    
+    print("end2")
     return 0
 end
 
 
 function rotation:conserve(args)
+    print("start")
     -- print(variable.average_burn_length)
     -- actions.conserve=mirror_image
     if canCast(mirror_image) and castSpell("player",mirror_image) then
@@ -694,7 +707,7 @@ function rotation:conserve(args)
         end
     end
     -- actions.conserve+=/rune_of_power,if=buff.arcane_charge.stack=buff.arcane_charge.max_stack&(full_recharge_time<=execute_time|full_recharge_time<=cooldown.arcane_power.remains|target.time_to_die<=cooldown.arcane_power.remains)
-    if UnitPower("player",16) == UnitPowerMax("player",16) and ( full_recharge_time(rune_of_power) <= getCastTime(rune_of_power) or full_recharge_time(rune_of_power) <= getSpellCD(arcane_power) or getTimeToDie(tg) <= getSpellCD(arcane_power) ) then
+    if UnitPower("player",16) == UnitPowerMax("player",16) and ( full_recharge_time(rune_of_power) <= getCastTime(rune_of_power) or full_recharge_time(rune_of_power) <= getSpellCD(arcane_power) or (UnitExists(tg) and getTimeToDie(tg) <= getSpellCD(arcane_power) )  ) then
         if getCharges(rune_of_power) >= 1 and not UnitBuffID("player",rune_of_power_buff) and castSpell("player",rune_of_power) then
             if ydebug.is_enabled then
                 print(306)
@@ -769,6 +782,7 @@ function rotation:conserve(args)
             return 0
         end
     end
+    print("end")
     return 0
 end
 
@@ -822,7 +836,7 @@ function rotation:default_action()
     if variable.burntime == nil then variable.burntime = GetTime();end
     if variable.average_burn_length == nil or variable.average_burn_length >= 30 then variable.average_burn_length = 10;end
     if variable.lk_mana == nil or variable.average_burn_length >= 30 then variable.lk_mana = 20;end
-    if lk == nil then lk = 0;end
+    if lk == nil then lk = 1;end
     local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发    
     if IsControlKeyDown() and  isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
@@ -886,7 +900,7 @@ function rotation:default_action()
     -- print(tg)
     if tgtype.value ~= "智能" then
         tg = "target"
-    end
+    end    
     -- GH_Print((tg))
     --本地化自己
     zj = "player"
@@ -1010,23 +1024,26 @@ function rotation:default_action()
     if burn_phase then
         lk = 0
     end
+    
+    print(lk)
     if (burn_phase --[[ or getTimeToDie(tg) < variable.average_burn_length ]] or lk==0) and ( (xlms.value == "仅BOSS" and isBoss(tg)) or xlms.value == "卡CD" ) then        
         self:burn()
-        -- return
+        return
     end
     -- # Start Burn Phase when Arcane Power is ready and Evocation will be ready (on average) before the burn phase is over. Also make sure we got 4 Arcane Charges, or can get 4 Arcane Charges with Charged Up.
     -- actions+=/call_action_list,name=burn,if=(cooldown.arcane_power.remains=0&cooldown.evocation.remains<=variable.average_burn_length&(buff.arcane_charge.stack=buff.arcane_charge.max_stack|(talent.charged_up.enabled&cooldown.charged_up.remains=0&buff.arcane_charge.stack<=1)))
     if (( getSpellCD(arcane_power) == 0 and getSpellCD(evocation) <= variable.average_burn_length and ( UnitPower("player",16) ==  UnitPowerMax("player",16) or ( getTalent(4,2) and getSpellCD(charged_up) == 0 and UnitPower("player",16) <=1 ))) or lk == 0) and ( (xlms.value == "仅BOSS" and isBoss(tg)) or xlms.value == "卡CD" ) then        
         self:burn()
-        -- return
+        return
     end
-    print(burn_phase)
+    -- print(burn_phase)
     -- actions+=/call_action_list,name=conserve,if=!burn_phase
-    if not burn_phase or lk == 1 then     
+    if not burn_phase or lk == 1 or xlms.value == "仅BOSS" or xlms.value == "卡CD" then     
         self:conserve()
         -- return
     end
 
+    
 
 end
 -----------------------------------------------------------
