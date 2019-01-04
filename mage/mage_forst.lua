@@ -1,6 +1,6 @@
 ----------------------------------------------
 -- 模块属性
--- 来自于18.10.17 simc
+-- from simc 20181017
 -----------------------------------------------------------
 -- 定义循环的唯一ID，可以去https://1024tools.com/uuid生成，保证每次都不一样，宇宙唯一。
 local rotation_id = "0c02decd-b730-4509-b5bf-259d28ca3c28";
@@ -224,6 +224,24 @@ do
     end;
     aoenum_setting.value_width = 100; -- 值显示宽度像素（默认为100）
 
+    local hxfb_setting = dps_category:create_setting("hxfb"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    hxfb_setting.display_name = L["AOE彗星风暴人数"];
+    hxfb_setting.description = "AOE情况下超过设定人数，打彗星风暴"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    hxfb_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    hxfb_setting.default_value = 3; -- 变量默认值
+    hxfb_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    hxfb_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    hxfb_setting.is_enabled_by_default = true; -- 是否默认启用
+    hxfb_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 0) then
+            return true;
+        else
+            return false, "The number is too small.";
+        end
+    end;
+    hxfb_setting.value_width = 100; -- 值显示宽度像素（默认为100）
+
+
 
     -- 在类别test_category下添加配置变量test5
     local targets_setting = dps_category:create_setting("targets"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
@@ -255,8 +273,8 @@ do
     daduan_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
     local Touch_of_Death_setting = dps_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    Touch_of_Death_setting.display_name = L["爆发"];
-    Touch_of_Death_setting.description = "按下这个键切换爆发状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    Touch_of_Death_setting.display_name = L["爆发Ctrl+"];
+    Touch_of_Death_setting.description = "按下这个键和Ctrl键切换爆发状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     Touch_of_Death_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
     Touch_of_Death_setting.default_value = "E"; -- 变量默认值
     Touch_of_Death_setting.optional_values = nil -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
@@ -385,7 +403,7 @@ function rotation:precombat_action()
     end    
     
     local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发    
-    if isKeyDown(bf) and GetTime() - tt > 1 then
+    if IsControlKeyDown() and isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
         tt = GetTime()
         if baofa then
@@ -441,8 +459,8 @@ function rotation:aoe()
         end
     end
     self:rest()
-    -- actions.aoe+=/comet_storm
-    if canCast(comet_storm) and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) ) and castSpell(tg,comet_storm) then
+    -- actions.aoe+=/comet_storm --此处增加彗星风暴的使用条件
+    if canCast(comet_storm) and hxfb.is_enabled and active_enemies >= hxfb.value and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) ) and castSpell(tg,comet_storm) then
         if ydebug.is_enabled then
             print(102)
             return 0
@@ -613,7 +631,7 @@ function rotation:cooldowns()
     end
     self:rest()
     -- actions.cooldowns+=/blood_fury
-    if canCast(blood_fury) and castSpell(zj,blood_fury) then
+    if baofa and canCast(blood_fury) and castSpell(zj,blood_fury) then
         if ydebug.is_enabled then
             print(209)
             return 0
@@ -623,7 +641,7 @@ function rotation:cooldowns()
     end
     self:rest()
     -- actions.cooldowns+=/berserking
-    if canCast(berserking) and castSpell(zj,berserking) then
+    if baofa and canCast(berserking) and castSpell(zj,berserking) then
         if ydebug.is_enabled then
             print(210)
             return 0
@@ -656,7 +674,7 @@ end
 
 function rotation:single()
     -- actions.single=ice_nova,if=cooldown.ice_nova.ready&debuff.winters_chill.up
-    if getSpellCD(ice_nova) == 0 and UnitExists(tg) and UnitDebuffID(tg,winters_chill) then
+    if getSpellCD(ice_nova) <= 0 and UnitExists(tg) and UnitDebuffID(tg,winters_chill) then
         if canCast(ice_nova) and castSpell(tg,ice_nova) then
             if ydebug.is_enabled then
                 print(301)
@@ -743,7 +761,7 @@ function rotation:single()
     end
     self:rest()
     -- actions.single+=/blizzard,if=active_enemies>2|active_enemies>1&cast_time=0&buff.fingers_of_frost.react<2
-    if aoe_blizzard.is_enabled and active_enemies > 2 or active_enemies > 1 and getCastTime(blizzard) == 0 and getBuffRemain("player",fingers_of_frost) < 2 then
+    if aoe_blizzard.is_enabled and  ( active_enemies > 2 or active_enemies > 1 and getCastTime(blizzard) <= 0 and getBuffRemain("player",fingers_of_frost) < 2 ) then
         if canCast(blizzard) and castSpell(tg,blizzard) then
             if ydebug.is_enabled then
                 print(305)
@@ -767,7 +785,7 @@ function rotation:single()
     end
     self:rest()    
     -- actions.single+=/comet_storm
-    if canCast(comet_storm) and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) )  and castSpell(tg,comet_storm) then
+    if canCast(comet_storm) and hxfb.is_enabled and ( (getTalent(3,1) and getBuffStacks("player",116267) >= 4) or (not getTalent(3,1)) )  and castSpell(tg,comet_storm) then
         if ydebug.is_enabled then
             print(308)
             return 0
@@ -907,7 +925,7 @@ end
 function rotation:default_action()
 
     local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发    
-    if isKeyDown(bf) and GetTime() - tt > 1 then
+    if IsControlKeyDown() and isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
         tt = GetTime()
         if baofa then
@@ -921,7 +939,7 @@ function rotation:default_action()
     
     
     -- 不打断施法
-    if UnitCastingInfo("player") or UnitChannelInfo("player") and getSpellCD(61304) > 0 then return; end;
+    if UnitCastingInfo("player") or UnitChannelInfo("player") and getSpellCD(61304) > 0.01 then return; end;
 
     --获得变量
     aoe_blizzard = self.settings.aoetg --暴风雪
@@ -937,12 +955,15 @@ function rotation:default_action()
     lgpz = self.settings.lgpz --棱光屏障
     daduan = self.settings.daduan --打断
     orb = self.settings.orb --溜溜球
+    hxfb = self.settings.hxfb --彗星风暴
     -- baofa = Y.baofa --爆發
 
     if isbus.is_enabled and isBused("player") then return; end
 
     -- 本地化
     lastSpellCast = getLastSpell()
+
+
     
     
     --获得第一个符合条件的目标
@@ -1029,11 +1050,19 @@ function rotation:default_action()
 
 
     --水元素
-    if callpet.is_enabled then
+    -- if callpet.is_enabled then
+    --     if not UnitExists("pet") or not isAlive("pet") then
+    --         castSpell(zj,31687)
+    --     end
+    -- end
+
+    if _t1==nil then _t1=GetTime(); end
+    if callpet.is_enabled and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then            
         if not UnitExists("pet") or not isAlive("pet") then
             castSpell(zj,31687)
         end
-    end
+    end    
+    _t1=GetTime()+ 5
 
     -- 石头
     if getHP(zj) <= zlsyz.value and canUse(5512) then
@@ -1085,9 +1114,37 @@ function rotation:default_action()
         end
     end
     self:rest()
+
+    --进攻驱散
+    local pdlist = getEnemy(30)
+    self:rest()
+    for i = 1,#pdlist do
+        local p1 = pdlist[i] 
+        if tqmf == true and canPD(p1,true) and isInCombat(p1) then
+            if csi(p1,30449)  then
+                GH_Print("已偷取敌方魔法！！！")
+                self:rest()
+            end
+        end
+    end
+    --去除诅咒
+    local fd = getFriend(30)
+    self:rest()
+    for i = 1,#fd do
+        local p1 = fd[i] 
+        if qczz == true and UnitExists(p1) and isAlive(p1) and isInCombat(p1) then
+
+            if csi(p1,475)  then
+                GH_Print("已驱散诅咒！！！")
+                self:rest()
+            end
+        end
+    end
+
     -- -- # If the mage has FoF after casting instant Flurry, we can delay the Ice Lance and use other high priority action, if available.
     -- actions+=/ice_lance,if=prev_gcd.1.flurry&brain_freeze_active&!buff.fingers_of_frost.react
-    if lastSpellCast == flurry and UnitBuffID("player",brain_freeze) and not UnitBuffID("player",fingers_of_frost) then
+    -- actions+=/ice_lance,if=prev_gcd.1.flurry&!buff.fingers_of_frost.react
+    if lastSpellCast == flurry and not UnitBuffID("player",fingers_of_frost) then
         if castSpell(tg,ice_lance) then
             if ydebug.is_enabled then
                 print(1)

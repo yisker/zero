@@ -155,6 +155,17 @@ do
     targets_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
+    local xlms_setting = dps_category:create_setting("xlms"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    xlms_setting.display_name = L["泄蓝模式"];
+    xlms_setting.description = "确定泄蓝方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    xlms_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    xlms_setting.default_value = "仅BOSS"; -- 变量默认值
+    xlms_setting.optional_values = {"卡CD", "仅BOSS"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    xlms_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    xlms_setting.is_enabled_by_default = false; -- 是否默认启用
+    xlms_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    xlms_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
     local daduan_setting = dps_category:create_setting("daduan"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     daduan_setting.display_name = L["打断目标"];
     daduan_setting.description = "按下这个键打断当前目标"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
@@ -173,8 +184,8 @@ do
     daduan_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
     local Touch_of_Death_setting = dps_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    Touch_of_Death_setting.display_name = L["爆发"];
-    Touch_of_Death_setting.description = "按下这个键切换爆发状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    Touch_of_Death_setting.display_name = L["强制泄蓝"];
+    Touch_of_Death_setting.description = "按下这个键切换强制泄蓝状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     Touch_of_Death_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
     Touch_of_Death_setting.default_value = "E"; -- 变量默认值
     Touch_of_Death_setting.optional_values = nil -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
@@ -244,11 +255,12 @@ function rotation:macro_handler(argument)
         baofa = not baofa
     end
     if baofa == true then
-        GH_Print("爆发开启")
-        OverlayR("爆发开启")
+        lk = 0
+        GH_Print("强制泄蓝开启")
+        OverlayR("强制泄蓝开启")
     else
-        GH_Print("爆发关闭")
-        OverlayR("爆发关闭")
+        GH_Print("强制泄蓝关闭")
+        OverlayR("强制泄蓝关闭")
     end
 
 end
@@ -292,20 +304,30 @@ function rotation:precombat_action()
         baofa = not baofa
         tt = GetTime()
         if baofa then
-            GH_Print("爆发开启")
-            OverlayY("爆发开启")
+            lk = 0
+            GH_Print("强制泄蓝开启")
+            OverlayY("强制泄蓝开启")
         else
-            GH_Print("爆发关闭")
-            OverlayY("爆发关闭")
+            GH_Print("强制泄蓝关闭")
+            OverlayY("强制泄蓝关闭")
         end
     end
 	if not UnitBuffID("player",1459) then
 	    castSpell("player",1459)
-	end
+    end
+    if lk == 0 and UnitExists(tg) and UnitCanAttack("player",tg) and isCastingSpell("player",evocation) then
+        self:burn()
+    end
+    -- if lk == 1 and UnitExists(tg) and UnitCanAttack("player",tg)  then
+    --     self:conserve()
+    -- end
     self:rest();
 end
 
 function rotation:burn(args)
+    lk = 0
+    
+    
     -- # Increment our burn phase counter. Whenever we enter the `burn` actions without being in a burn phase, it means that we are about to start one.
     -- actions.burn=variable,name=total_burns,op=add,value=1,if=!burn_phase
     if not variable.total_burns then variable.total_burns = 0;end
@@ -382,6 +404,14 @@ function rotation:burn(args)
     end
     -- actions.burn+=/berserking
     -- actions.burn+=/arcane_power
+    if canCast(arcane_power) and castSpell("player",arcane_power) then
+        if ydebug.is_enabled then
+            print(225)
+            return 0
+        else
+            return 0
+        end
+    end
     -- actions.burn+=/use_items,if=buff.arcane_power.up|target.time_to_die<cooldown.arcane_power.remains
     -- actions.burn+=/blood_fury
     -- actions.burn+=/fireblood
@@ -459,11 +489,20 @@ function rotation:burn(args)
     -- actions.burn+=/variable,name=average_burn_length,op=set,value=(variable.average_burn_length*variable.total_burns-variable.average_burn_length+(burn_phase_duration))%variable.total_burns
     
     -- actions.burn+=/evocation,interrupt_if=mana.pct>=85,interrupt_immediate=1
-    
+    if getMana("player") <= variable.lk_mana and canCast(evocation) and castSpell("player",evocation) then
+        -- lk = 0
+        if ydebug.is_enabled then
+            print(213)
+            return 0
+        else
+            return 0
+        end
+    end  
     -- # For the rare occasion where we go oom before evocation is back up. (Usually because we get very bad rng so the burn is cut very short)
     -- actions.burn+=/arcane_barrage
-    if canCast(arcane_barrage) and castSpell(tg,arcane_barrage) then
+    if UnitPower("player",16) == 4 and canCast(arcane_barrage) and castSpell(tg,arcane_barrage) then
         print("离开MP："..getMana("player"))
+        variable.lk_mana = getMana("player") + 5        
         lk = 1
         if ydebug.is_enabled then
             print(212)
@@ -471,25 +510,16 @@ function rotation:burn(args)
         else
             return 0
         end
-    end
-    if lk==1 then
-        if canCast(evocation) and castSpell("player",evocation) then
-            lk = 0
-            if ydebug.is_enabled then
-                print(213)
-                return 0
-            else
-                return 0
-            end
-        end
-    end
+    end  
+    
+    
     
     return 0
 end
 
 
 function rotation:conserve(args)
-    print("平均时长："..variable.average_burn_length)
+    -- print(variable.average_burn_length)
     -- actions.conserve=mirror_image
     if canCast(mirror_image) and castSpell("player",mirror_image) then
         if ydebug.is_enabled then
@@ -511,7 +541,7 @@ function rotation:conserve(args)
         end
     end
     -- actions.conserve+=/nether_tempest,if=(refreshable|!ticking)&buff.arcane_charge.stack=buff.arcane_charge.max_stack&buff.rune_of_power.down&buff.arcane_power.down
-    if ( getDebuffRemain(tg,nether_tempest) <= 3) and UnitPower("player",16) == UnitPowerMax("player",16) and getBuffRemain("player",rune_of_power) <= 0 and getBuffRemain("player",arcane_power) <= 0 then
+    if ( UnitExists(tg) and getDebuffRemain(tg,nether_tempest) <= 3) and UnitPower("player",16) == UnitPowerMax("player",16) and getBuffRemain("player",rune_of_power) <= 0 and getBuffRemain("player",arcane_power) <= 0 then
         if canCast(nether_tempest) and castSpell(tg,nether_tempest) then
             if ydebug.is_enabled then
                 print(303)
@@ -672,20 +702,25 @@ function rotation:default_action()
 
     if variable.burntime == nil then variable.burntime = GetTime();end
     if variable.average_burn_length == nil or variable.average_burn_length >= 30 then variable.average_burn_length = 10;end
+    if variable.lk_mana == nil or variable.average_burn_length >= 30 then variable.lk_mana = 20;end
     if lk == nil then lk = 0;end
     local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发    
     if isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
         tt = GetTime()
         if baofa then
-            GH_Print("爆发开启")
-            OverlayY("爆发开启")
+            lk = 0
+            GH_Print("强制泄蓝开启")
+            OverlayY("强制泄蓝开启")
         else
-            GH_Print("爆发关闭")
-            OverlayY("爆发关闭")
+            GH_Print("强制泄蓝关闭")
+            OverlayY("强制泄蓝关闭")
         end
     end  
     
+    if isCastingSpell("player",evocation) and getMana("player") >= 85 then
+        SpellStopCasting()
+    end
     
     -- 不打断施法
     if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.01 then return; end;
@@ -699,6 +734,7 @@ function rotation:default_action()
     -- callpet = self.settings.callpet --坐骑
     -- jslq = self.settings.jslq --急速冷却
     zlsyz = self.settings.zlsyz --治疗石
+    xlms = self.settings.xlms --治疗石
     -- hbpz = self.settings.hbpz --寒冰屏障
     -- hbht = self.settings.hbht --寒冰护体
     -- lgpz = self.settings.lgpz --棱光屏障
@@ -765,19 +801,10 @@ function rotation:default_action()
     castSpell = csi
 
     -- talents=2032021
-
-
-    if lk==1 then
-        if canCast(evocation) and castSpell("player",evocation) then
-            lk = 0
-            if ydebug.is_enabled then
-                print(213)
-                return 0
-            else
-                return 0
-            end
-        end
-    end
+    local t1 = 2.25
+    if getCastTime(arcane_blast) ~= 0 then t1 = getCastTime(arcane_blast);end
+    variable.average_burn_length = math.floor( 110000/13500 ) * t1 
+    
     -- # Default consumables
     -- potion=battle_potion_of_intellect
     -- flask=endless_fathoms
@@ -798,13 +825,15 @@ function rotation:default_action()
     -- actions.precombat+=/arcane_familiar
     -- # conserve_mana is the mana percentage we want to go down to during conserve. It needs to leave enough room to worst case scenario spam AB only during AP.
     -- actions.precombat+=/variable,name=
-    variable.conserve_mana = 60
+    variable.conserve_mana = 70
     -- actions.precombat+=/snapshot_stats
     -- actions.precombat+=/mirror_image
     -- actions.precombat+=/potion
     -- actions.precombat+=/arcane_blast
     burn_phase = getSpellCD(arcane_power) == 0 and getSpellCD(evocation) <= variable.average_burn_length and ( UnitPower("player",16) == UnitPowerMax("player",16) or ( getTalent(4,2) and getSpellCD(charged_up) == 0 ))
 
+    
+    print("LK:"..lk)
     -- actions+=/call_action_list,name=movement
     if isMoving("player") then
         self:movement()
@@ -814,30 +843,24 @@ function rotation:default_action()
     -- actions=counterspell,if=target.debuff.casting.react
     -- # Go to Burn Phase when already burning, or when boss will die soon.
     -- actions+=/call_action_list,name=burn,if=burn_phase|target.time_to_die<variable.average_burn_length
-    if burn_phase --[[ or getTimeToDie(tg) < variable.average_burn_length ]] and lk == 0 then
-        if variable.burntime == 0 then
-            variable.burntime = GetTime()
-        end
+    if burn_phase then
+        lk = 0
+    end
+    if (burn_phase --[[ or getTimeToDie(tg) < variable.average_burn_length ]] or lk==0) and ( (xlms.value == "仅BOSS" and isBoss(tg)) or xlms.value == "卡CD" ) then        
         self:burn()
+        -- return
     end
     -- # Start Burn Phase when Arcane Power is ready and Evocation will be ready (on average) before the burn phase is over. Also make sure we got 4 Arcane Charges, or can get 4 Arcane Charges with Charged Up.
     -- actions+=/call_action_list,name=burn,if=(cooldown.arcane_power.remains=0&cooldown.evocation.remains<=variable.average_burn_length&(buff.arcane_charge.stack=buff.arcane_charge.max_stack|(talent.charged_up.enabled&cooldown.charged_up.remains=0&buff.arcane_charge.stack<=1)))
-    if ( getSpellCD(arcane_power) == 0 and getSpellCD(evocation) <= variable.average_burn_length and ( UnitPower("player",16) ==  UnitPowerMax("player",16) or ( getTalent(4,2) and getSpellCD(charged_up) == 0 and UnitPower("player",16) <=1 ))) and lk == 0 then
-        if variable.burntime == 0 then
-            variable.burntime = GetTime()
-        end
+    if (( getSpellCD(arcane_power) == 0 and getSpellCD(evocation) <= variable.average_burn_length and ( UnitPower("player",16) ==  UnitPowerMax("player",16) or ( getTalent(4,2) and getSpellCD(charged_up) == 0 and UnitPower("player",16) <=1 ))) or lk == 0) and ( (xlms.value == "仅BOSS" and isBoss(tg)) or xlms.value == "卡CD" ) then        
         self:burn()
+        -- return
     end
+    print(burn_phase)
     -- actions+=/call_action_list,name=conserve,if=!burn_phase
-    if  not burn_phase then
-        if variable.burntime ~= 0 or variable.average_burn_length == 10 then
-            -- body
-            if count == nil then count = 0;end        
-            variable.average_burn_length = (variable.average_burn_length*count + GetTime() - variable.burntime)/(count+1) - 6
-            count = count + 1
-        end    
-        variable.burntime = 0
+    if not burn_phase or lk == 1 then     
         self:conserve()
+        -- return
     end
 
 
