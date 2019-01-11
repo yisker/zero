@@ -4314,7 +4314,7 @@ function rotation:default_action()
     else
         active_enemies = 0
     end    
-
+    if i=1 then return;end
     gcd = getGCD()
     time = getCombatTime()
     expected_combat_length = getTimeToDie(tg)
