@@ -1,50 +1,50 @@
-
-
 ----------------------------------------------
 -- 模块属性
 -----------------------------------------------------------
--- 定义循环的唯一ID，可以去https://1024tools.com/uuid生成，保证每次都不一样，宇宙唯一。
-local rotation_id = "f60430eb-d774-457a-8913-7bbefd23bf5c";
--- 定义循环的英文名称。
-local rotation_name = "test_priest_discipline";
-Scorpio("zeus." .. rotation_name)("");
--- 定义多语言字符串。
-local L = _Locale("zhCN", true);
-if L then
-    -- 简体中文系列。
-    L[rotation_name] = "测试戒律";
-    L["Welcome to use test module."] = "欢迎使用测试戒律模块！";
-    L["Test 1"] = "测试1号";
-    L["Test 2"] = "测试2号";
-    L["At least 2 values must be entered."] = "至少要输入2个值";
-    L["Test Category"] = "测试类别";
-    L["Test 3"] = "测试3号";
-    L["Test 4"] = "测试4号";
-    L["Test 5"] = "测试5号";
+do
+    -- 定义循环的唯一ID，可以去https://1024tools.com/uuid生成，保证每次都不一样，宇宙唯一。
+    local rotation_id = "f60430eb-d774-457a-8913-7bbefd23bf5c";
+    -- 定义循环的英文名称。
+    local rotation_name = "test_priest_discipline";
+    Scorpio("zeus." .. rotation_name)("");
+    -- 定义多语言字符串。
+    local L = _Locale("zhCN", true);
+    if L then
+        -- 简体中文系列。
+        L[rotation_name] = "测试戒律";
+        L["Welcome to use test module."] = "欢迎使用测试戒律模块！";
+        L["Test 1"] = "测试1号";
+        L["Test 2"] = "测试2号";
+        L["At least 2 values must be entered."] = "至少要输入2个值";
+        L["Test Category"] = "测试类别";
+        L["Test 3"] = "测试3号";
+        L["Test 4"] = "测试4号";
+        L["Test 5"] = "测试5号";
+    end
+    L = _Locale("zhTW");
+    if L then
+        -- 繁体中文系列。
+        L[rotation_name] = "測試戒律";
+        L["Welcome to use test module."] = "歡迎使用測試戒律模組！";
+        L["Test 1"] = "測試1號";
+        L["Test 2"] = "測試2號";
+        L["At least 2 values must be entered."] = "至少要输入2个值";
+        L["Test Category"] = "測試類別";
+        L["Test 3"] = "測試3號";
+        L["Test 4"] = "測試4號";
+        L["Test 5"] = "測試5號";
+    end
+    L = _Locale;
+    local rotation = zeus.rotation(rotation_id, L[rotation_name]);
+    -- 定义循环加载并可用时的消息，填入"N/A"则不显示。
+    rotation.condition_yes_message = L["Welcome to use test module."];
+    -- 定义循环加载并不可用时的消息，填入"N/A"则不显示。
+    rotation.condition_no_message = "N/A";
+    -- 定义循环的执行间隔（秒），如果不设默认是0.1。
+    rotation.interval = 0.1;
+    -- 定义模块专用宏命令，下面的例子会定义出：/zeus test [argument]。如果不需要宏控制，则删除下面一行。
+    rotation.macro = "abc";
 end
-L = _Locale("zhTW");
-if L then
-    -- 繁体中文系列。
-    L[rotation_name] = "測試戒律";
-    L["Welcome to use test module."] = "歡迎使用測試戒律模組！";
-    L["Test 1"] = "測試1號";
-    L["Test 2"] = "測試2號";
-    L["At least 2 values must be entered."] = "至少要输入2个值";
-    L["Test Category"] = "測試類別";
-    L["Test 3"] = "測試3號";
-    L["Test 4"] = "測試4號";
-    L["Test 5"] = "測試5號";
-end
-L = _Locale;
-local rotation = zeus.rotation(rotation_id, L[rotation_name]);
--- 定义循环加载并可用时的消息，填入"N/A"则不显示。
-rotation.condition_yes_message = L["Welcome to use test module."];
--- 定义循环加载并不可用时的消息，填入"N/A"则不显示。
-rotation.condition_no_message = "N/A";
--- 定义循环的执行间隔（秒），如果不设默认是0.1。
-rotation.interval = 0.1;
--- 定义模块专用宏命令，下面的例子会定义出：/zeus test [argument]。如果不需要宏控制，则删除下面一行。
-rotation.macro = "abc";
 -----------------------------------------------------------
 -- 模块变量
 -----------------------------------------------------------
@@ -53,88 +53,89 @@ rotation.macro = "abc";
 -- 类别和变量会根据添加的先后顺序，依次在界面自上而下显示。默认类别下的变量会显示在最上面。
 -- 变量的当前值会保存在WTF中。
 -----------------------------------------------------------
--- 给默认类别添加一个配置变量test1，并配置相关属性。
-local test1_setting = rotation.default_setting_category:create_setting("test1"); -- 指定变量的名字为test1，用于在脚本中进行引用
-test1_setting.display_name = L["Test 1"]; -- 变量在界面上显示的名字
-test1_setting.description = "这是number数组类型的变量，其值为number数组。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-test1_setting.value_type = rotation_setting_type.numbers; -- 变量值类型（number数组类型）
-test1_setting.default_value = {100, 200}; -- 变量默认值（删除此行不设，则为{}）
-test1_setting.optional_values = {100, 200, 300}; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
-test1_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-test1_setting.is_enabled_by_default = true; -- 是否默认启用（勾选框默认选中）
-test1_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-test1_setting.value_width = 120; -- 值显示宽度像素（默认为100）
--- 给默认类别添加一个配置变量test2，并配置相关属性。
-local test2_setting = rotation.default_setting_category:create_setting("test2"); -- 指定变量的名字为test2，用于在脚本中进行引用（名字不能与test1重复）
-test2_setting.display_name = L["Test 2"]; -- 变量在界面上显示的名字
-test2_setting.description = "这是text数组类型的变量，其值为string数组。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-test2_setting.value_type = rotation_setting_type.texts; -- 变量值类型（text数组类型）
-test2_setting.default_value = {"Hello", "World"}; -- 变量默认值（可以留空则为{}）
-test2_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框，需用户手动输入多个值，用英文逗号分隔）
-test2_setting.can_enable_disable = false; -- 是否支持启用停用（不支持则在界面上不显示勾选框）
-test2_setting.is_enabled_by_default = false; -- 是否默认启用
-test2_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
-    if (#value > 1) then
-        return true;
-    else
-        return false, L["At least 2 values must be entered."];
-    end
-end;
-test2_setting.value_width = 90; -- 值显示宽度像素（默认为100）
--- 添加一个自定义类别test_category。
-local test_category = rotation:create_setting_category("test_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
-test_category.display_name = L["Test Category"]; -- 类别在界面上显示的名字
--- 在类别test_category下添加配置变量test3
-local test3_setting = test_category:create_setting("test3"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-test3_setting.display_name = L["Test 3"];
-test3_setting.description = "这是plain类型的变量，它没有值。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-test3_setting.value_type = rotation_setting_type.plain; -- 变量值类型（空类型，也就是说只有启用停用一说）
-test3_setting.default_value = nil; -- 变量默认值（空类型不需要默认值）
-test3_setting.optional_values = nil; -- 变量备选值（空类型不需要备选值）
-test3_setting.can_enable_disable = true; -- 是否支持启用停用（既然是空类型就必须支持了，否则还有什么意义）
-test3_setting.is_enabled_by_default = false; -- 是否默认启用
-test3_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（空类型连值都没，还验证个毛）
-test3_setting.value_width = 100; -- 值显示宽度像素（空类型设多少都一回事，反正不显示，就这么搁着吧）
--- 在类别test_category下添加配置变量test4
-local test4_setting = test_category:create_setting("test4"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-test4_setting.display_name = L["Test 4"];
-test4_setting.description = "这是number类型的变量，它只能接受number。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-test4_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
-test4_setting.default_value = 500; -- 变量默认值
-test4_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
-test4_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-test4_setting.is_enabled_by_default = false; -- 是否默认启用
-test4_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
-    if (value > 100) then
-        return true;
-    else
-        return false, "The number is too small.";
-    end
-end;
-test4_setting.value_width = 80; -- 值显示宽度像素（默认为100）
--- 在类别test_category下添加配置变量test5
-local test5_setting = test_category:create_setting("test5"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-test5_setting.display_name = L["Test 5"];
-test5_setting.description = "这是string类型的变量，它只能接受string。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-test5_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
-test5_setting.default_value = "Hello"; -- 变量默认值
-test5_setting.optional_values = {"Hello", "World", "Hello, World"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
-test5_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-test5_setting.is_enabled_by_default = false; -- 是否默认启用
-test5_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-test5_setting.value_width = 130; -- 值显示宽度像素（默认为100）
--- 在类别test_category下添加配置变量test5
-local targets_setting = test_category:create_setting("targets"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-targets_setting.display_name = L["targets"];
-targets_setting.description = "确定目标的选择方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-targets_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
-targets_setting.default_value = "智能"; -- 变量默认值
-targets_setting.optional_values = {"智能", "当前目标"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
-targets_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
-targets_setting.is_enabled_by_default = false; -- 是否默认启用
-targets_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
-
+do
+    -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local test1_setting = rotation.default_setting_category:create_setting("test1"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    test1_setting.display_name = L["Test 1"]; -- 变量在界面上显示的名字
+    test1_setting.description = "这是number数组类型的变量，其值为number数组。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    test1_setting.value_type = rotation_setting_type.numbers; -- 变量值类型（number数组类型）
+    test1_setting.default_value = {100, 200}; -- 变量默认值（删除此行不设，则为{}）
+    test1_setting.optional_values = {100, 200, 300}; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    test1_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    test1_setting.is_enabled_by_default = true; -- 是否默认启用（勾选框默认选中）
+    test1_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    test1_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+    -- 给默认类别添加一个配置变量test2，并配置相关属性。
+    local test2_setting = rotation.default_setting_category:create_setting("test2"); -- 指定变量的名字为test2，用于在脚本中进行引用（名字不能与test1重复）
+    test2_setting.display_name = L["Test 2"]; -- 变量在界面上显示的名字
+    test2_setting.description = "这是text数组类型的变量，其值为string数组。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    test2_setting.value_type = rotation_setting_type.texts; -- 变量值类型（text数组类型）
+    test2_setting.default_value = {"Hello", "World"}; -- 变量默认值（可以留空则为{}）
+    test2_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框，需用户手动输入多个值，用英文逗号分隔）
+    test2_setting.can_enable_disable = false; -- 是否支持启用停用（不支持则在界面上不显示勾选框）
+    test2_setting.is_enabled_by_default = false; -- 是否默认启用
+    test2_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (#value > 1) then
+            return true;
+        else
+            return false, L["At least 2 values must be entered."];
+        end
+    end;
+    test2_setting.value_width = 90; -- 值显示宽度像素（默认为100）
+    -- 添加一个自定义类别test_category。
+    local test_category = rotation:create_setting_category("test_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
+    test_category.display_name = L["Test Category"]; -- 类别在界面上显示的名字
+    -- 在类别test_category下添加配置变量test3
+    local test3_setting = test_category:create_setting("test3"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    test3_setting.display_name = L["Test 3"];
+    test3_setting.description = "这是plain类型的变量，它没有值。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    test3_setting.value_type = rotation_setting_type.plain; -- 变量值类型（空类型，也就是说只有启用停用一说）
+    test3_setting.default_value = nil; -- 变量默认值（空类型不需要默认值）
+    test3_setting.optional_values = nil; -- 变量备选值（空类型不需要备选值）
+    test3_setting.can_enable_disable = true; -- 是否支持启用停用（既然是空类型就必须支持了，否则还有什么意义）
+    test3_setting.is_enabled_by_default = false; -- 是否默认启用
+    test3_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（空类型连值都没，还验证个毛）
+    test3_setting.value_width = 100; -- 值显示宽度像素（空类型设多少都一回事，反正不显示，就这么搁着吧）
+    -- 在类别test_category下添加配置变量test4
+    local test4_setting = test_category:create_setting("test4"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    test4_setting.display_name = L["Test 4"];
+    test4_setting.description = "这是number类型的变量，它只能接受number。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    test4_setting.value_type = rotation_setting_type.number; -- 变量值类型（number类型）
+    test4_setting.default_value = 500; -- 变量默认值
+    test4_setting.optional_values = nil; -- 变量备选值（此处不设，则为文本输入框）
+    test4_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    test4_setting.is_enabled_by_default = false; -- 是否默认启用
+    test4_setting.validator = function(self, value) -- 变量值校验函数，检测值除了类型以外的其他合法性（如果合法就返回true，否则返回false, [错误信息]）
+        if (value > 100) then
+            return true;
+        else
+            return false, "The number is too small.";
+        end
+    end;
+    test4_setting.value_width = 80; -- 值显示宽度像素（默认为100）
+    -- 在类别test_category下添加配置变量test5
+    local test5_setting = test_category:create_setting("test5"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    test5_setting.display_name = L["Test 5"];
+    test5_setting.description = "这是string类型的变量，它只能接受string。"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    test5_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    test5_setting.default_value = "Hello"; -- 变量默认值
+    test5_setting.optional_values = {"Hello", "World", "Hello, World"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    test5_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    test5_setting.is_enabled_by_default = false; -- 是否默认启用
+    test5_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    test5_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+    -- 在类别test_category下添加配置变量test5
+    local targets_setting = test_category:create_setting("targets"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    targets_setting.display_name = L["targets"];
+    targets_setting.description = "确定目标的选择方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    targets_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    targets_setting.default_value = "智能"; -- 变量默认值
+    targets_setting.optional_values = {"智能", "当前目标"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    targets_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    targets_setting.is_enabled_by_default = false; -- 是否默认启用
+    targets_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+end
 -----------------------------------------------------------
 -- 模块脚本
 -----------------------------------------------------------
@@ -4006,7 +4007,6 @@ function rotation:prestop_action()
     -- 编写模块停止前脚本。
     print("stop now not ");
 end
-
 function rotation:precombat_action()
     -- 编写在非战斗中循环执行的脚本。
     -- local test1 = self.settings.test1; -- 返回指定配置变量是否启用+当前值。
@@ -4053,7 +4053,7 @@ function rotation:precombat_action()
     -- end
 
 end
-function rotation:aoe(args)
+function rotation:aoe()
     -- # Multi target action priority list
     -- actions.aoe=stormkeeper,if=talent.stormkeeper.enabled
     if talent.stormKeeper then
@@ -4116,7 +4116,7 @@ function rotation:aoe(args)
     -- actions.aoe+=/frost_shock,moving=1
     return 0
 end
-function rotation:single_target(args)
+function rotation:single_target()
     -- # Single Target Action Priority List
     -- # Ensure FS is active unless you have 14 or more stacks of Wind Gust from Storm Elemental. (Edge case: upcoming Asc but active SE; don't )
     -- actions.single_target=flame_shock,if=(!ticking|talent.storm_elemental.enabled&cooldown.storm_elemental.remains<2*gcd|dot.flame_shock.remains<=gcd|talent.ascendance.enabled&dot.flame_shock.remains<(cooldown.ascendance.remains+buff.ascendance.duration)&cooldown.ascendance.remains<4&(!talent.storm_elemental.enabled|talent.storm_elemental.enabled&cooldown.storm_elemental.remains<120))&buff.wind_gust.stack<14 
@@ -4271,8 +4271,6 @@ function rotation:single_target(args)
     -- # Frost Shock is our movement filler.
     -- actions.single_target+=/frost_shock,moving=1
 end
-
-
 function rotation:default_action()
 
     player          = cPlayer:new("player",262)
