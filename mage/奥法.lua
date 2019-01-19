@@ -511,7 +511,7 @@ function rotation:burn(args)
     end
     -- # When running Overpowered, and we got a Rule of Threes proc (AKA we got our 4th Arcane Charge via Charged Up), use it before using RoP+AP, because the mana reduction is otherwise largely wasted since the AB was free anyway.
     -- actions.burn+=/arcane_blast,if=buff.rule_of_threes.up&talent.overpowered.enabled&active_enemies<3
-    if getBuffRemain("player", rule_of_threes) > 0 and getTalent(7,1) and active_enemies < 3 then
+    if getBuffRemain("player", rule_of_threes) > 0 and getTalent(7,1) and active_enemies < 3 and active_enemies2 < 3 then
         if canCast(arcane_blast) and castSpell(tg,arcane_blast) then
             if ydebug.is_enabled then
                 print(204)
