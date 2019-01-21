@@ -137,6 +137,199 @@ do
     targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 end
 -----------------------------------------------------------
+-- 注册事件
+-----------------------------------------------------------
+--注册事件
+do
+    local guid = UnitGUID("player")
+    local frame = CreateFrame('Frame')
+    frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+
+    if Y == nil then
+        Y = {}
+    end
+
+    if Y.lastspell_failed == nil then
+        Y.lastspell_failed = 0;
+    end
+    if Y.lastspell_failedtime == nil then
+        Y.lastspell_failedtime = 0;
+    end
+    if Y.lastspell_time == nil then
+        Y.lastspell_time = 0;
+    end
+    if Y.lastspell_cast == nil then
+        Y.lastspell_cast = 0;
+    end
+    if Y.spelllist_failed == nil then 
+        Y.spelllist_failed = {};
+    end
+    if Y.spelllist_success == nil then 
+        Y.spelllist_success = {};
+    end
+    if Y.data == nil then 
+        Y.data = {};
+    end
+    if Y.nNove == nil then 
+        Y.nNove = {};
+    end
+    if Y.nTank == nil then 
+        Y.nTank = {};
+    end
+
+    if tt == nil then
+        tt = 0
+    end
+
+    if Y.spelllist == nil then
+        Y.spelllist = {}
+    end
+
+    -------------------------------------------------------------------------------------------------------------------
+    -- 记录进入战斗后自己释放成功和失败的技能队列，
+
+    -- 通过访问Y.lastspell_failed获得上一次失败的技能ID，
+    -- Y.lastspell_failedtime获得上一次失败的技能时间，
+    -- Y.spelllist_failed记录失败的施法队列，
+    -- Y.spelllist_failed[id]为最近一次释放同ID技能失败的列表，键值是name，target，stime
+
+    -- 通过访问Y.lastspell_time获得上一次成功的技能ID，
+    -- Y.lastspell_time获得上一次成功的技能时间，
+    -- Y.lastspell_cast记录成功的施法队列，
+    -- Y.spelllist_success[id]为最近一次释放同ID技能成功的列表，键值是name，target，stime
+    -------------------------------------------------------------------------------------------------------------------
+    local function reader(self,event,...)
+        local timeStamp, param, hideCaster, source, sourceName, sourceFlags, 
+        sourceRaidFlags, destination,
+        destName, destFlags, destRaidFlags, spell, spellName, _, spellType = CombatLogGetCurrentEventInfo()
+
+        if source == guid then
+            if param == "SPELL_CAST_FAILED" then
+                if sourceName ~= nil then
+                    if isInCombat("player") and UnitIsUnit(sourceName,"player") and spell ~= 48018 and spell ~= 48020 then
+                        Y.lastspell_failed = spell 
+                        Y.lastspell_failedtime = GetTime()
+                        if Y.spelllist_failed[spell] == nil then 
+                            Y.spelllist_failed[spell] = {};
+                        end
+                        table.insert(Y.spelllist_failed[spell],{name = spellName, target = destination, stime = Y.lastspell_failedtime})
+                        -- if source == guid then
+                            --print(spellName.." 失败原因: "..spellType)
+                        -- end
+                        if spell == Y.lastspell_start then
+                            Y.lastspell_start = 0
+                        end
+                    end
+                end
+            end
+            
+            if param == "SPELL_CAST_START" then
+                Y.lastspell_start = spell
+            end
+            
+            if param == "SPELL_CAST_SUCCESS" then
+                if sourceName ~= nil then
+                    if isInCombat("player") and UnitIsUnit(sourceName,"player") then
+                        Y.lastspell_time = GetTime()
+                        Y.lastspell_cast = {spellname = spell, spelltarget = destination}
+                        if Y.spelllist_success[spell] == nil then 
+                            Y.spelllist_success[spell] = {};
+                        end
+                        table.insert(Y.spelllist_success[spell],{name = spellName, target = destination, stime = Y.lastspell_time})
+                        table.insert( Y.spelllist, spell )
+                        if destination then
+                            Y.lastspell_target = destination
+                            -- if self.settings.ydebug.is_enabled then             
+                            --     GH_Print("成功对 "..destName.." ".."施放了 "..spellName)
+                            -- end
+                        else
+                            Y.lastspell_target = none
+                        end
+                    end
+                end
+            end
+        end
+
+    end
+    frame:SetScript("OnEvent", reader)
+
+
+    -------------------------------------------------------------------------------------------------------------------
+    -- 记录进入战斗的时间
+    -- 通过访问Y.data["Combat Started"]获得战斗开始时间，
+    -- 离开战斗或者玩家死亡，清除所有的_G
+    -------------------------------------------------------------------------------------------------------------------
+    local Frame = CreateFrame('Frame')
+    Frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    Frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    Frame:RegisterEvent("PLAYER_DEAD")
+    local function EnteringCombat(self,event,...)
+        if event == "PLAYER_REGEN_DISABLED" then
+        -- here we should manage stats snapshots
+        --AgiSnap = getAgility()
+        Y.data["Combat Started"] = GetTime();
+        -- Y.data["GCD"] = getGCD();
+        -- if ydebug.is_enabled then
+        --     GH_Print(" or cffFF0000进入战斗，开始计时")
+        -- end
+        -- SetupTables()
+        end
+        if event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_DEAD"  then
+        
+            Y.data["Combat Started"] = 0
+            Y.lastspell_failed = 0;
+            Y.lastspell_failedtime = 0;
+            Y.lastspell_cast = 0;
+            Y.lastspell_time = 0;
+            Y.spelllist_failed = {};
+            Y.spelllist_success = {};
+            Y.spelllist = {};
+            -- Y.data["GCD"] = getGCD();
+            -- SetupTables()
+            -- if self.settings.ydebug.is_enabled then
+            --     GH_Print(" or cffFF0000离开战斗，重置参数")
+            -- end
+        
+        end
+    end
+    Frame:SetScript("OnEvent",EnteringCombat)
+    
+    --   -------------------------------------------------------------------------------------------------------------------
+    --   -- 创建队友列表，通过团队时间驱动刷新
+    --   -- 通过访问_nNova获得列表，
+    --   -- 
+    --   -------------------------------------------------------------------------------------------------------------------
+    --   local updateHealingTable = CreateFrame("frame", nil)
+    --   updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
+    --   updateHealingTable:SetScript("OnEvent", function()
+    --     table.wipe(Y.nNove)
+    --     table.wipe(Y.nTank)  
+    --     SetupTables()
+    --   end)
+    
+    --  -- if Y.nNove == nil then
+    --      -- SetupTables()
+    --  -- end
+    
+    --   function SetupTables()    
+        
+    --  table.wipe(Y.nNove)
+    --     table.wipe(Y.nTank)
+    --     local group =  IsInRaid() and "raid" or "party" 
+    --     local groupSize = IsInRaid() and GetNumGroupMembers() or 
+    --     GetNumGroupMembers() - 1
+
+    --     for i=1, groupSize do 
+    --       local groupUnit = group..i      
+    --       if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
+    --       if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
+    --     end
+
+    --     table.insert(Y.nNove, "player")
+        
+    --   end
+end
+-----------------------------------------------------------
 -- 模块脚本
 -----------------------------------------------------------
 function rotation:macro_handler(argument)
@@ -3561,19 +3754,37 @@ function rotation:prestart_action()
     -- 基本类
     function cUnit:new(unit)
         local self = {}
+        local function getHP(Unit)
+            if Unit == nil then 
+                Unit = "player";
+                return UnitHealth(Unit)/UnitHealthMax(Unit)
+            end
+            if UnitExists(Unit) and not UnitIsDeadOrGhost(Unit) then
+                if UnitIsEnemy("player", Unit) and UnitIsVisible(Unit) then
+                    return UnitHealth(Unit)/UnitHealthMax(Unit)
+                else
+                    if not UnitIsDeadOrGhost(Unit) and UnitIsVisible(Unit) then                        
+                        return UnitHealth(Unit)/UnitHealthMax(Unit)                        
+                    end
+                end
+            end
+            return 0
+        end
+        
         self.artifact       = {} 	
         self.buff           = {}       
         self.debuff         = {}        
         self.cooldown       = {}        
         self.charges        = {} 
-        self.spell	        = {}        
+        self.spell	        = {}
+        self.pct_health     = getHP      
         return self
     end
 
     --玩家类
     function cPlayer:new(unit,spec)    
         -- 继承基本类
-        local self = cUnit:new() 
+        local self = cUnit:new(unit)
         -- 根据职业，专精取list数据       
         local playerClass = select(2,UnitClass("player"))
         local spec = select(1,GetSpecializationInfo(GetSpecialization()))
@@ -3616,7 +3827,11 @@ function rotation:prestart_action()
             if self.charges[k]      == nil then self.charges[k]         = {} end        
             if self.cooldown[k]     == nil then self.cooldown[k]        = {} end 
             if self.cast            == nil then self.cast               = {} end       
-            if self.cast.able       == nil then self.cast.able          = {} end       
+            if self.cast.able       == nil then self.cast.able          = {} end
+            if self.cast.able       == nil then self.cast.able          = {} end
+            if self.prev_gcd        == nil then self.prev_gcd           = {} end
+            -- if self.prev_gcd.1      == nil then self.prev_gcd.1         = {} end
+            -- if self.prev_gcd.2      == nil then self.prev_gcd.2         = {} end
 
             -- Build Spell Charges
             local charges = self.charges[k]
@@ -3658,6 +3873,7 @@ function rotation:prestart_action()
                 return getSpellCD(v)
             end
 
+
             -- 构造施法函数
             self.cast[k] = function(thisUnit,FacingCheck,MovementCheck,SpamAllowed,KnownSkip,DeadCheck,DistanceSkip,usableSkip)
                 if thisUnit == nil then thisUnit = "target";end
@@ -3666,6 +3882,11 @@ function rotation:prestart_action()
             self.cast.able[k] = function()
                 return canCast(v)
                 -- return self.cast[v](nil,"debug")
+            end
+
+            self.prev_gcd[k] = function (targetunit)
+                if targetunit == nil then targetunit = "target";end
+                return Y.lastspell_cast["spellname"] == v and UnitIsUnit(Y.lastspell_cast["spelltarget"],targetunit)
             end
             
         end
@@ -3738,6 +3959,14 @@ function rotation:prestart_action()
                 return getRegen("player")
             end
             power.ttm = function(amount)
+                if amount == nil then amount = 6 end
+                if isDKRunes then
+                    return runeTimeTill(amount)
+                else
+                    return getTimeToMax("player")
+                end
+            end
+            power.time_to_max = function(amount)
                 if amount == nil then amount = 6 end
                 if isDKRunes then
                     return runeTimeTill(amount)
@@ -3990,7 +4219,9 @@ function rotation:prestart_action()
         if self.talent == nil then 
             getTalentInfo();
             getAzeriteTraitInfo();
-        end 
+        end
+        
+        
         return self
     end
 
@@ -4053,227 +4284,9 @@ function rotation:precombat_action()
     -- end
 
 end
-function rotation:aoe()
-    -- # Multi target action priority list
-    -- actions.aoe=stormkeeper,if=talent.stormkeeper.enabled
-    if talent.stormKeeper then
-        if cast.able.stormKeeper() and cast.stormKeeper("player") then
-            return 0
-        end
-    end
-    -- actions.aoe+=/ascendance,if=talent.ascendance.enabled&(talent.storm_elemental.enabled&cooldown.storm_elemental.remains<120&cooldown.storm_elemental.remains>15|!talent.storm_elemental.enabled)
-    if talent.ascendance and (talent.stormElemental and cooldown.stormElemental.remains()<120 and cooldown.stormElemental.remains()>15 or  not talent.stormElemental) then
-        if cast.able.ascendance() and cast.ascendance("player") then
-            return 0
-        end
-    end
-    -- actions.aoe+=/liquid_magma_totem,if=talent.liquid_magma_totem.enabled
-    if talent.liquidMagmaTotem then
-        if cast.able.liquidMagmaTotem() and cast.liquidMagmaTotem("player") then
-            return 0
-        end
-    end
-    -- # Spread Flame Shock in <=4 target fights, but not during SE uptime, unless you're fighting 3 targets and have less than 14 Wind Gust stacks.
-    -- actions.aoe+=/flame_shock,target_if=refreshable&spell_targets.chain_lightning<5&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120|spell_targets.chain_lightning=3&buff.wind_gust.stack<14)
-    if debuff.flameShock.refreshable() and active_enemies<5 and ( not talent.stormElemental or cooldown.stormElemental.remains()<120 or active_enemies==3 and buff.windGust.stack()<14) then
-        if cast.able.flameShock() and cast.flameShock() then
-            return 0
-        end
-    end
-    -- # Try to game Earthquake with Master of the Elements buff when fighting 3 targets. Don't overcap Maelstrom not 
-    -- actions.aoe+=/earthquake,if=!talent.master_of_the_elements.enabled|buff.stormkeeper.up|maelstrom>=(100-4*spell_targets.chain_lightning)|buff.master_of_the_elements.up|spell_targets.chain_lightning>3
-    if  not talent.masterOfTheElements or buff.stormKeeper.up() or power.maelstrom.amount()>=(100-4*active_enemies) or buff.masterOfTheElements.up() or active_enemies>3 then
-        if cast.able.earthquake() and cast.earthquake() then
-            return 0
-        end
-    end
-    -- # Only cast Lava Burst on three targets if it is an instant and Storm Elemental is NOT active.
-    -- actions.aoe+=/lava_burst,if=(buff.lava_surge.up|buff.ascendance.up)&spell_targets.chain_lightning<4&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120)
-    if (buff.lavaSurge.up() or buff.ascendance.up()) and active_enemies<4 and ( not talent.stormElemental or cooldown.stormElemental.remains()<120) then
-        if cast.able.lavaBurst() and cast.lavaBurst() then
-            return 0
-        end
-    end
-    -- # Use Elemental Blast against up to 3 targets as long as Storm Elemental is not active.
-    -- actions.aoe+=/elemental_blast,if=talent.elemental_blast.enabled&spell_targets.chain_lightning<4&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120)
-    if talent.elementalBlast and active_enemies<4 and ( not talent.stormElemental or cooldown.stormElemental.remains()<120) then
-        if cast.able.elementalBlast() and cast.elementalBlast() then
-            return 0
-        end
-    end
-    -- actions.aoe+=/lava_beam,if=talent.ascendance.enabled 
-    if talent.ascendance then
-        if cast.able.lavaBeam() and cast.lavaBeam() then
-            return 0
-        end
-    end
-    -- actions.aoe+=/chain_lightning
-    if cast.able.chainLightning() and cast.chainLightning() then
-        return 0
-    end
-    -- actions.aoe+=/lava_burst,moving=1,if=talent.ascendance.enabled
-    -- actions.aoe+=/flame_shock,moving=1,target_if=refreshable
-    -- actions.aoe+=/frost_shock,moving=1
-    return 0
-end
-function rotation:single_target()
-    -- # Single Target Action Priority List
-    -- # Ensure FS is active unless you have 14 or more stacks of Wind Gust from Storm Elemental. (Edge case: upcoming Asc but active SE; don't )
-    -- actions.single_target=flame_shock,if=(!ticking|talent.storm_elemental.enabled&cooldown.storm_elemental.remains<2*gcd|dot.flame_shock.remains<=gcd|talent.ascendance.enabled&dot.flame_shock.remains<(cooldown.ascendance.remains+buff.ascendance.duration)&cooldown.ascendance.remains<4&(!talent.storm_elemental.enabled|talent.storm_elemental.enabled&cooldown.storm_elemental.remains<120))&buff.wind_gust.stack<14 
-    if ( not debuff.flameShock.ticking() or talent.stormElemental and cooldown.stormElemental.remains()<2*gcd or debuff.flameShock.remains()<=gcd or talent.ascendance and debuff.flameShock.remains()<(cooldown.ascendance.remains()+buff.ascendance.duration()) and cooldown.ascendance.remains()<4 and ( not talent.stormElemental or talent.stormElemental and cooldown.stormElemental.remains()<120)) and buff.windGust.stack()<14 then
-        if cast.able.flameShock() and cast.flameShock() then
-            return 0
-        end
-    end
-    -- # Use Ascendance after you've spent all Lava Burst charges and only if neither Storm Elemental nor iceFury are currently active.
-    -- actions.single_target+=/ascendance,if=talent.ascendance.enabled&(time>=60|buff.bloodlust.up)&cooldown.lava_burst.remains>0&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains>120)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
-    if talent.ascendance and (time>=60 or buff.bloodlust.up()) and cooldown.lavaBurst.remains()>0 and ( not talent.stormElemental or cooldown.stormElemental.remains()>120) and ( not talent.iceFury or  not buff.iceFury.up() and  not cooldown.iceFury.up()) then
-        if cast.able.ascendance() and cast.ascendance("player") then
-            return 0
-        end
-    end
-    -- # Don't use Elemental Blast if you could cast a Master of the Elements empowered Earth Shock instead. Don't cast Elemental Blast during Storm Elemental unless you have 3x Natural Harmony in which case you stop using Elemental Blast once you reach 14 stacks of Wind Gust.
-    -- actions.single_target+=/elemental_blast,if=talent.elemental_blast.enabled&(talent.master_of_the_elements.enabled&buff.master_of_the_elements.up&maelstrom<60|!talent.master_of_the_elements.enabled)&(!(cooldown.storm_elemental.remains>120&talent.storm_elemental.enabled)|azerite.natural_harmony.rank=3&buff.wind_gust.stack<14) 
-    if talent.elementalBlast and (talent.masterOfTheElements and buff.masterOfTheElements.up() and power.maelstrom.amount()<60 or  not talent.masterOfTheElements) and ( not (cooldown.stormElemental.remains()>120 and talent.stormElemental) or azerite.natural_harmony.rank==3 and buff.windGust.stack()<14) then
-        if cast.able.elementalBlast() and cast.elementalBlast() then
-            return 0
-        end
-    end
-    -- # Keep SK for large or soon add waves. Unless you have Surge of Power, in which case you want to double buff Lightning Bolt by pooling Maelstrom beforehand. Example sequence: 100MS, ES, SK, LB, LvB, ES, LB
-    -- actions.single_target+=/stormkeeper,if=talent.stormkeeper.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)&(!talent.surge_of_power.enabled|buff.surge_of_power.up|maelstrom>=44)
-    if talent.stormKeeper and (active_enemies<3) and ( not talent.surgeOfPower or buff.surgeOfPower.up() or power.maelstrom.amount()>=44) then
-        if cast.able.stormKeeper() and cast.stormKeeper() then
-            return 0
-        end
-    end
-    -- actions.single_target+=/liquid_magma_totem,if=talent.liquid_magma_totem.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)
-    if talent.liquidMagmaTotem and (active_enemies<3) then
-        if cast.able.liquidMagmaTotem() and cast.liquidMagmaTotem("player") then
-            return 0
-        end
-    end
-    -- # Combine stormKeeper with Master of the Elements or Surge of Power.
-    -- actions.single_target+=/lightning_bolt,if=buff.stormkeeper.up&spell_targets.chain_lightning<2&(buff.master_of_the_elements.up&!talent.surge_of_power.enabled|buff.surge_of_power.up)
-    if buff.stormKeeper.up() and active_enemies<2 and (buff.masterOfTheElements.up() and  not talent.surgeOfPower or buff.surgeOfPower.up()) then
-        if cast.able.lightningBolt() and cast.lightningBolt() then
-            return 0
-        end
-    end
-    -- # There might come an update for this line with some SoP logic.
-    -- actions.single_target+=/earthquake,if=active_enemies>1&spell_targets.chain_lightning>1&(!talent.surge_of_power.enabled|!dot.flame_shock.refreshable|cooldown.storm_elemental.remains>120)&(!talent.master_of_the_elements.enabled|buff.master_of_the_elements.up|maelstrom>=92) 
-    if active_enemies>1 and active_enemies>1 and ( not talent.surgeOfPower or  not debuff.flameShock.refreshable() or cooldown.stormElemental.remains()>120) and ( not talent.masterOfTheElements or buff.masterOfTheElements.up() or power.maelstrom.amount()>=92) then
-        if cast.able.earthquake() and cast.earthquake() then
-            return 0
-        end
-    end
-    -- # Boy...what a condition. With Master of the Elements pool Maelstrom up to 8 Maelstrom below the cap to ensure it's used with Earth Shock. Without Master of the Elements, use Earth Shock either if stormKeeper is up, Maelstrom is 10 Maelstrom below the cap or less, or either Storm Elemental isn't talented or it's not active and your last Storm Elemental of the fight will have only a partial duration.
-    -- actions.single_target+=/earth_shock,if=!buff.surge_of_power.up&talent.master_of_the_elements.enabled&(buff.master_of_the_elements.up|maelstrom>=92+30*talent.call_the_thunder.enabled|buff.stormkeeper.up&active_enemies<2)|!talent.master_of_the_elements.enabled&(buff.stormkeeper.up|maelstrom>=90+30*talent.call_the_thunder.enabled|!(cooldown.storm_elemental.remains>120&talent.storm_elemental.enabled)&expected_combat_length-time-cooldown.storm_elemental.remains-150*floor((expected_combat_length-time-cooldown.storm_elemental.remains)%150)>=30*(1+(azerite.echo_of_the_elementals.rank>=2)))
-    local x1,x2 = 0,0
-    if  talent.callTheThunder then x1 = 1;end
-    -- if  azerite.echo_of_the_elementals.rank>=2 then x2 = 1;end
-    if  not buff.surgeOfPower.up() and talent.masterOfTheElements and (buff.masterOfTheElements.up() or power.maelstrom.amount()>=92+30*x1 or buff.stormKeeper.up() and active_enemies<2) or  not talent.masterOfTheElements and (buff.stormKeeper.up() or power.maelstrom.amount()>=90+30*x1 or  not (cooldown.stormElemental.remains()>120 and talent.stormElemental) and expected_combat_length-time-cooldown.stormElemental.remains()-150*math.floor((expected_combat_length-time-cooldown.stormElemental.remains())%150)>=30*(1+(x2))) then
-        if cast.able.earthShock() and cast.earthShock() then
-            return 0
-        end
-    end
-    -- # Use Earth Shock if Surge of Power is talented, but neither it nor a DPS Elemental is active at the moment, and Lava Burst is ready or will be within the next GCD.
-    -- actions.single_target+=/earth_shock,if=talent.surge_of_power.enabled&!buff.surge_of_power.up&cooldown.lava_burst.remains<=gcd&(!talent.storm_elemental.enabled&!(cooldown.fire_elemental.remains>120)|talent.storm_elemental.enabled&!(cooldown.storm_elemental.remains>120))
-    if talent.surgeOfPower and  not buff.surgeOfPower.up() and cooldown.lavaBurst.remains()<=gcd and ( not talent.stormElemental and  not (cooldown.fireElemental.remains()>120) or talent.stormElemental and  not (cooldown.stormElemental.remains()>120)) then
-        if cast.able.earthShock() and cast.earthShock() then
-            return 0
-        end
-    end
-    -- # Cast Lightning Bolts during Storm Elemental duration.
-    -- actions.single_target+=/lightning_bolt,if=cooldown.storm_elemental.remains>120&talent.storm_elemental.enabled
-    if cooldown.stormElemental.remains()>120 and talent.stormElemental then
-        if cast.able.lightningBolt() and cast.lightningBolt() then
-            return 0
-        end
-    end
-    -- # Use Frost Shock with iceFury and Master of the Elements.
-    -- actions.single_target+=/frost_shock,if=talent.icefury.enabled&talent.master_of_the_elements.enabled&buff.icefury.up&buff.master_of_the_elements.up
-    if talent.iceFury and talent.masterOfTheElements and buff.iceFury.up() and buff.masterOfTheElements.up() then
-        if cast.able.frostShock() and cast.frostShock() then
-            return 0
-        end
-    end
-    -- actions.single_target+=/lava_burst,if=buff.ascendance.up
-    if buff.ascendance.up() then
-        if cast.able.lavaBurst() and cast.lavaBurst() then
-            return 0
-        end
-    end
-    -- # Utilize Surge of Power to spread Flame Shock if multiple enemies are present.
-    -- actions.single_target+=/flame_shock,target_if=refreshable&active_enemies>1&buff.surge_of_power.up
-    if debuff.flameShock.refreshable() and active_enemies>1 and buff.surgeOfPower.up() then
-        if cast.able.flameShock() and cast.flameShock() then
-            return 0
-        end
-    end
-    -- # Use Lava Burst with Surge of Power if the last potential usage of a DPS Elemental hasn't a full duration OR if you could get another usage of the DPS Elemental if the remaining fight was 16% longer.
-    -- actions.single_target+=/lava_burst,if=talent.storm_elemental.enabled&cooldown_react&buff.surge_of_power.up&(expected_combat_length-time-cooldown.storm_elemental.remains-150*floor((expected_combat_length-time-cooldown.storm_elemental.remains)%150)<30*(1+(azerite.echo_of_the_elementals.rank>=2))|(1.16*(expected_combat_length-time)-cooldown.storm_elemental.remains-150*floor((1.16*(expected_combat_length-time)-cooldown.storm_elemental.remains)%150))<(expected_combat_length-time-cooldown.storm_elemental.remains-150*floor((expected_combat_length-time-cooldown.storm_elemental.remains)%150)))
-    if talent.stormElemental and cooldown.lavaBurst.up() and buff.surgeOfPower.up() and (expected_combat_length-time-cooldown.stormElemental.remains()-150*floor((expected_combat_length-time-cooldown.stormElemental.remains())%150)<30*(1+(x2)) or (1.16*(expected_combat_length-time)-cooldown.stormElemental.remains()-150*floor((1.16*(expected_combat_length-time)-cooldown.stormElemental.remains())%150))<(expected_combat_length-time-cooldown.stormElemental.remains()-150*floor((expected_combat_length-time-cooldown.stormElemental.remains())%150))) then
-        if cast.able.lavaBurst() and cast.lavaBurst() then
-            return 0
-        end
-    end
-    -- # Use Lava Burst with Surge of Power if the last potential usage of a DPS Elemental hasn't a full duration OR if you could get another usage of the DPS Elemental if the remaining fight was 16% longer.
-    -- actions.single_target+=/lava_burst,if=!talent.storm_elemental.enabled&cooldown_react&buff.surge_of_power.up&(expected_combat_length-time-cooldown.fire_elemental.remains-150*floor((expected_combat_length-time-cooldown.fire_elemental.remains)%150)<30*(1+(azerite.echo_of_the_elementals.rank>=2))|(1.16*(expected_combat_length-time)-cooldown.fire_elemental.remains-150*floor((1.16*(expected_combat_length-time)-cooldown.fire_elemental.remains)%150))<(expected_combat_length-time-cooldown.fire_elemental.remains-150*floor((expected_combat_length-time-cooldown.fire_elemental.remains)%150)))
-    if  not talent.stormElemental and cooldown.lavaBurst.up() and buff.surgeOfPower.up() and (expected_combat_length-time-cooldown.fireElemental.remains()-150*floor((expected_combat_length-time-cooldown.fireElemental.remains())%150)<30*(1+(x2)) or (1.16*(expected_combat_length-time)-cooldown.fireElemental.remains-150*floor((1.16*(expected_combat_length-time)-cooldown.fireElemental.remains())%150))<(expected_combat_length-time-cooldown.fireElemental.remains()-150*floor((expected_combat_length-time-cooldown.fireElemental.remains())%150))) then
-        if cast.able.lavaBurst() and cast.lavaBurst() then
-            return 0
-        end
-    end
-    -- actions.single_target+=/lightning_bolt,if=buff.surge_of_power.up
-    if buff.surgeOfPower.up() then
-        if cast.able.lightningBolt() and cast.lightningBolt() then
-            return 0
-        end
-    end
-    -- actions.single_target+=/lava_burst,if=cooldown_react 
-    if cooldown.lavaBurst.up() then
-        if cast.able.lavaBurst() and cast.lavaBurst() then
-            return 0
-        end
-    end
-    -- # Don't accidentally use Surge of Power with Flame Shock during single target.
-    -- actions.single_target+=/flame_shock,target_if=refreshable&!buff.surge_of_power.up
-    if debuff.flameShock.refreshable() and  not buff.surgeOfPower.up() then
-        if cast.able.flameShock() and cast.flameShock() then
-            return 0
-        end
-    end
-    -- actions.single_target+=/totem_mastery,if=talent.totem_mastery.enabled&(buff.resonance_totem.remains<6|(buff.resonance_totem.remains<(buff.ascendance.duration+cooldown.ascendance.remains)&cooldown.ascendance.remains<15))
-    if talent.totemMastery and (buff.resonanceTotem.remains()<6 or (buff.resonanceTotem.remains()<(buff.ascendance.duration()+cooldown.ascendance.remains()) and cooldown.ascendance.remains()<15)) then
-        if cast.able.totemMastery() and cast.totemMastery("player") then
-            return 0
-        end
-    end
-    -- # Slightly game iceFury buff to hopefully buff some with Master of the Elements.
-    -- actions.single_target+=/frost_shock,if=talent.icefury.enabled&buff.icefury.up&(buff.icefury.remains<gcd*4*buff.icefury.stack|buff.stormkeeper.up|!talent.master_of_the_elements.enabled)
-    if talent.iceFury and buff.iceFury.up() and (buff.iceFury.remains()<gcd*4*buff.iceFury.stack() or buff.stormKeeper.up() or  not talent.masterOfTheElements) then
-        if cast.able.frostShock() and cast.frostShock() then
-            return 0
-        end
-    end
-    -- actions.single_target+=/icefury,if=talent.icefury.enabled 
-    if talent.iceFury then
-        if cast.able.iceFury() and cast.iceFury() then
-            return 0
-        end
-    end
-    -- actions.single_target+=/lightning_bolt
-    if cast.able.lightningBolt() and cast.lightningBolt() then
-        return 0
-    end
-    -- actions.single_target+=/flame_shock,moving=1,target_if=refreshable
-    -- actions.single_target+=/flame_shock,moving=1,if=movement.distance>6
-    -- # Frost Shock is our movement filler.
-    -- actions.single_target+=/frost_shock,moving=1
-end
 function rotation:default_action()
 
-    player          = cPlayer:new("player",262)
+    player          = cPlayer:new("player",269)
     talent          = player.talent
     buff            = player.buff
     debuff          = player.debuff
@@ -4281,9 +4294,9 @@ function rotation:default_action()
     cooldown        = player.cooldown
     power           = player.power
     azerite         = player.traits
-
-    target          = cPlayer:new()
-    Debuff          = target.debuff
+    pct_health      = player.pct_health
+    energy          = player.power.energy
+    chi             = player.power.chi.amount
 
     -- 不打断施法
     if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
@@ -4319,20 +4332,39 @@ function rotation:default_action()
     time = getCombatTime()
     expected_combat_length = getTimeToDie(tg)
     active_enemies = getNumEnemies(tg,8)
-    -- 编写在战斗中循环执行的脚本。
-    -- 下面这是一个用我目前正在开发的SIMC库写的一个简单逻辑：无红字无限打技能。
-    --     shaman="T23_Shaman_Elemental"
+    tb = getEnemy(5,filler_unit)
+
+    function getDebuffRemainMin(tb,debuffid)
+        if tb ~= nil and UnitExists(tb[1]) then 
+            local tgg = tb[1]
+            if #tb == 1 then
+                return tb[1]
+            end
+            for i=1,#tb do
+                if UnitExists(tb[i]) and not UnitDebuffID(tb[i],debuffid) then
+                    return tb[i]                
+                elseif UnitExists(tb[i]) and getDebuffRemain(tgg,debuffid) > getDebuffRemain(tb[i],debuffid) then
+                    tgg = tb[i]
+                    self:rest()
+                end
+            end
+            return tgg
+        end
+        return "target"
+    end    
+    
+    -- monk="T23_Monk_Windwalker_Serenity"
     -- source=default
-    -- spec=elemental
+    -- spec=windwalker
     -- level=120
-    -- race=tauren
-    -- role=spell
-    -- position=ranged_back
-    -- talents=1302012
+    -- race=pandaren
+    -- role=dps
+    -- position=back
+    -- talents=2022033
 
     -- # Default consumables
-    -- potion=battle_potion_of_intellect
-    -- flask=flask_of_endless_fathoms
+    -- potion=bursting_blood
+    -- flask=currents
     -- food=bountiful_captains_feast
     -- augmentation=battle_scarred
 
@@ -4348,58 +4380,50 @@ function rotation:default_action()
     -- actions.precombat+=/augmentation
     -- # Snapshot raid buffed stats before combat begins and pre-potting is done.
     -- actions.precombat+=/snapshot_stats
-    -- actions.precombat+=/totem_mastery
-    -- actions.precombat+=/earth_elemental,if=!talent.primal_elementalist.enabled
-    -- # Use Stormkeeper precombat unless some adds will spawn soon.
-    -- actions.precombat+=/stormkeeper,if=talent.stormkeeper.enabled&(raid_event.adds.count<3|raid_event.adds.in>50)
-    -- actions.precombat+=/fire_elemental,if=!talent.storm_elemental.enabled
-    -- actions.precombat+=/storm_elemental,if=talent.storm_elemental.enabled
     -- actions.precombat+=/potion
-    -- actions.precombat+=/elemental_blast,if=talent.elemental_blast.enabled
-    -- actions.precombat+=/lava_burst,if=!talent.elemental_blast.enabled
+    -- actions.precombat+=/chiBurst, if ( not talent.serenity.enabled or  not talent.fistOfTheWhiteTiger.enabled)
+    -- actions.precombat+=/chiWave
 
     -- # Executed every time the actor is available.
-    -- # Cast Bloodlust manually if the Azerite Trait Ancestral Resonance is present.
-    -- actions=bloodlust,if=azerite.ancestral_resonance.enabled
-    -- # In-combat potion is preferentially linked to your Elemental, unless combat will end shortly
-    -- actions+=/potion,if=expected_combat_length-time<30|cooldown.fire_elemental.remains>120|cooldown.storm_elemental.remains>120
-    -- # Interrupt of casts.
-    -- actions+=/wind_shear
-    -- actions+=/totem_mastery,if=talent.totem_mastery.enabled&buff.resonance_totem.remains<2
-    if talent.totemMastery and buff.resonanceTotem.remains()<2 then
-        if cast.able.totemMastery() and cast.totemMastery("player") then
+    -- actions=auto_attack
+    StartAttack()
+    -- actions+=/spearHandStrike, if target.debuff.casting.react
+    -- # Touch of Karma on cooldown, if Good Karma is enabled equal to 100% of maximum health
+    -- actions+=/touchOfKarma,interval=90,
+    if pct_health()==0.5 then
+        if cast.able.touchOfKarma() and cast.touchOfKarma() then
             return 0
         end
     end
-    -- actions+=/fire_elemental,if=!talent.storm_elemental.enabled
-    if  not talent.stormElemental then
-        if cast.able.fireElemental() and cast.fireElemental("player") then
+    -- # Potion if Serenity or Storm, Earth, and Fire are up or you are running serenity and a main stat trinket procs, or you are under the effect of bloodlust, or target time to die is greater or equal to 60
+    -- actions+=/potion, if buff.serenity.up or buff.storm_earth_and_fire.up or ( not talent.serenity.enabled and trinket.proc.agility.react) or buff.bloodlust.react or target.time_to_die<=60
+    -- actions+=/call_action_list,name=serenity, 
+    if buff.serenity.up()
+    -- actions+=/fistOfTheWhiteTiger, 
+    if (energy.time_to_max()<1 or (talent.serenity and cooldown.serenity.remains()<2)) and chi.max()-chi()>=3 then
+        if cast.able.fistOfTheWhiteTiger() and cast.fistOfTheWhiteTiger() then
             return 0
         end
     end
-    -- actions+=/storm_elemental,if=talent.storm_elemental.enabled&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
-    if talent.stormElemental and ( not talent.iceFury or  not buff.iceFury.up() and  not cooldown.iceFury.up()) then
-        if cast.able.stormElemental() and cast.stormElemental("player") then
+    -- actions+=/tigerPalm,target_ if min:debuff.markOfTheCrane.remains, 
+    tg1 = getDebuffRemainMin(tb,lists.spells["MONK"][269]["debuffs"]["markOfTheCrane"])
+    if (energy.time_to_max()<1 or (talent.serenity and cooldown.serenity.remains()<2)) and chi.max()-chi()>=2 and  not prev_gcd.tigerPalm(tg1) then
+        if cast.able.tigerPalm() and cast.tigerPalm(tg1) then
             return 0
         end
     end
-    -- actions+=/earth_elemental,if=!talent.primal_elementalist.enabled|talent.primal_elementalist.enabled&(cooldown.fire_elemental.remains<120&!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120&talent.storm_elemental.enabled)
-    if  not talent.primalElementalist or talent.primalElementalist and (cooldown.fireElemental.remains()<120 and  not talent.stormElemental or cooldown.stormElemental.remains()<120 and talent.stormElemental) then
-        if cast.able.earthElemental() and cast.earthElemental("player") then
-            return 0
-        end
+    -- actions+=/call_action_list,name=cd
+    self:cd()
+    -- # Call the ST action list if there are 2 or less enemies
+    -- actions+=/call_action_list,name=st, 
+    if active_enemies<3 then
+        self:st()
     end
-    -- actions+=/use_items
-    -- actions+=/blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-    -- actions+=/berserking,if=!talent.ascendance.enabled|buff.ascendance.up
-    -- actions+=/fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-    -- actions+=/ancestral_call,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
-    -- actions+=/run_action_list,name=aoe,if=active_enemies>2&(spell_targets.chain_lightning>2|spell_targets.lava_beam>2)
-    if active_enemies>2 --[[ and (spell_targets.chainLightning>2 or spell_targets.lavaBeam>2) ]] then
+    -- # Call the AoE action list if there are 3 or more enemies
+    -- actions+=/call_action_list,name=aoe, 
+    if active_enemies>=3 then
         self:aoe()
-    end
-    -- actions+=/run_action_list,name=single_target
-    self:single_target()
+    end             
 
     return 0    
 end
@@ -4407,3 +4431,125 @@ end
 -- 注册模块（自己手动开启）
 -----------------------------------------------------------
 rotation_manager.instance:register(rotation);
+
+
+
+
+
+
+
+
+
+
+function rotation:aoe(args)
+    -- # Actions.AoE is intended for use with Hectic_Add_Cleave and currently needs to be optimized
+    -- actions.aoe=risingSunKick,target_ if min:debuff.markOfTheCrane.remains, 
+    if (talent.whirlingDragonPunch and cooldown.whirlingDragonPunch.remains()<5) and cooldown.fistsOfFury.remains()>3 then
+        if cast.able.risingSunKick() and cast.risingSunKick(tg1) then
+            return 0
+        end
+    end
+    -- actions.aoe+=/whirlingDragonPunch
+    if cast.able.whirlingDragonPunch() and cast.whirlingDragonPunch() then
+        return 0
+    end
+    -- actions.aoe+=/energizingElixir, 
+    if  not prev_gcd.tigerPalm() and chi()<=1 and energy()<50 then
+        if cast.able.energizingElixir() and cast.energizingElixir() then
+            return 0
+        end
+    end
+    -- actions.aoe+=/fistsOfFury, 
+    if energy.time_to_max()>3 then
+        if cast.able.fistsOfFury() and cast.fistsOfFury() then
+            return 0
+        end
+    end
+    -- actions.aoe+=/rushingJadeWind, 
+    if buff.rushingJadeWind.down() then
+        if cast.able.rushingJadeWind() and cast.rushingJadeWind() then
+            return 0
+        end
+    end
+    -- actions.aoe+=/spinningCraneKick, 
+    if  not prev_gcd.spinningCraneKick() and (((chi()>3 or cooldown.fistsOfFury.remains()>6) and (chi()>=5 or cooldown.fistsOfFury.remains()>2)) or energy.time_to_max()<=3) then
+        if cast.able.spinningCraneKick() and cast.spinningCraneKick() then
+            return 0
+        end
+    end
+    -- actions.aoe+=/chiBurst, 
+    if chi()<=3 then
+        if cast.able.chiBurst() and cast.chiBurst() then
+            return 0
+        end
+    end
+    -- actions.aoe+=/fistOfTheWhiteTiger, 
+    if chi.max()-chi()>=3 then
+        if cast.able.fistOfTheWhiteTiger() and cast.fistOfTheWhiteTiger() then
+            return 0
+        end
+    end
+    -- actions.aoe+=/tigerPalm,target_ if min:debuff.markOfTheCrane.remains, 
+    if chi.max()-chi()>=2 and ( not talent.hitCombo or  not prev_gcd.tigerPalm()) then
+        if cast.able.tigerPalm() and cast.tigerPalm() then
+            return 0
+        end
+    end
+    -- actions.aoe+=/chiWave
+    if cast.able.chiWave() and cast.chiWave() then
+        return 0
+    end
+    -- actions.aoe+=/flying_serpent_kick, if buff.bok_proc.down,interrupt=1
+    -- actions.aoe+=/blackout_kick,target_ if min:debuff.markOfTheCrane.remains, 
+    if  not prev_gcd.blackout_kick() and (buff.bok_proc.up() or (talent.hitCombo and prev_gcd.tigerPalm() and chi()<4)) then
+        if cast.able.tigerPalm() and cast.tigerPalm(tg1) then
+            return 0
+        end
+    end
+    return 0
+end
+
+
+
+
+function rotation:cd(args)
+    -- # Cooldowns
+    -- actions.cd=invokeXuenTheWhiteTiger
+    if cast.able.invokeXuenTheWhiteTiger() and cast.invokeXuenTheWhiteTiger() then
+        return 0
+    end
+    -- actions.cd+=/use_item,name=variable_intensity_gigavolt_oscillating_reactor
+    -- actions.cd+=/blood_fury
+    -- actions.cd+=/berserking
+    -- # Use Arcane Torrent if you are missing at least 1 Chi and won't cap energy within 0.5 seconds
+    -- actions.cd+=/arcane_torrent, 
+    if chi.max()-chi()>=1 and energy.time_to_max()>=0.5
+    -- actions.cd+=/lights_judgment
+    -- actions.cd+=/fireblood
+    -- actions.cd+=/ancestral_call
+    -- actions.cd+=/touch_of_death, if target.time_to_die>9
+    -- actions.cd+=/storm_earth_and_fire, if cooldown.storm_earth_and_fire.charges=2 or (cooldown.fistsOfFury.remains<=6 and chi>=3 and cooldown.risingSunKick.remains<=1) or target.time_to_die<=15
+    -- actions.cd+=/serenity, if cooldown.risingSunKick.remains<=2 or target.time_to_die<=12
+end
+
+
+
+-- # Serenity priority
+-- actions.serenity=risingSunKick,target_ if min:debuff.markOfTheCrane.remains, if active_enemies<3 or prev_gcd.1.spinningCraneKick
+-- actions.serenity+=/fistsOfFury, if (buff.bloodlust.up and prev_gcd.1.risingSunKick) or buff.serenity.remains<1 or (active_enemies>1 and active_enemies<5)
+-- actions.serenity+=/spinningCraneKick, if  not prev_gcd.1.spinningCraneKick and (active_enemies>=3 or (active_enemies=2 and prev_gcd.1.blackout_kick))
+-- actions.serenity+=/blackout_kick,target_ if min:debuff.markOfTheCrane.remains
+
+-- actions.st=whirlingDragonPunch
+-- actions.st+=/risingSunKick,target_ if min:debuff.markOfTheCrane.remains, if chi>=5
+-- actions.st+=/fistsOfFury, if energy.time_to_max>3
+-- actions.st+=/risingSunKick,target_ if min:debuff.markOfTheCrane.remains
+-- actions.st+=/spinningCraneKick, if  not prev_gcd.1.spinningCraneKick and buff.dance_of_chiji.up
+-- actions.st+=/rushingJadeWind, if buff.rushingJadeWind.down and active_enemies>1
+-- actions.st+=/fistOfTheWhiteTiger, if chi<=2
+-- actions.st+=/energizingElixir, if chi<=3 and energy<50
+-- actions.st+=/blackout_kick,target_ if min:debuff.markOfTheCrane.remains, if  not prev_gcd.1.blackout_kick and (cooldown.risingSunKick.remains>3 or chi>=3) and (cooldown.fistsOfFury.remains>4 or chi>=4 or (chi=2 and prev_gcd.1.tigerPalm)) and buff.swift_roundhouse.stack<2
+-- actions.st+=/chiWave
+-- actions.st+=/chiBurst, if chi.max-chi>=1 and active_enemies=1 or chi.max-chi>=2
+-- actions.st+=/tigerPalm,target_ if min:debuff.markOfTheCrane.remains, if  not prev_gcd.1.tigerPalm and chi.max-chi>=2
+-- actions.st+=/flying_serpent_kick, if prev_gcd.1.blackout_kick and chi>3 and buff.swift_roundhouse.stack<2,interrupt=1
