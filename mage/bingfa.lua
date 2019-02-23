@@ -304,7 +304,208 @@ do
 
     
 end
+
 -----------------------------------------------------------
+--注册事件
+do
+    local guid = UnitGUID("player")
+    local frame = CreateFrame('Frame')
+    frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+
+    if Y == nil then
+        Y = {}
+    end
+
+    if Y.lastspell_failed == nil then
+        Y.lastspell_failed = 0;
+    end
+    if Y.lastspell_failedtime == nil then
+        Y.lastspell_failedtime = 0;
+    end
+    if Y.lastspell_time == nil then
+        Y.lastspell_time = 0;
+    end
+    if Y.lastspell_cast == nil then
+        Y.lastspell_cast = 0;
+    end
+    if Y.spelllist_failed == nil then 
+        Y.spelllist_failed = {};
+    end
+    if Y.spelllist_success == nil then 
+        Y.spelllist_success = {};
+    end
+    if Y.data == nil then 
+        Y.data = {};
+    end
+    if Y.nNove == nil then 
+        Y.nNove = {};
+    end
+    if Y.nTank == nil then 
+        Y.nTank = {};
+    end
+
+    if tt == nil then
+        tt = 0
+    end
+
+    if Y.spelllist == nil then
+        Y.spelllist = {}
+    end
+
+    if Y.spellcast == nil then
+        Y.spellcast = 0
+    end
+
+    -------------------------------------------------------------------------------------------------------------------
+    -- 记录进入战斗后自己释放成功和失败的技能队列，
+
+    -- 通过访问Y.lastspell_failed获得上一次失败的技能ID，
+    -- Y.lastspell_failedtime获得上一次失败的技能时间，
+    -- Y.spelllist_failed记录失败的施法队列，
+    -- Y.spelllist_failed[id]为最近一次释放同ID技能失败的列表，键值是name，target，stime
+
+    -- 通过访问Y.lastspell_time获得上一次成功的技能ID，
+    -- Y.lastspell_time获得上一次成功的技能时间，
+    -- Y.lastspell_cast记录成功的施法队列，
+    -- Y.spelllist_success[id]为最近一次释放同ID技能成功的列表，键值是name，target，stime
+    -------------------------------------------------------------------------------------------------------------------
+    local function reader(self,event,...)
+        local timeStamp, param, hideCaster, source, sourceName, sourceFlags, 
+        sourceRaidFlags, destination,
+        destName, destFlags, destRaidFlags, spell, spellName, _, spellType = CombatLogGetCurrentEventInfo()
+
+        if source == guid then
+            if param == "SPELL_CAST_FAILED" then
+                if sourceName ~= nil then
+                    if isInCombat("player") and UnitIsUnit(sourceName,"player") and spell ~= 48018 and spell ~= 48020 then
+                        Y.lastspell_failed = spell 
+                        Y.lastspell_failedtime = GetTime()
+                        if Y.spelllist_failed[spell] == nil then 
+                            Y.spelllist_failed[spell] = {};
+                        end
+                        table.insert(Y.spelllist_failed[spell],{name = spellName, target = destination, stime = Y.lastspell_failedtime})                        
+                        if spell == Y.lastspell_start then
+                            Y.lastspell_start = 0
+                        end
+                    end
+                end
+            end
+            
+            if param == "SPELL_CAST_START" or param == "SPELL_CAST_SUCCESS" then
+                if isInCombat("player") and UnitIsUnit(sourceName,"player") then
+                    Y.lastspell_start = spell
+                    Y.spellcast = spell
+                end
+            end
+            
+            if param == "SPELL_CAST_SUCCESS" then
+                if sourceName ~= nil then
+                    if isInCombat("player") and UnitIsUnit(sourceName,"player") then
+                        Y.lastspell_time = GetTime()
+                        Y.lastspell_cast = spell
+                        if Y.spelllist_success[spell] == nil then 
+                            Y.spelllist_success[spell] = {};
+                        end
+                        table.insert(Y.spelllist_success[spell],{name = spellName, target = destination, stime = Y.lastspell_time})
+                        table.insert( Y.spelllist, spell )
+                        if destination then
+                            Y.lastspell_target = destination
+                            -- if self.settings.ydebug.is_enabled then             
+                            --     GH_Print("成功对 "..destName.." ".."施放了 "..spellName)
+                            -- end
+                        else
+                            Y.lastspell_target = none
+                        end
+                    end
+                end
+            end
+        end
+
+    end
+    frame:SetScript("OnEvent", reader)
+
+
+    -------------------------------------------------------------------------------------------------------------------
+    -- 记录进入战斗的时间
+    -- 通过访问Y.data["Combat Started"]获得战斗开始时间，
+    -- 离开战斗或者玩家死亡，清除所有的_G
+    -------------------------------------------------------------------------------------------------------------------
+    local Frame = CreateFrame('Frame')
+    Frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    Frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    Frame:RegisterEvent("PLAYER_DEAD")
+    local function EnteringCombat(self,event,...)
+        if event == "PLAYER_REGEN_DISABLED" then
+        -- here we should manage stats snapshots
+        --AgiSnap = getAgility()
+        Y.data["Combat Started"] = GetTime();
+        -- Y.data["GCD"] = getGCD();
+        -- if ydebug.is_enabled then
+        --     GH_Print(" or cffFF0000进入战斗，开始计时")
+        -- end
+        -- SetupTables()
+        end
+        if event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_DEAD"  then
+        
+            Y.data["Combat Started"] = 0
+            Y.lastspell_failed = 0;
+            Y.lastspell_failedtime = 0;
+            Y.lastspell_cast = 0;
+            Y.lastspell_time = 0;
+            Y.spelllist_failed = {};
+            Y.spelllist_success = {};
+            Y.spelllist = {};
+            Y.count = 0
+            Y.spellcast = 0
+            -- Y.data["GCD"] = getGCD();
+            -- SetupTables()
+            -- if self.settings.ydebug.is_enabled then
+            --     GH_Print(" or cffFF0000离开战斗，重置参数")
+            -- end
+        
+        end
+    end
+    Frame:SetScript("OnEvent",EnteringCombat)
+    
+    --   -------------------------------------------------------------------------------------------------------------------
+    --   -- 创建队友列表，通过团队时间驱动刷新
+    --   -- 通过访问_nNova获得列表，
+    --   -- 
+    --   -------------------------------------------------------------------------------------------------------------------
+    --   local updateHealingTable = CreateFrame("frame", nil)
+    --   updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
+    --   updateHealingTable:SetScript("OnEvent", function()
+    --     table.wipe(Y.nNove)
+    --     table.wipe(Y.nTank)  
+    --     SetupTables()
+    --   end)
+    
+    --  -- if Y.nNove == nil then
+    --      -- SetupTables()
+    --  -- end
+    
+    --   function SetupTables()    
+        
+    --  table.wipe(Y.nNove)
+    --     table.wipe(Y.nTank)
+    --     local group =  IsInRaid() and "raid" or "party" 
+    --     local groupSize = IsInRaid() and GetNumGroupMembers() or 
+    --     GetNumGroupMembers() - 1
+
+    --     for i=1, groupSize do 
+    --       local groupUnit = group..i      
+    --       if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
+    --       if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
+    --     end
+
+    --     table.insert(Y.nNove, "player")
+        
+    --   end
+end
+-----------------------------------------------------------
+function csi(unit,spellid)
+    return castSpell(unit,spellid,false,false,true) and Y.spellcast == spellid
+end
 --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
 local function filler_unit(Unit)
     if (UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) then
