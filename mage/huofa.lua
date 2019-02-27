@@ -383,7 +383,7 @@ function rotation:default_action()
             end
         end
         -- print(30)
-        -- actions.active_talents+=/meteor,if=cooldown.combustion.remains>40|(cooldown.combustion.remains>target.time_to_die)|buff.rune_of_power.up|firestarter.active
+        -- actions.active_talents+=/meteor,if=cooldown.combustion.remains>40|(cooldown.combustion.remains>target.time_to_die)|buff.rune_of_power.up|(getTalent(1,1) and getHP("target") >= 90)
         if getSpellCD(combustion) > 40 or ( getSpellCD(combustion) > getTimeToDie(target) ) or  UnitAuraID("player",rune_of_power_buff) or (getTalent(1,1) and getHP("target") >= 90) then
             if getTalent(7,3) and getSpellCD(meteor) <= 0 and castSpell(tg,meteor) then
                 print(102)           
@@ -589,21 +589,21 @@ function rotation:default_action()
         end
 
 
-        -- actions.rop_phase+=/fire_blast,if=!prev_off_gcd.fire_blast&buff.heating_up.react&firestarter.active&charges_fractional>1.7
+        -- actions.rop_phase+=/fire_blast,if=!prev_off_gcd.fire_blast&buff.heating_up.react&(getTalent(1,1) and getHP("target") >= 90)&charges_fractional>1.7
         if  not _G.lastspell_cast == fire_blast and  UnitAuraID("player",heating_up) and (getTalent(1,1) and getHP("target") >= 90) and  charges_fractional(fire_blast) > 1.7 then
             if getCharges(fire_blast) >= 1 and castSpell(tg,fire_blast,false,false) then
                 print(307)
                 return true
             end
         end
-        -- actions.rop_phase+=/phoenix_flames,if=!prev_gcd.1.phoenix_flames&charges_fractional>2.7&firestarter.active
+        -- actions.rop_phase+=/phoenix_flames,if=!prev_gcd.1.phoenix_flames&charges_fractional>2.7&(getTalent(1,1) and getHP("target") >= 90)
         if not _G.lastspell_cast == phoenixs_flames and  charges_fractional(phoenixs_flames) > 2.7 and   (getTalent(1,1) and getHP("target") >= 90) then
             if getCharges(phoenixs_flames) >= 1 and castSpell(tg,phoenixs_flames,false,false) then
                 print(308)
                 return true
             end
         end
-        -- actions.rop_phase+=/fire_blast,if=!prev_off_gcd.fire_blast&!firestarter.active
+        -- actions.rop_phase+=/fire_blast,if=!prev_off_gcd.fire_blast&!(getTalent(1,1) and getHP("target") >= 90)
         if  not  _G.lastspell_cast == fire_blast and not (getTalent(1,1) and getHP("target") >= 90) then
             if getCharges(fire_blast) >= 1 and castSpell(tg,fire_blast,false,false) then
                 print(309)
@@ -681,7 +681,7 @@ function rotation:default_action()
             end
         end
         -- print(21)
-        -- actions.standard_rotation+=/pyroblast,if=buff.hot_streak.react&firestarter.active&!talent.rune_of_power.enabled
+        -- actions.standard_rotation+=/pyroblast,if=buff.hot_streak.react&(getTalent(1,1) and getHP("target") >= 90)&!talent.rune_of_power.enabled
         if  UnitAuraID("player",hot_streak) and  (getTalent(1,1) and getHP("target") >= 90)   and  not  getTalent(3,3) then
             if castSpell(tg,pyroblast,false,false) then
                 print(403)
@@ -843,7 +843,7 @@ function rotation:default_action()
     end
     -- print(4)
     -- # Standard Talent RoP Logic.
-    -- actions+=/rune_of_power,if=firestarter.active&action.rune_of_power.charges=2|cooldown.combustion.remains>40&buff.combustion.down&!talent.kindling.enabled|target.time_to_die<11|talent.kindling.enabled&(charges_fractional>1.8|time<40)&cooldown.combustion.remains>40
+    -- actions+=/rune_of_power,if=(getTalent(1,1) and getHP("target") >= 90)&action.rune_of_power.charges=2|cooldown.combustion.remains>40&buff.combustion.down&!talent.kindling.enabled|target.time_to_die<11|talent.kindling.enabled&(charges_fractional>1.8|time<40)&cooldown.combustion.remains>40
     if (getTalent(1,1) and getHP("target") >= 90)  and getCharges(rune_of_power) >= 2 or getSpellCD(combustion) > 40 and getBuffRemain("player",combustion) <= 0 and not getTalent(7,1) or getTimeToDie(tg) < 11 or getTalent(7,1) and ( charges_fractional(rune_of_power) > 1.8 or time < 40 ) and  getSpellCD(combustion) > 40 then
         castSpell("player",rune_of_power)
     end
@@ -858,7 +858,7 @@ function rotation:default_action()
     --     castSpell("player",rune_of_power)
     -- end
     -- print(1)
-    -- actions+=/call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!firestarter.active|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
+    -- actions+=/call_action_list,name=combustion_phase,if=cooldown.combustion.remains<=action.rune_of_power.cast_time+(!talent.kindling.enabled*gcd)&(!talent.firestarter.enabled|!(getTalent(1,1) and getHP("target") >= 90)|active_enemies>=4|active_enemies>=2&talent.flame_patch.enabled)|buff.combustion.up
     local x1 = 0;
     if not getTalent(7,1) then
         x1 = 1;
