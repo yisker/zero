@@ -538,6 +538,7 @@ function rotation:prestart_action()
                     darkSuccor                  = 101568,
                     empowerRuneWeapon           = 47568,
                     frozenPulse                 = 195750,
+                    icyCitadel                  = 272723,
                     icyTalons                   = 194879,
                     killingMachine              = 51124,
                     pillarOfFrost               = 51271,
@@ -580,7 +581,7 @@ function rotation:prestart_action()
                     runicAttenuation            = 207104,
                 },
                 traits                          = {
-    
+                    icyCitadel                  = 272718,
                 }
             },
             -- Unholy
@@ -623,7 +624,7 @@ function rotation:prestart_action()
                     -- necroticStrike              = 223829,
                     -- outbreak                    = 77575,
                     -- scourgeOfWorlds             = 191748,
-                    -- soulReaper                  = 130736,
+                    soulReaper                  = 130736,
                     virulentPlague              = 191587,
                 },
                 glyphs                          = {
@@ -792,7 +793,7 @@ function rotation:prestart_action()
                     demonSpikes                 = 203819,
                     bladeTurning                = 247254,
                     empowerWards                = 218256,
-                    imolationAura               = 178740,
+                    immolationAura              = 178740,
                     soulFragments               = 203981,
                     metamorphosis               = 187827,
                     feastofSouls                = 207693,
@@ -875,6 +876,7 @@ function rotation:prestart_action()
                     barkskin                    = 22812,
                     celestialAlignment          = 194223,
                     fullMoon                    = 274283,
+                    furyOfElune                 = 202770,
                     halfMoon                    = 274282,
                     innervate                   = 29166,
                     lunarStrike                 = 194153,
@@ -894,7 +896,6 @@ function rotation:prestart_action()
                     blessingOfAnshe             = 202739,
                     incarnationChoseOfElune     = 102560,
                     celestialAlignment          = 194223,
-                    furyOfElune                 = 202770,
                     onethsOverconfidence        = 209407,
                     onethsIntuition             = 209406,
                     solarEmpowerment            = 164545,
@@ -1271,51 +1272,69 @@ function rotation:prestart_action()
             -- Marksmanship
             [254] = {
                 abilities                       = {
-                    aMurderOfCrows              = 131894,
                     aimedShot                   = 19434,
                     arcaneShot                  = 185358,
                     barrage                     = 120360,
                     burstingShot                = 186387,
                     concussiveShot              = 5116,
                     counterShot                 = 147362,
-                    disengage                   = 781,
                     doubleTap                   = 260402,
                     explosiveShot               = 212431,
-                    explosiveShotDetonate       = 212679,
-                    misdirection                = 34477,
                     multiShot                   = 257620,
-                    trueShot                    = 193526,
-                    steadyShot                  = 56641,
+                    piercingShot                = 198670,
                     rapidFire                   = 257044,
+                    serpentSting                = 271788,
+                    steadyShot                  = 56641,
+                    trueShot                    = 193526,
                 },
                 artifacts                       = {
                 },
                 buffs                           = {
                     doubleTap                   = 260402,
-                    lockAndLoad                 = 194594,
-                    trickShots                  = 257622,
-                    trueshot                    = 193526,
-                    preciseShots                = 260242,
-                    lethalShots                 = 260395,
-                    steadyFocus                 = 193534,
                     feignDeath                  = 5384,
+                    lethalShots                 = 260395,
+                    lockAndLoad                 = 194594,
+                    masterMarksman              = 269576,
+                    preciseShots                = 260242,
+                    preciseShots                = 260242,
+                    steadyFocus                 = 193534,
+                    trickShots                  = 257622,
+                    trickShots                  = 257622,
+                    trueshot                    = 288613,
+                    unerringVision              = 274447,
     
                 },
                 debuffs                         = {
                     aMurderOfCrows              = 131894,
                     huntersMark                 = 257284,
+                    serpentSting                = 271788,
                 },
                 glyphs                          = {
     
                 },
                 talents                         = {
-                    lethalShots                 = 260393,
-                    steadyFocus                 = 193533,
                     barrage                     = 120360,
+                    callingTheShots             = 260404,
+                    carefulAim                  = 260228,
+                    doubleTap                   = 260402,
+                    explosiveShot               = 212431,
+                    huntersMark                 = 257284,
+                    lethalShots                 = 260393,
+                    lockAndLoad                 = 194595,
+                    masterMarksman              = 260309,
+                    piercingShot                = 198670,
+                    serpentSting                = 271788,
+                    steadyFocus                 = 193533,
+                    streamline                  = 260367,
+                    volley                      = 260243,
                 },
                 traits                          = {
                     focusedFire                 = 278531,
                     inTheRhytm                  = 264198,
+                    rapidReload                 = 278530,
+                    steadyAim                   = 277651,
+                    surgingShots                = 287707,
+                    unerringVision              = 274444,
                 },
             },
             -- Survival
@@ -1384,6 +1403,7 @@ function rotation:prestart_action()
                     latentPoison                = 273283,
                     upCloseAndPersonal          = 278533,
                     venomousFangs               = 274590,
+                    wildernessSurvival          = 279589,
                 }
             },
             -- All
@@ -1594,9 +1614,9 @@ function rotation:prestart_action()
                 talents                         = {
                     alexstraszasFury            = 235870,
                     blastWave                   = 157981,
-                    cinderstorm                 = 198929,
+                    --cinderstorm                 = 198929,
                     conflagration               = 205023,
-                    controlledBurn              = 205033,
+                    --controlledBurn              = 205033,
                     firestarter                 = 205026,
                     flameOn                     = 205029,
                     flamePatch                  = 205037,
@@ -1634,7 +1654,7 @@ function rotation:prestart_action()
                     iceBarrier                  = 11426,
                 },
                 artifacts                       = {
-                    icyHand                     = 220817,
+                   -- icyHand                     = 220817,
                 },
                 buffs                           = {
                     brainFreeze                 = 190446,
@@ -1658,11 +1678,11 @@ function rotation:prestart_action()
     
                 },
                 talents                         = {
-                    articGale                   = 205038,
+                    --articGale                   = 205038,
                     boneChilling                = 205027,
                     cometStorm                  = 153595,
                     ebonbolt                    = 257537,
-                    frostBomb                   = 112948,
+                    --frostBomb                   = 112948,
                     frozenTouch                 = 205030,
                     glacialSpike                = 199786,
                     iceNova                     = 157997,
@@ -1712,7 +1732,7 @@ function rotation:prestart_action()
                     ringOfFrost                 = 113724,
                     runeOfPower                 = 116011,
                     shimmer                     = 212653,
-                    unstableMagic               = 157976,
+                    --unstableMagic               = 157976,
                 },
             },
         },
@@ -1777,7 +1797,7 @@ function rotation:prestart_action()
                     mistwalk                    = 197945,
                     chiTorpedo                  = 115008,
                     tigersLust                  = 116841,
-                    cracklingJadeLightning       = 117952,
+                    cracklingJadeLightning      = 117952,
                     detox                       = 115450,
                     effuse                      = 116694,
                     envelopingMist              = 124682,
@@ -1868,15 +1888,10 @@ function rotation:prestart_action()
                     chiWave                     = 115098,
                     detox                       = 218164,
                     disable                     = 116095,
-                    energizingElixir            = 115288,
-                    fistOfTheWhiteTiger         = 261947,
                     fistsOfFury                 = 113656,
                     flyingSerpentKick           = 101545,
                     flyingSerpentKickEnd        = 115057,
-                    invokeXuenTheWhiteTiger     = 123904,
                     risingSunKick               = 107428,
-                    rushingJadeWind             = 116847,
-                    serenity                    = 152173,
                     spearHandStrike             = 116705,
                     spinningCraneKick           = 101546,
                     stormEarthAndFire           = 137639,
@@ -1918,7 +1933,7 @@ function rotation:prestart_action()
                     goodKarma                   = 280195,
                     hitCombo                    = 196740,
                     innerStrength               = 261767,
-                    invokeXuen                  = 123904,
+                    invokeXuenTheWhiteTiger     = 123904,
                     rushingJadeWind             = 116847,
                     serenity                    = 152173,
                     spiritualFocus              = 280197,
@@ -1952,6 +1967,7 @@ function rotation:prestart_action()
                 },
                 buffs                           = {
                     blackoutKick                = 116768,
+                    danceOfChiJi                = 286587,
                     dampenHarm                  = 122278,
                     diffuseMagic                = 122783,
                 },
@@ -2107,7 +2123,7 @@ function rotation:prestart_action()
             },
             -- Retribution
             [70] = {
-                abilities                       = {                
+                abilities                       = {
                     bladeOfJustice              = 184575,
                     cleanseToxins               = 213644,
                     divineStorm                 = 53385,
@@ -2143,16 +2159,16 @@ function rotation:prestart_action()
                     glyphOfWingedVengeance      = 57979,
                 },
                 talents                         = {
-                    bladeOfWrath                = 231832, 
-                    consecration                = 205228, 
-                    crusade                     = 231895, 
-                    divineJudgment              = 271580, 
-                    divinePurpose               = 223817, 
-                    executionSentence           = 267798, 
-                    eyeForAnEye                 = 205191,                
-                    firesOfJustice              = 203316, 
-                    fistOfJustice               = 234299, 
-                    hammerOfWrath               = 24275, 
+                    bladeOfWrath                = 231832,
+                    consecration                = 205228,
+                    crusade                     = 231895,
+                    divineJudgment              = 271580,
+                    divinePurpose               = 223817,
+                    executionSentence           = 267798,
+                    eyeForAnEye                 = 205191,
+                    firesOfJustice              = 203316,
+                    fistOfJustice               = 234299,
+                    hammerOfWrath               = 24275,
                     inquisition                 = 84963,
                     justicarsVengeance          = 215661,
                     righteousVerdict            = 267610,
@@ -2168,15 +2184,15 @@ function rotation:prestart_action()
             -- All
             Shared = {
                 abilities                       = {
-                    avengingWrath               = 31884, 
-                    blessingOfFreedom           = 1044, 
+                    avengingWrath               = 31884,
+                    blessingOfFreedom           = 1044,
                     blessingOfProtection        = 1022,
-                    contemplation               = 121183, 
-                    crusaderStrike              = 35395, 
-                    divineShield                = 642, 
-                    divineSteed                 = 190784,  
-                    flashOfLight                = 19750, 
-                    hammerOfJustice             = 853, 
+                    contemplation               = 121183,
+                    crusaderStrike              = 35395,
+                    divineShield                = 642,
+                    divineSteed                 = 190784,
+                    flashOfLight                = 19750,
+                    hammerOfJustice             = 853,
                     handOfReckoning             = 62124,
                     layOnHands                  = 633,
                     redemption                  = 7328,
@@ -2185,7 +2201,7 @@ function rotation:prestart_action()
     
                 },
                 buffs                           = {
-                    divineShield                = 642,                
+                    divineShield                = 642,
                     divineSteed                 = 190784,
                     blessingOfProtection        = 1022,
                 },
@@ -2414,10 +2430,13 @@ function rotation:prestart_action()
                     voidForm                    = 194249,
                     voidTorrent                 = 205065,
                     zeksExterminatus            = 236546, -- Legendary Cloak proc
+                    thoughtsHarvester           = 288340,
                 },
                 debuffs                         = {
                     shadowWordPain              = 589,
                     vampiricTouch               = 34914,
+                    weakenedSoul                = 6788,
+    
                 },
                 glyphs                          = {
     
@@ -2426,6 +2445,7 @@ function rotation:prestart_action()
                     auspiciousSpirits           = 155271,
                     bodyAndSoul                 = 64129,
                     darkVoid                    = 263346,
+                    darkAscension               = 280711,
                     --dominantMind                = 205367,
                     fortressOfTheMind           = 193195,
                     legacyOfTheVoid             = 193225,
@@ -2469,6 +2489,7 @@ function rotation:prestart_action()
                 buffs                           = {
                     classHallSpeed              = 224098,
                     powerWordFortitude          = 21562,
+                    
                 },
                 debuffs                         = {
     
@@ -2517,7 +2538,7 @@ function rotation:prestart_action()
                     hiddenBlades                = 270070,
                     leechingPoison              = 108211,
                     sharpenedBlades             = 272916,
-                    masterAssassins             = 255989,
+                    masterAssassin              = 256735,
                     stealth                     = 1784 or 115191,
                     subterfuge                  = 115192,
                     theDreadlordsDeceit         = 208692,
@@ -2580,7 +2601,6 @@ function rotation:prestart_action()
                     grapplingHook               = 195457,
                     killingSpree                = 51690,
                     masteryMainGauche           = 76806,
-                    parley                      = 199743,
                     pistolShot                  = 185763,
                     riposte                     = 199754,
                     rollTheBones                = 193316,
@@ -2625,13 +2645,13 @@ function rotation:prestart_action()
                     opportunity                 = 195627,
                     ruthlessPrecision           = 193357,
                     rollTheBones                = {
-                    broadside                   = 193356,
-                    buriedTreasure              = 199600,
-                    grandMelee                  = 193358,
-                    ruthlessPrecision           = 193357,
-                    skullAndCrossbones          = 199603,
-                    trueBearing                 = 193359,
-                },
+                        broadside                   = 193356,
+                        buriedTreasure              = 199600,
+                        grandMelee                  = 193358,
+                        ruthlessPrecision           = 193357,
+                        skullAndCrossbones          = 199603,
+                        trueBearing                 = 193359,
+                    },
                     sharkInfestedWaters         = 193357,
                     skullAndCrossbones          = 199603,
                     sliceAndDice                = 5171,
@@ -2642,7 +2662,6 @@ function rotation:prestart_action()
                 },
                 debuffs                         = {
                     ghostlyStrike               = 196937,
-                    parley                      = 199743,
                 },
                 glyphs                          = {
     
@@ -2652,11 +2671,10 @@ function rotation:prestart_action()
                     dirtyTricks                 = 108216,
                     bladeRush                   = 271877,
                     ghostlyStrike               = 196937,
-                    grapplingHook               = 195457,
+                    grapplingHook               = 256188,
                     hitAndRun                   = 196922,
                     ironStomach                 = 193546,
                     killingSpree                = 51690,
-                    parley                      = 199743,
                     sliceAndDice                = 5171,
                     weaponmaster                = 200733,
                     quickDraw                   = 196938,
@@ -2727,7 +2745,9 @@ function rotation:prestart_action()
                 traits                          = {
                     bladeInTheShadows           = 275896,
                     nightsVengeance             = 273418,
+                    replicatingShadows          = 286121,
                     sharpenedBlades             = 272911,
+                    theFirstDance               = 278681
                 }
             },
             -- All
@@ -2821,7 +2841,7 @@ function rotation:prestart_action()
                 },
                 artifacts                       = {
                     seismicStorm                = 238141,
-                    stormKeeper                 = 205495,
+                    stormkeeper                 = 205495,
                     swellingMaelstrom           = 238105,
                 },
                 buffs                           = {
@@ -3441,7 +3461,8 @@ function rotation:prestart_action()
                     furiousSlash                = 202539,
                     meatCleaver                 = 85739,
                     recklessness                = 1719,
-                    whirlwind					= 85739,
+                    suddenDeath                 = 280776,
+                    whirlwind                   = 85739,
                 },
                 debuffs                         = {
                     siegebreaker                = 280773,
@@ -3468,6 +3489,9 @@ function rotation:prestart_action()
                     warMachine                  = 262231,
                     warpaint                    = 208154,
                 },
+                traits                          = {
+                    coldSteelHotBlood           = 288080
+                }
             },
             -- Protection
             [73] = {
@@ -3505,6 +3529,7 @@ function rotation:prestart_action()
                     vengeanceRevenge            = 202573,
                 },
                 debuffs                         = {
+                    deepwoundsProt              = 115767,
                     demoralizingShout           = 1160,
                     thunderClap                 = 6343,
                 },
@@ -3516,11 +3541,16 @@ function rotation:prestart_action()
                     bolster                     = 280001,
                     boomingVoice                = 202743,
                     cracklingThunder            = 203201,
+                    devastator                  = 236279,
+                    dragonRoar                  = 118000,
                     heavyRepercussions          = 203177,
                     indomitable                 = 202095,
                     intoTheFray                 = 202603,
+                    menace                      = 275338,
                     neverSurrender              = 202561,
+                    punish                      = 275334,
                     ravager                     = 228920,
+                    rumblingEarth               = 275339,
                     safeguard                   = 223657,
                     unstoppableForce            = 275336,
                     vengeance                   = 202572,
@@ -3587,11 +3617,21 @@ function rotation:prestart_action()
                     concordanceOfTheLegionfall      = 239042,
                 },
                 buffs                               = {
-                    ancientHysteria                 = 90355,                
+                    ancientHysteria                 = 90355,
                     battlePotionOfAgility           = 279152,
                     battlePotionOfIntellect         = 279151,
                     battlePotionOfStrength          = 279153,
-                    bloodlust                       = 2825,
+                    bloodLust                       = {
+                        ancientHysteria             = 90355,
+                        bloodlust                   = 2825,
+                        drumsOfRage                 = 146555,
+                        drumsOfTheMaelstrom         = 256740,
+                        drumsOfTheMountain          = 230935,
+                        heroism                     = 32182,
+                        netherwinds                 = 160452,
+                        primalRage                  = 264667,
+                        timewarp                    = 80353,
+                    },
                     concordanceOfTheLegionfall      = 239042,
                     defiledAugmentation             = 224001, -- Lightforged Augment Rune buff
                     felFocus                        = 242551,
@@ -3777,7 +3817,8 @@ function rotation:prestart_action()
         self.cooldown       = {}        
         self.charges        = {} 
         self.spell	        = {}
-        self.pct_health     = getHP      
+        self.pct_health     = getHP
+        self.time_to_die    = getTimeToDie  
         return self
     end
 
@@ -3871,6 +3912,9 @@ function rotation:prestart_action()
             end
             cooldown.remains = function()
                 return getSpellCD(v)
+            end
+            cooldown.charges = function()
+                return getCharges(v)
             end
 
 
@@ -3998,6 +4042,11 @@ function rotation:prestart_action()
                     if thisUnit == nil then thisUnit = 'player' end
                     if sourceUnit == nil then sourceUnit = 'player' end
                     return UnitBuffID(thisUnit,v,sourceUnit) ~= nil
+                end
+                buff.down = function(thisUnit,sourceUnit)
+                    if thisUnit == nil then thisUnit = 'player' end
+                    if sourceUnit == nil then sourceUnit = 'player' end
+                    return not UnitBuffID(thisUnit,v,sourceUnit)
                 end
                 buff.ticking = function(thisUnit,sourceUnit)
                     if thisUnit == nil then thisUnit = 'player' end
@@ -4287,6 +4336,7 @@ end
 function rotation:default_action()
 
     player          = cPlayer:new("player",269)
+    target          = player
     talent          = player.talent
     buff            = player.buff
     debuff          = player.debuff
@@ -4396,7 +4446,7 @@ function rotation:default_action()
         end
     end
     -- # Potion if Serenity or Storm, Earth, and Fire are up or you are running serenity and a main stat trinket procs, or you are under the effect of bloodlust, or target time to die is greater or equal to 60
-    -- actions+=/potion, if buff.serenity.up or buff.storm_earth_and_fire.up or ( not talent.serenity.enabled and trinket.proc.agility.react) or buff.bloodlust.react or target.time_to_die<=60
+    -- actions+=/potion, if buff.serenity.up or buff.stormEarthAndFire.up or ( not talent.serenity.enabled and trinket.proc.agility.react) or buff.bloodlust.react or target.time_to_die<=60
     -- actions+=/call_action_list,name=serenity, 
     if buff.serenity.up()
     -- actions+=/fistOfTheWhiteTiger, 
@@ -4499,9 +4549,9 @@ function rotation:aoe(args)
     if cast.able.chiWave() and cast.chiWave() then
         return 0
     end
-    -- actions.aoe+=/flying_serpent_kick, if buff.bok_proc.down,interrupt=1
-    -- actions.aoe+=/blackout_kick,target_ if min:debuff.markOfTheCrane.remains, 
-    if  not prev_gcd.blackout_kick() and (buff.bok_proc.up() or (talent.hitCombo and prev_gcd.tigerPalm() and chi()<4)) then
+    -- actions.aoe+=/flyingSerpentKick, if buff.bok_proc.down,interrupt=1
+    -- actions.aoe+=/blackoutKick,target_ if min:debuff.markOfTheCrane.remains, 
+    if  not prev_gcd.blackoutKick() and (buff.bok_proc.up() or (talent.hitCombo and prev_gcd.tigerPalm(tg1) and chi()<4)) then
         if cast.able.tigerPalm() and cast.tigerPalm(tg1) then
             return 0
         end
@@ -4522,34 +4572,141 @@ function rotation:cd(args)
     -- actions.cd+=/blood_fury
     -- actions.cd+=/berserking
     -- # Use Arcane Torrent if you are missing at least 1 Chi and won't cap energy within 0.5 seconds
-    -- actions.cd+=/arcane_torrent, 
-    if chi.max()-chi()>=1 and energy.time_to_max()>=0.5
+    -- actions.cd+=/arcaneTorrent, 
+    if chi.max()-chi()>=1 and energy.time_to_max()>=0.5 then
+        if cast.able.arcaneTorrent() and cast.arcaneTorrent() then
+            return 0
+        end
+    end
     -- actions.cd+=/lights_judgment
     -- actions.cd+=/fireblood
     -- actions.cd+=/ancestral_call
-    -- actions.cd+=/touch_of_death, if target.time_to_die>9
-    -- actions.cd+=/storm_earth_and_fire, if cooldown.storm_earth_and_fire.charges=2 or (cooldown.fistsOfFury.remains<=6 and chi>=3 and cooldown.risingSunKick.remains<=1) or target.time_to_die<=15
-    -- actions.cd+=/serenity, if cooldown.risingSunKick.remains<=2 or target.time_to_die<=12
+    -- actions.cd+=/touchOfDeath, 
+    if target.time_to_die(tg)>9 then
+        if cast.able.touchOfDeath() and cast.touchOfDeath() then
+            return 0
+        end
+    end
+    -- actions.cd+=/stormEarthAndFire, 
+    if cooldown.stormEarthAndFire.charges()==2 or (cooldown.fistsOfFury.remains()<=6 and chi()>=3 and cooldown.risingSunKick.remains()<=1) or target.time_to_die(tg)<=15 then
+        if cast.able.stormEarthAndFire() and cast.stormEarthAndFire() then
+            return 0
+        end
+    end
+    -- actions.cd+=/serenity, 
+    if cooldown.risingSunKick.remains()<=2 or target.time_to_die()<=12 then
+        if cast.able.serenity() and cast.serenity() then
+            return 0
+        end
+    end
+    return 0
 end
 
 
+function rotation:serenity(args)
+    -- # Serenity priority
+    -- actions.serenity=risingSunKick,target_ if min:debuff.markOfTheCrane.remains, 
+    if active_enemies<3 or prev_gcd.spinningCraneKick(tg1) then
+        if cast.able.risingSunKick() and cast.risingSunKick() then
+            return 0
+        end
+    end
+    -- actions.serenity+=/fistsOfFury, 
+    if (buff.bloodlust.up() and prev_gcd.risingSunKick()) or buff.serenity.remains()<1 or (active_enemies>1 and active_enemies<5) then
+        if cast.able.fistsOfFury() and cast.fistsOfFury() then
+            return 0
+        end
+    end
+    -- actions.serenity+=/spinningCraneKick, 
+    if  not prev_gcd.spinningCraneKick() and (active_enemies>=3 or (active_enemies=2 and prev_gcd.blackoutKick())) then
+        if cast.able.spinningCraneKick() and cast.spinningCraneKick() then
+            return 0
+        end
+    end
+    -- actions.serenity+=/blackoutKick,target_ 
+    if debuff.markOfTheCrane.remains(tg1) then
+        if cast.able.blackoutKick() and cast.blackoutKick(tg1) then
+            return 0
+        end
+    end
+    return 0
+end
 
--- # Serenity priority
--- actions.serenity=risingSunKick,target_ if min:debuff.markOfTheCrane.remains, if active_enemies<3 or prev_gcd.1.spinningCraneKick
--- actions.serenity+=/fistsOfFury, if (buff.bloodlust.up and prev_gcd.1.risingSunKick) or buff.serenity.remains<1 or (active_enemies>1 and active_enemies<5)
--- actions.serenity+=/spinningCraneKick, if  not prev_gcd.1.spinningCraneKick and (active_enemies>=3 or (active_enemies=2 and prev_gcd.1.blackout_kick))
--- actions.serenity+=/blackout_kick,target_ if min:debuff.markOfTheCrane.remains
 
--- actions.st=whirlingDragonPunch
--- actions.st+=/risingSunKick,target_ if min:debuff.markOfTheCrane.remains, if chi>=5
--- actions.st+=/fistsOfFury, if energy.time_to_max>3
--- actions.st+=/risingSunKick,target_ if min:debuff.markOfTheCrane.remains
--- actions.st+=/spinningCraneKick, if  not prev_gcd.1.spinningCraneKick and buff.dance_of_chiji.up
--- actions.st+=/rushingJadeWind, if buff.rushingJadeWind.down and active_enemies>1
--- actions.st+=/fistOfTheWhiteTiger, if chi<=2
--- actions.st+=/energizingElixir, if chi<=3 and energy<50
--- actions.st+=/blackout_kick,target_ if min:debuff.markOfTheCrane.remains, if  not prev_gcd.1.blackout_kick and (cooldown.risingSunKick.remains>3 or chi>=3) and (cooldown.fistsOfFury.remains>4 or chi>=4 or (chi=2 and prev_gcd.1.tigerPalm)) and buff.swift_roundhouse.stack<2
--- actions.st+=/chiWave
--- actions.st+=/chiBurst, if chi.max-chi>=1 and active_enemies=1 or chi.max-chi>=2
--- actions.st+=/tigerPalm,target_ if min:debuff.markOfTheCrane.remains, if  not prev_gcd.1.tigerPalm and chi.max-chi>=2
--- actions.st+=/flying_serpent_kick, if prev_gcd.1.blackout_kick and chi>3 and buff.swift_roundhouse.stack<2,interrupt=1
+function rotation:st(args)
+    -- actions.st=whirlingDragonPunch
+    if cast.able.whirlingDragonPunch() and cast.whirlingDragonPunch() then
+        return 0
+    end
+    -- actions.st+=/risingSunKick,target_ if min:debuff.markOfTheCrane.remains, 
+    if chi()>=5 then
+        if cast.able.risingSunKick() and cast.risingSunKick(tg1) then
+            return 0
+        end
+    end
+    -- actions.st+=/fistsOfFury, 
+    if energy.time_to_max()>3 then
+        if cast.able.fistsOfFury() and cast.fistsOfFury() then
+            return 0
+        end
+    end
+    -- actions.st+=/risingSunKick,target_ 
+    if debuff.markOfTheCrane.remains(tg1) then
+        if cast.able.risingSunKick() and cast.risingSunKick() then
+            return 0
+        end
+    end
+    -- actions.st+=/spinningCraneKick, 
+    if  not prev_gcd.spinningCraneKick() and buff.dance_of_chiji.up() then
+        if cast.able.spinningCraneKick() and cast.spinningCraneKick() then
+            return 0
+        end
+    end 
+    -- actions.st+=/rushingJadeWind, 
+    if buff.rushingJadeWind.down() and active_enemies>1 then
+        if cast.able.rushingJadeWind() and cast.rushingJadeWind() then
+            return 0
+        end
+    end
+    -- actions.st+=/fistOfTheWhiteTiger, 
+    if chi()<=2 then
+        if cast.able.fistOfTheWhiteTiger() and cast.fistOfTheWhiteTiger() then
+            return 0
+        end
+    end
+    -- actions.st+=/energizingElixir, 
+    if chi()<=3 and energy()<50 then
+        if cast.able.energizingElixir() and cast.energizingElixir() then
+            return 0
+        end
+    end
+    -- actions.st+=/blackoutKick,target_ if min:debuff.markOfTheCrane.remains, 
+    if  not prev_gcd.blackoutKick() and (cooldown.risingSunKick.remains()>3 or chi()>=3) and (cooldown.fistsOfFury.remains()>4 or chi()>=4 or (chi()==2 and prev_gcd.tigerPalm())) and buff.swiftRoundhouse.stack()<2 then
+        if cast.able.blackoutKick() and cast.blackoutKick(tg1) then
+            return 0
+        end
+    end
+    -- actions.st+=/chiWave
+    if cast.able.chiWave() and cast.chiWave() then
+        return 0
+    end
+    -- actions.st+=/chiBurst, 
+    if chi.max()-chi()>=1 and active_enemies==1 or chi.max()-chi()>=2 then
+        if cast.able.chiBurst() and cast.chiBurst() then
+            return 0
+        end
+    end
+    -- actions.st+=/tigerPalm,target_ if min:debuff.markOfTheCrane.remains, 
+    if  not prev_gcd.tigerPalm() and chi.max()-chi()>=2 then
+        if cast.able.tigerPalm() and cast.tigerPalm(tg1) then
+            return 0
+        end
+    end
+    -- actions.st+=/flyingSerpentKick, 
+    if prev_gcd.blackoutKick and chi()>3 and buff.swiftRoundhouse.stack()<2 then
+        if cast.able.flyingSerpentKick() and cast.flyingSerpentKick() then
+            return 0
+        end
+    end
+end
+
