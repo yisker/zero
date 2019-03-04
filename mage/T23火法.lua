@@ -206,10 +206,17 @@ end
 -----------------------------------------------------------
 --注册事件
 do
-    if Y                        == nil then Y                       = {};   end; --初始化总空间
-    if Y.lastspell_failed       == nil then Y.lastspell_failed      = {};   end; --初始化最近一次失败法术的记录空间    
-    if Y.lastspell_success      == nil then Y.lastspell_success     = {};   end; --初始化最近一次成功法术的记录空间
-    if Y.spell_cast_return      == nil then Y.spell_cast_return     = 0;    end; --初始化最近一次成功法术返回的值    
+    if Y                                    == nil then Y                                   = {};           end; --初始化总空间
+    if Y.spelllist_failed                   == nil then Y.spelllist_failed                  = {};           end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_success                   == nil then Y.spelllist_success                  = {};           end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_failed.spellname         == nil then Y.spelllist_failed.spellname        = 0;            end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_failed.spelltarget       == nil then Y.spelllist_failed.spelltarget      = "player";     end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_failed.spelltime         == nil then Y.spelllist_failed.spelltime        = 0;            end; --初始化最近一次失败法术的记录空间    
+    if Y.lastspell_success                  == nil then Y.lastspell_success                 = {};           end; --初始化最近一次成功法术的记录空间
+    if Y.lastspell_success.spellName         == nil then Y.lastspell_success.spellName        = 0;            end; --初始化最近一次成功法术的记录空间    
+    if Y.lastspell_success.spelltarget       == nil then Y.lastspell_success.spelltarget      = "player";     end; --初始化最近一次成功法术的记录空间    
+    if Y.lastspell_success.spelltime         == nil then Y.lastspell_success.spelltime        = 0;            end; --初始化最近一次成功法术的记录空间  
+    if Y.spell_cast_return                  == nil then Y.spell_cast_return                 = 0;            end; --初始化最近一次成功法术返回的值    
     
     if Y.data == nil then Y.data = {}; end;
     if Y.nNove == nil then Y.nNove = {}; end;
@@ -334,9 +341,15 @@ do
         end
         if event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_DEAD"  then
             Y.data["Combat Started"] = 0
-            Y.lastspell_failed = {};
+            Y.spelllist_failed = {};
             Y.lastspell_success = {};
-            Y.spell_cast_return = 0;       
+            Y.spell_cast_return = 0;
+            Y.spelllist_failed.spellname = 0
+            Y.spelllist_failed.spelltarget = "player"
+            Y.spelllist_failed.spelltime = 0
+            Y.lastspell_success.spellName = 0
+            Y.lastspell_success.spelltarget = "player"
+            Y.lastspell_success.spelltime = 0      
         
         end
     end
@@ -364,6 +377,54 @@ local function filler_unit(Unit)
         return false
     end
 end
+--为了1,1天赋创造的函数,估算掉血到90还有多久
+local function round2(num, idp)
+    local mult = 10^(idp or 0)
+    return math.floor(num * mult + 0.5) / mult
+  end
+  
+local thpcurr,thpstart,timestart,currtar,priortar,timecurr,timeToDie
+local function getTimeTo90(unit)
+      unit = unit or "target";
+      if getHP(unit) < 90 then return -999;end
+      if thpcurr == nil then thpcurr = 0; end --定义目标当前血量
+      if thpstart == nil then thpstart = 0; end --定义目标起始血量
+      if timestart == nil then timestart = 0; end --定义目标起始时间
+      if UnitIsVisible(unit) and not UnitIsDeadOrGhost(unit) then --目标存在
+          if currtar ~= UnitGUID(unit) then --如果当前目标和参数目标不一致，把当前目标放到priortar，再指定当前目标为参数目标
+              priortar = currtar;
+              currtar = UnitGUID(unit);
+          end
+          if thpstart == 0 and timestart == 0 then --如果目标起始血量为0，起始血量赋值为当前血量，起始时间赋值为当前时间
+              thpstart = UnitHealth(unit);
+              timestart = GetTime();
+          else --如果目标起始血量和时间都已经设定好了（这已经是第二次运算才会给的值）
+              thpcurr = UnitHealth(unit); --目标当前血量赋值
+              timecurr = GetTime(); --目标当前时间赋值
+              if thpcurr >= thpstart then --如果当前血量大于起始血量，计算失败，把当前血量赋值给起始血量，返回999的错误值
+                  thpstart = thpcurr; 
+                  timeToDie = -999;
+              else
+                  if ((timecurr - timestart)==0) or ((thpstart - thpcurr)==0) then --如果时间或者血量都一致，说明是第一次运算，返回999错误值
+                      timeToDie = -999;
+                  else
+                      timeToDie = round2((thpcurr - UnitHealthMax(unit)*0.9)/((thpstart - thpcurr) / (timecurr - timestart)),2); --当前血量/（血量差 / 时间差）==血量掉落的速度
+                  end
+              end
+          end
+      elseif not UnitIsVisible(unit) or currtar ~= UnitGUID(unit) then
+          currtar = 0;
+          priortar = 0;
+          thpstart = 0;
+          timestart = 0;
+          timeToDie = 0;
+      end
+      if timeToDie == nil then
+          return -999
+      else
+          return timeToDie
+      end
+  end
 -----------------------------------------------------------
 -- 模块脚本
 -----------------------------------------------------------
@@ -4356,6 +4417,31 @@ function rotation:prestop_action()
     -- 编写模块停止前脚本。
     print("stop now not ");
 end
+function rotation:active_talents(args)
+    -- actions.active_talents=livingBomb,
+    if active_enemies>1 and buff.combustion.down() and (cooldown.combustion.remains()>cooldown.livingBomb.duration() or cooldown.combustion.ready()) then
+        if cast.able.livingBomb() and cast.livingBomb() then
+            if ydebug.is_enabled then
+                print(201)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- actions.active_talents+=/meteor,
+    if buff.runeOfPower.up() and (((getTalent(1,1) and getHP("target") >= 90) and getTimeTo90(tg)>cooldown.meteor.duration) or not (getTalent(1,1) and getHP("target") >= 90)) or cooldown.runeOfPower.remains()>target.time_to_die() and action.runeOfPower.charges()<1 or (cooldown.meteor.duration()<cooldown.combustion.remains() or cooldown.combustion.ready()) and not talent.runeOfPower and (cooldown.meteor.duration()<getTimeTo90(tg) or not talent.firestarter or not (getTalent(1,1) and getHP("target") >= 90)) then
+        if cast.able.meteor() and cast.meteor() then
+            if ydebug.is_enabled then
+                print(202)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+
+end
 function rotation:default_action()
 
     player          = cPlayer:new("player",63)
@@ -4457,7 +4543,7 @@ function rotation:default_action()
         end
     end
     -- actions+=/runeOfPower,
-    if talent.firestarter and buff.firestarter.remains()>full_recharge_time.runeOfPower() or cooldown.combustion.remains()>variable.combustion_rop_cutoff and buff.combustion.down() or target.time_to_die()<cooldown.combustion.remains() and buff.combustion.down() then
+    if talent.firestarter and getTimeTo90(tg)>full_recharge_time.runeOfPower() or cooldown.combustion.remains()>variable.combustion_rop_cutoff and buff.combustion.down() or target.time_to_die()<cooldown.combustion.remains() and buff.combustion.down() then
         if charges.runeOfPower() >= 1 and cast.able.runeOfPower() and cast.runeOfPower() then
             if ydebug.is_enabled then
                 print(102)
@@ -4479,7 +4565,7 @@ function rotation:default_action()
     end
     self:rest()
     -- actions+=/variable,name=fireBlast_pooling,value
-    variable.fireBlast_pooling=talent.runeOfPower and cooldown.runeOfPower.remains()<cooldown.fireBlast.full_recharge_time() and (cooldown.combustion.remains()>variable.combustion_rop_cutoff or (getTalent(1,1) and getHP(tg) >= 90)) and (cooldown.runeOfPower.remains()<target.time_to_die() or action.runeOfPower.charges()>0) or cooldown.combustion.remains()<action.fireBlast.full_recharge_time()+cooldown.fireBlast.duration()*azerite.blaster_master.enabled and not (getTalent(1,1) and getHP(tg) >= 90) and cooldown.combustion.remains()<target.time_to_die() or talent.firestarter and (getTalent(1,1) and getHP(tg) >= 90) and buff.firestarter.remains()<cooldown.fireBlast.full_recharge_time()+cooldown.fireBlast.duration()*azerite.blaster_master.enabled
+    variable.fireBlast_pooling=talent.runeOfPower and cooldown.runeOfPower.remains()<cooldown.fireBlast.full_recharge_time() and (cooldown.combustion.remains()>variable.combustion_rop_cutoff or (getTalent(1,1) and getHP(tg) >= 90)) and (cooldown.runeOfPower.remains()<target.time_to_die() or action.runeOfPower.charges()>0) or cooldown.combustion.remains()<action.fireBlast.full_recharge_time()+cooldown.fireBlast.duration()*azerite.blaster_master.enabled and not (getTalent(1,1) and getHP(tg) >= 90) and cooldown.combustion.remains()<target.time_to_die() or talent.firestarter and (getTalent(1,1) and getHP(tg) >= 90) and getTimeTo90(tg)<cooldown.fireBlast.full_recharge_time()+cooldown.fireBlast.duration()*azerite.blaster_master.enabled
     -- actions+=/variable,name=
     variable.phoenix_pooling=talent.runeOfPower and cooldown.runeOfPower.remains()<cooldown.phoenixFlames.full_recharge_time() and cooldown.combustion.remains()>variable.combustion_rop_cutoff and (cooldown.runeOfPower.remains()<target.time_to_die() or action.runeOfPower.charges()>0) or cooldown.combustion.remains()<action.phoenixFlames.full_recharge_time() and cooldown.combustion.remains()<target.time_to_die()
     -- actions+=/call_action_list,name=standard_rotation
@@ -4508,44 +4594,51 @@ rotation_manager.instance:register(rotation);
 
 
 
-
-
-
-function rotation:active_talents(args)
-    -- actions.active_talents=livingBomb,
-    if active_enemies>1 and buff.combustion.down() and (cooldown.combustion.remains()>cooldown.livingBomb.duration() or cooldown.combustion.ready()) then
-        if 
-    -- actions.active_talents+=/meteor,if buff.runeOfPower.up and (firestarter.remains>cooldown.meteor.duration or not (getTalent(1,1) and getHP("target") >= 90)) or cooldown.runeOfPower.remains>target.time_to_die and action.runeOfPower.charges<1 or (cooldown.meteor.duration<cooldown.combustion.remains or cooldown.combustion.ready) and not talent.runeOfPower.enabled and (cooldown.meteor.duration<firestarter.remains or not talent.firestarter.enabled or not (getTalent(1,1) and getHP("target") >= 90))
-
+function rotation:bm_combustion_phase(args)
+    -- actions.bm_combustion_phase=lightsJudgment,
+    if buff.combustion.down() then
+        if cast.able.lightsJudgment() and cast.lightsJudgment() then
+            if ydebug.is_enabled then
+                print(301)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- actions.bm_combustion_phase+=/livingBomb,if buff.combustion.down and active_enemies>1
+    -- actions.bm_combustion_phase+=/runeOfPower,if buff.combustion.down
+    -- actions.bm_combustion_phase+=/fireBlast,use_while_casting=1,if buff.blaster_master.down and (talent.runeOfPower.enabled and action.runeOfPower.executing and action.runeOfPower.execute_remains<0.6 or (cooldown.combustion.ready or buff.combustion.up) and not talent.runeOfPower.enabled and not action.pyroblast.in_flight and not action.fireball.in_flight)
+    -- actions.bm_combustion_phase+=/call_action_list,name=active_talents
+    -- actions.bm_combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if azerite.blaster_master.enabled and ((action.meteor.in_flight and action.meteor.in_flight_remains<0.2) or not talent.meteor.enabled or prev_gcd.1.meteor) and (buff.runeOfPower.up or not talent.runeOfPower.enabled)
+    -- actions.bm_combustion_phase+=/potion
+    -- actions.bm_combustion_phase+=/blood_fury
+    -- actions.bm_combustion_phase+=/berserking
+    -- actions.bm_combustion_phase+=/fireblood
+    -- actions.bm_combustion_phase+=/ancestral_call
+    -- actions.bm_combustion_phase+=/call_action_list,name=trinkets
+    -- actions.bm_combustion_phase+=/pyroblast,if prev_gcd.1.scorch and buff.heating_up.up
+    -- actions.bm_combustion_phase+=/pyroblast,if buff.hot_streak.up
+    -- actions.bm_combustion_phase+=/pyroblast,if buff.pyroclasm.react and cast_time<buff.combustion.remains
+    -- actions.bm_combustion_phase+=/phoenixFlames
+    -- actions.bm_combustion_phase+=/fireBlast,use_off_gcd=1,if buff.blaster_master.stack=1 and buff.hot_streak.down and not buff.pyroclasm.react and prev_gcd.1.pyroblast and (buff.blaster_master.remains<0.15 or gcd.remains<0.15)
+    -- actions.bm_combustion_phase+=/fireBlast,use_while_casting=1,if buff.blaster_master.stack=1 and (action.scorch.executing and action.scorch.execute_remains<0.15 or buff.blaster_master.remains<0.15)
+    -- actions.bm_combustion_phase+=/scorch,if buff.hot_streak.down and (cooldown.fireBlast.remains<cast_time or action.fireBlast.charges>0)
+    -- actions.bm_combustion_phase+=/fireBlast,use_while_casting=1,use_off_gcd=1,if buff.blaster_master.stack>1 and (prev_gcd.1.scorch and not buff.hot_streak.up and not action.scorch.executing or buff.blaster_master.remains<0.15)
+    -- actions.bm_combustion_phase+=/livingBomb,if buff.combustion.remains<gcd.max and active_enemies>1
+    -- actions.bm_combustion_phase+=/dragons_breath,if buff.combustion.remains<gcd.max
+    -- actions.bm_combustion_phase+=/scorch
 end
 
 
--- actions.bm_combustion_phase=lights_judgment,if buff.combustion.down
--- actions.bm_combustion_phase+=/livingBomb,if buff.combustion.down and active_enemies>1
--- actions.bm_combustion_phase+=/runeOfPower,if buff.combustion.down
--- actions.bm_combustion_phase+=/fireBlast,use_while_casting=1,if buff.blaster_master.down and (talent.runeOfPower.enabled and action.runeOfPower.executing and action.runeOfPower.execute_remains<0.6 or (cooldown.combustion.ready or buff.combustion.up) and not talent.runeOfPower.enabled and not action.pyroblast.in_flight and not action.fireball.in_flight)
--- actions.bm_combustion_phase+=/call_action_list,name=active_talents
--- actions.bm_combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if azerite.blaster_master.enabled and ((action.meteor.in_flight and action.meteor.in_flight_remains<0.2) or not talent.meteor.enabled or prev_gcd.1.meteor) and (buff.runeOfPower.up or not talent.runeOfPower.enabled)
--- actions.bm_combustion_phase+=/potion
--- actions.bm_combustion_phase+=/blood_fury
--- actions.bm_combustion_phase+=/berserking
--- actions.bm_combustion_phase+=/fireblood
--- actions.bm_combustion_phase+=/ancestral_call
--- actions.bm_combustion_phase+=/call_action_list,name=trinkets
--- actions.bm_combustion_phase+=/pyroblast,if prev_gcd.1.scorch and buff.heating_up.up
--- actions.bm_combustion_phase+=/pyroblast,if buff.hot_streak.up
--- actions.bm_combustion_phase+=/pyroblast,if buff.pyroclasm.react and cast_time<buff.combustion.remains
--- actions.bm_combustion_phase+=/phoenixFlames
--- actions.bm_combustion_phase+=/fireBlast,use_off_gcd=1,if buff.blaster_master.stack=1 and buff.hot_streak.down and not buff.pyroclasm.react and prev_gcd.1.pyroblast and (buff.blaster_master.remains<0.15 or gcd.remains<0.15)
--- actions.bm_combustion_phase+=/fireBlast,use_while_casting=1,if buff.blaster_master.stack=1 and (action.scorch.executing and action.scorch.execute_remains<0.15 or buff.blaster_master.remains<0.15)
--- actions.bm_combustion_phase+=/scorch,if buff.hot_streak.down and (cooldown.fireBlast.remains<cast_time or action.fireBlast.charges>0)
--- actions.bm_combustion_phase+=/fireBlast,use_while_casting=1,use_off_gcd=1,if buff.blaster_master.stack>1 and (prev_gcd.1.scorch and not buff.hot_streak.up and not action.scorch.executing or buff.blaster_master.remains<0.15)
--- actions.bm_combustion_phase+=/livingBomb,if buff.combustion.remains<gcd.max and active_enemies>1
--- actions.bm_combustion_phase+=/dragons_breath,if buff.combustion.remains<gcd.max
--- actions.bm_combustion_phase+=/scorch
+
+
+
+
+
 
 -- # Combustion phase prepares abilities with a delay, then launches into the Combustion sequence
--- actions.combustion_phase=lights_judgment,if buff.combustion.down
+-- actions.combustion_phase=lightsJudgment,if buff.combustion.down
 -- actions.combustion_phase+=/call_action_list,name=bm_combustion_phase,if azerite.blaster_master.enabled and talent.flame_on.enabled
 -- actions.combustion_phase+=/runeOfPower,if buff.combustion.down
 -- actions.combustion_phase+=/call_action_list,name=active_talents
@@ -4588,12 +4681,12 @@ end
 -- actions.standard_rotation+=/pyroblast,if buff.hot_streak.react and target.health.pct<=30 and talent.searing_touch.enabled
 -- actions.standard_rotation+=/pyroblast,if buff.pyroclasm.react and cast_time<buff.pyroclasm.remains
 -- actions.standard_rotation+=/fireBlast,use_off_gcd=1,use_while_casting=1,if (cooldown.combustion.remains>0 and buff.runeOfPower.down or (getTalent(1,1) and getHP("target") >= 90)) and not talent.kindling.enabled and not variable.fireBlast_pooling and (((action.fireball.executing or action.pyroblast.executing) and (buff.heating_up.react or (getTalent(1,1) and getHP("target") >= 90) and not buff.hot_streak.react and not buff.heating_up.react)) or (talent.searing_touch.enabled and target.health.pct<=30 and (buff.heating_up.react and not action.scorch.executing or not buff.hot_streak.react and not buff.heating_up.react and action.scorch.executing and not action.pyroblast.in_flight and not action.fireball.in_flight)) or ((getTalent(1,1) and getHP("target") >= 90) and (action.pyroblast.in_flight or action.fireball.in_flight) and not buff.heating_up.react and not buff.hot_streak.react))
--- actions.standard_rotation+=/fireBlast,if talent.kindling.enabled and buff.heating_up.react and (cooldown.combustion.remains>full_recharge_time+2+talent.kindling.enabled or firestarter.remains>full_recharge_time or (not talent.runeOfPower.enabled or cooldown.runeOfPower.remains>target.time_to_die and action.runeOfPower.charges<1) and cooldown.combustion.remains>target.time_to_die)
+-- actions.standard_rotation+=/fireBlast,if talent.kindling.enabled and buff.heating_up.react and (cooldown.combustion.remains>full_recharge_time+2+talent.kindling.enabled or getTimeTo90(tg)>full_recharge_time or (not talent.runeOfPower.enabled or cooldown.runeOfPower.remains>target.time_to_die and action.runeOfPower.charges<1) and cooldown.combustion.remains>target.time_to_die)
 -- actions.standard_rotation+=/pyroblast,if prev_gcd.1.scorch and buff.heating_up.up and talent.searing_touch.enabled and target.health.pct<=30 and ((talent.flame_patch.enabled and active_enemies=1 and not (getTalent(1,1) and getHP("target") >= 90)) or (active_enemies<4 and not talent.flame_patch.enabled))
 -- actions.standard_rotation+=/phoenixFlames,if (buff.heating_up.react or (not buff.hot_streak.react and (action.fireBlast.charges>0 or talent.searing_touch.enabled and target.health.pct<=30))) and not variable.phoenix_pooling
 -- actions.standard_rotation+=/call_action_list,name=active_talents
 -- actions.standard_rotation+=/dragons_breath,if active_enemies>1
--- actions.standard_rotation+=/use_item,name=tidestorm_codex,if cooldown.combustion.remains>20 or talent.firestarter.enabled and firestarter.remains>20
+-- actions.standard_rotation+=/use_item,name=tidestorm_codex,if cooldown.combustion.remains>20 or talent.firestarter.enabled and getTimeTo90(tg)>20
 -- actions.standard_rotation+=/scorch,if target.health.pct<=30 and talent.searing_touch.enabled
 -- actions.standard_rotation+=/fireball
 -- actions.standard_rotation+=/scorch
