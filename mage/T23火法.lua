@@ -4442,6 +4442,7 @@ function rotation:active_talents(args)
     end
 
 end
+
 function rotation:default_action()
 
     player          = cPlayer:new("player",63)
@@ -4594,101 +4595,6 @@ rotation_manager.instance:register(rotation);
 
 
 
-function rotation:bm_combustion_phase(args)
-    -- actions.bm_combustion_phase=lightsJudgment,
-    if buff.combustion.down() then
-        if cast.able.lightsJudgment() and cast.lightsJudgment() then
-            if ydebug.is_enabled then
-                print(301)
-                return 0
-            else
-                return 0
-            end
-        end
-    end
-    -- actions.bm_combustion_phase+=/livingBomb,if buff.combustion.down and active_enemies>1
-    -- actions.bm_combustion_phase+=/runeOfPower,if buff.combustion.down
-    -- actions.bm_combustion_phase+=/fireBlast,use_while_casting=1,if buff.blaster_master.down and (talent.runeOfPower.enabled and action.runeOfPower.executing and action.runeOfPower.execute_remains<0.6 or (cooldown.combustion.ready or buff.combustion.up) and not talent.runeOfPower.enabled and not action.pyroblast.in_flight and not action.fireball.in_flight)
-    -- actions.bm_combustion_phase+=/call_action_list,name=active_talents
-    -- actions.bm_combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if azerite.blaster_master.enabled and ((action.meteor.in_flight and action.meteor.in_flight_remains<0.2) or not talent.meteor.enabled or prev_gcd.1.meteor) and (buff.runeOfPower.up or not talent.runeOfPower.enabled)
-    -- actions.bm_combustion_phase+=/potion
-    -- actions.bm_combustion_phase+=/blood_fury
-    -- actions.bm_combustion_phase+=/berserking
-    -- actions.bm_combustion_phase+=/fireblood
-    -- actions.bm_combustion_phase+=/ancestral_call
-    -- actions.bm_combustion_phase+=/call_action_list,name=trinkets
-    -- actions.bm_combustion_phase+=/pyroblast,if prev_gcd.1.scorch and buff.heating_up.up
-    -- actions.bm_combustion_phase+=/pyroblast,if buff.hot_streak.up
-    -- actions.bm_combustion_phase+=/pyroblast,if buff.pyroclasm.react and cast_time<buff.combustion.remains
-    -- actions.bm_combustion_phase+=/phoenixFlames
-    -- actions.bm_combustion_phase+=/fireBlast,use_off_gcd=1,if buff.blaster_master.stack=1 and buff.hot_streak.down and not buff.pyroclasm.react and prev_gcd.1.pyroblast and (buff.blaster_master.remains<0.15 or gcd.remains<0.15)
-    -- actions.bm_combustion_phase+=/fireBlast,use_while_casting=1,if buff.blaster_master.stack=1 and (action.scorch.executing and action.scorch.execute_remains<0.15 or buff.blaster_master.remains<0.15)
-    -- actions.bm_combustion_phase+=/scorch,if buff.hot_streak.down and (cooldown.fireBlast.remains<cast_time or action.fireBlast.charges>0)
-    -- actions.bm_combustion_phase+=/fireBlast,use_while_casting=1,use_off_gcd=1,if buff.blaster_master.stack>1 and (prev_gcd.1.scorch and not buff.hot_streak.up and not action.scorch.executing or buff.blaster_master.remains<0.15)
-    -- actions.bm_combustion_phase+=/livingBomb,if buff.combustion.remains<gcd.max and active_enemies>1
-    -- actions.bm_combustion_phase+=/dragons_breath,if buff.combustion.remains<gcd.max
-    -- actions.bm_combustion_phase+=/scorch
-end
 
 
 
-
-
-
-
-
--- # Combustion phase prepares abilities with a delay, then launches into the Combustion sequence
--- actions.combustion_phase=lightsJudgment,if buff.combustion.down
--- actions.combustion_phase+=/call_action_list,name=bm_combustion_phase,if azerite.blaster_master.enabled and talent.flame_on.enabled
--- actions.combustion_phase+=/runeOfPower,if buff.combustion.down
--- actions.combustion_phase+=/call_action_list,name=active_talents
--- actions.combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if (not azerite.blaster_master.enabled or not talent.flame_on.enabled) and ((action.meteor.in_flight and action.meteor.in_flight_remains<=0.5) or not talent.meteor.enabled) and (buff.runeOfPower.up or not talent.runeOfPower.enabled)
--- actions.combustion_phase+=/potion
--- actions.combustion_phase+=/blood_fury
--- actions.combustion_phase+=/berserking
--- actions.combustion_phase+=/fireblood
--- actions.combustion_phase+=/ancestral_call
--- actions.combustion_phase+=/call_action_list,name=trinkets
--- actions.combustion_phase+=/flamestrike,if ((talent.flame_patch.enabled and active_enemies>2) or active_enemies>6) and buff.hot_streak.react
--- actions.combustion_phase+=/pyroblast,if buff.pyroclasm.react and buff.combustion.remains>cast_time
--- actions.combustion_phase+=/pyroblast,if buff.hot_streak.react
--- actions.combustion_phase+=/fireBlast,use_off_gcd=1,use_while_casting=1,if (not azerite.blaster_master.enabled or not talent.flame_on.enabled) and ((buff.combustion.up and (buff.heating_up.react and not action.pyroblast.in_flight and not action.scorch.executing) or (action.scorch.execute_remains and buff.heating_up.down and buff.hot_streak.down and not action.pyroblast.in_flight)))
--- actions.combustion_phase+=/pyroblast,if prev_gcd.1.scorch and buff.heating_up.up
--- actions.combustion_phase+=/phoenixFlames
--- actions.combustion_phase+=/scorch,if buff.combustion.remains>cast_time and buff.combustion.up or buff.combustion.down
--- actions.combustion_phase+=/livingBomb,if buff.combustion.remains<gcd.max and active_enemies>1
--- actions.combustion_phase+=/dragons_breath,if buff.combustion.remains<gcd.max and buff.combustion.up
--- actions.combustion_phase+=/scorch,if target.health.pct<=30 and talent.searing_touch.enabled
-
--- actions.rop_phase=runeOfPower
--- actions.rop_phase+=/flamestrike,if ((talent.flame_patch.enabled and active_enemies>1) or active_enemies>4) and buff.hot_streak.react
--- actions.rop_phase+=/pyroblast,if buff.hot_streak.react
--- actions.rop_phase+=/fireBlast,use_off_gcd=1,use_while_casting=1,if (cooldown.combustion.remains>0 or (getTalent(1,1) and getHP("target") >= 90) and buff.runeOfPower.up) and (not buff.heating_up.react and not buff.hot_streak.react and not prev_off_gcd.fireBlast and (action.fireBlast.charges>=2 or (action.phoenixFlames.charges>=1 and talent.phoenixFlames.enabled) or (talent.alexstraszas_fury.enabled and cooldown.dragons_breath.ready) or (talent.searing_touch.enabled and target.health.pct<=30) or (talent.firestarter.enabled and (getTalent(1,1) and getHP("target") >= 90))))
--- actions.rop_phase+=/call_action_list,name=active_talents
--- actions.rop_phase+=/pyroblast,if buff.pyroclasm.react and cast_time<buff.pyroclasm.remains and buff.runeOfPower.remains>cast_time
--- actions.rop_phase+=/fireBlast,use_off_gcd=1,use_while_casting=1,if (cooldown.combustion.remains>0 or (getTalent(1,1) and getHP("target") >= 90) and buff.runeOfPower.up) and (buff.heating_up.react and (target.health.pct>=30 or not talent.searing_touch.enabled))
--- actions.rop_phase+=/fireBlast,use_off_gcd=1,use_while_casting=1,if (cooldown.combustion.remains>0 or (getTalent(1,1) and getHP("target") >= 90) and buff.runeOfPower.up) and talent.searing_touch.enabled and target.health.pct<=30 and (buff.heating_up.react and not action.scorch.executing or not buff.heating_up.react and not buff.hot_streak.react)
--- actions.rop_phase+=/pyroblast,if prev_gcd.1.scorch and buff.heating_up.up and talent.searing_touch.enabled and target.health.pct<=30 and (not talent.flame_patch.enabled or active_enemies=1)
--- actions.rop_phase+=/phoenixFlames,if not prev_gcd.1.phoenixFlames and buff.heating_up.react
--- actions.rop_phase+=/scorch,if target.health.pct<=30 and talent.searing_touch.enabled
--- actions.rop_phase+=/dragons_breath,if active_enemies>2
--- actions.rop_phase+=/flamestrike,if (talent.flame_patch.enabled and active_enemies>2) or active_enemies>5
--- actions.rop_phase+=/fireball
-
--- actions.standard_rotation=flamestrike,if ((talent.flame_patch.enabled and active_enemies>1 and not (getTalent(1,1) and getHP("target") >= 90)) or active_enemies>4) and buff.hot_streak.react
--- actions.standard_rotation+=/pyroblast,if buff.hot_streak.react and buff.hot_streak.remains<action.fireball.execute_time
--- actions.standard_rotation+=/pyroblast,if buff.hot_streak.react and (prev_gcd.1.fireball or (getTalent(1,1) and getHP("target") >= 90) or action.pyroblast.in_flight)
--- actions.standard_rotation+=/pyroblast,if buff.hot_streak.react and target.health.pct<=30 and talent.searing_touch.enabled
--- actions.standard_rotation+=/pyroblast,if buff.pyroclasm.react and cast_time<buff.pyroclasm.remains
--- actions.standard_rotation+=/fireBlast,use_off_gcd=1,use_while_casting=1,if (cooldown.combustion.remains>0 and buff.runeOfPower.down or (getTalent(1,1) and getHP("target") >= 90)) and not talent.kindling.enabled and not variable.fireBlast_pooling and (((action.fireball.executing or action.pyroblast.executing) and (buff.heating_up.react or (getTalent(1,1) and getHP("target") >= 90) and not buff.hot_streak.react and not buff.heating_up.react)) or (talent.searing_touch.enabled and target.health.pct<=30 and (buff.heating_up.react and not action.scorch.executing or not buff.hot_streak.react and not buff.heating_up.react and action.scorch.executing and not action.pyroblast.in_flight and not action.fireball.in_flight)) or ((getTalent(1,1) and getHP("target") >= 90) and (action.pyroblast.in_flight or action.fireball.in_flight) and not buff.heating_up.react and not buff.hot_streak.react))
--- actions.standard_rotation+=/fireBlast,if talent.kindling.enabled and buff.heating_up.react and (cooldown.combustion.remains>full_recharge_time+2+talent.kindling.enabled or getTimeTo90(tg)>full_recharge_time or (not talent.runeOfPower.enabled or cooldown.runeOfPower.remains>target.time_to_die and action.runeOfPower.charges<1) and cooldown.combustion.remains>target.time_to_die)
--- actions.standard_rotation+=/pyroblast,if prev_gcd.1.scorch and buff.heating_up.up and talent.searing_touch.enabled and target.health.pct<=30 and ((talent.flame_patch.enabled and active_enemies=1 and not (getTalent(1,1) and getHP("target") >= 90)) or (active_enemies<4 and not talent.flame_patch.enabled))
--- actions.standard_rotation+=/phoenixFlames,if (buff.heating_up.react or (not buff.hot_streak.react and (action.fireBlast.charges>0 or talent.searing_touch.enabled and target.health.pct<=30))) and not variable.phoenix_pooling
--- actions.standard_rotation+=/call_action_list,name=active_talents
--- actions.standard_rotation+=/dragons_breath,if active_enemies>1
--- actions.standard_rotation+=/use_item,name=tidestorm_codex,if cooldown.combustion.remains>20 or talent.firestarter.enabled and getTimeTo90(tg)>20
--- actions.standard_rotation+=/scorch,if target.health.pct<=30 and talent.searing_touch.enabled
--- actions.standard_rotation+=/fireball
--- actions.standard_rotation+=/scorch
-
--- actions.trinkets=use_items
