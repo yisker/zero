@@ -108,6 +108,18 @@ do
     targets_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local isbus_setting = rotation.default_setting_category:create_setting("isbus"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    isbus_setting.display_name = L["有坐骑不打怪"]; -- 变量在界面上显示的名字
+    isbus_setting.description = "有坐骑不打怪"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    isbus_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
+    isbus_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
+    isbus_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    isbus_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    isbus_setting.is_enabled_by_default = true; -- 是否默认启用（勾选框默认选中）
+    isbus_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    isbus_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
     
     -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
     local ydebug_setting = rotation.default_setting_category:create_setting("ydebug"); -- 指定变量的名字为test1，用于在脚本中进行引用
@@ -560,6 +572,7 @@ do
             Y.spelllist_failed = {};
             Y.spelllist_success = {};
             Y.spelllist = {};
+            Y.count = 0
             -- Y.data["GCD"] = getGCD();
             -- SetupTables()
             -- if self.settings.ydebug.is_enabled then
@@ -672,7 +685,7 @@ function rotation:precombat_action()
     -- print(ADDON_SLASH_COMMAND)
     -- print(bf)
     -- print(isKeyDown(bf))
-    if isKeyDown(bf) and GetTime() - tt > 1 then
+    if IsLeftControlKeyDown() and isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
         tt = GetTime()
         if baofa then
@@ -699,7 +712,7 @@ function rotation:serenity( ... )
     end
     self:rest()    
     -- actions.serenity+=/fists_of_fury,if=(buff.bloodlust.up&prev_gcd.1.rising_sun_kick)|buff.serenity.remains<1|(active_enemies>1&active_enemies<5)
-    if ( getBuffRemain("player",bloodlust) > 0 and getLastSpell() == rising_sun_kick ) or getBuffRemain("player",serenity) < 1 or ( active_enemies > 1 and active_enemies < 5 ) then
+    if ( getBuffRemain("player",bloodlust) > 0 and getLastSpell() == rising_sun_kick and not UnitIsUnit(Y.lastspell_target,tg) ) or getBuffRemain("player",serenity) < 1 or ( active_enemies > 1 and active_enemies < 5 ) then
         if canCast(fists_of_fury) and (UnitBuffID("player",serenity) or getChi() >= 3) and castSpell(tg,fists_of_fury) then
             if tiaoshi.is_enabled then
                 print(5061)
@@ -711,7 +724,7 @@ function rotation:serenity( ... )
     end
     self:rest()
     -- actions.serenity+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&(active_enemies>=3|(active_enemies=2&prev_gcd.1.blackout_kick))
-    if not (getLastSpell() == spinning_crane_kick) and ( active_enemies >= 3 or ( active_enemies == 2 and getLastSpell() == blackout_kick)) then
+    if not (getLastSpell() == spinning_crane_kick) and ( active_enemies >= 3 or ( active_enemies == 2 and getLastSpell() == blackout_kick and not UnitIsUnit(Y.lastspell_target,tg) )) then
         if canCast(spinning_crane_kick) and (UnitBuffID("player",serenity) or getChi() >= 2) and castSpell(tg,spinning_crane_kick) then
             if tiaoshi.is_enabled then
                 print(5071)
@@ -759,8 +772,14 @@ function rotation:cd( ... )
     end
     
     self:rest()
+    -- actions.cd+=/use_item,name=variable_intensity_gigavolt_oscillating_reactor
     -- actions.cd+=/use_item,name=lustrous_golden_plumage
     if canUse(159617) and useItem(159617) then
+    end
+    self:rest()
+    if baofa and canUse(13) and useItem(13) then
+    end
+    if baofa and canUse(14) and useItem(14) then
     end
     self:rest()
     -- actions.cd+=/blood_fury
@@ -831,7 +850,7 @@ function rotation:aoe()
         end
     end
     self:rest()
-
+    -- actions.aoe+=/whirling_dragon_punch
     -- actions.aoe=whirling_dragon_punch
     if slb.is_enabled and (active_enemies >= aoenum.value or isBoss(tg)) and canCast(whirling_dragon_punch) and getSpellCD(fists_of_fury) > 0 and getSpellCD(rising_sun_kick) > 0 then
         if castSpell(tg,whirling_dragon_punch) then
@@ -868,8 +887,8 @@ function rotation:aoe()
         end
     end
     self:rest()
-    -- actions.aoe+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&energy.time_to_max>1
-    if getBuffRemain("player",rushing_jade_wind) <= 0 then
+    -- actions.aoe+=/rushing_jade_wind,if=buff.rushing_jade_wind.down
+    if not UnitBuffID("player",rushing_jade_wind) then
         if canCast(rushing_jade_wind) and castSpell(tg,rushing_jade_wind) then
             if tiaoshi.is_enabled then
                 print(6031)
@@ -906,7 +925,8 @@ function rotation:aoe()
     end
     self:rest()
     -- actions.aoe+=/fist_of_the_white_tiger,if=chi.max-chi>=3&(energy>46|buff.rushing_jade_wind.down)
-    if UnitPowerMax("player",12) - getChi() >= 3 and ( getRealMana("player") > 46 or getBuffRemain("player",rushing_jade_wind) <= 0 ) then
+    -- actions.aoe+=/fist_of_the_white_tiger,if=chi.max-chi>=3
+    if UnitPowerMax("player",12) - getChi() >= 3 --[[ and ( getRealMana("player") > 46 or getBuffRemain("player",rushing_jade_wind) <= 0 ) ]] then
         if bhq.is_enabled and canCast(fist_of_the_white_tiger) and getRealMana("player") >= 40 and castSpell(tg,fist_of_the_white_tiger) then
             if tiaoshi.is_enabled then
                 print(6071)
@@ -1013,6 +1033,18 @@ function rotation:st( ... )
         end
     end    
     self:rest()
+    -- actions.st+=/spinning_crane_kick,if=!prev_gcd.1.spinning_crane_kick&buff.dance_of_chiji.up
+    if not (getLastSpell() == spinning_crane_kick) and UnitBuffID("player",dance_of_chiji) then
+        if canCast(spinning_crane_kick) and (UnitBuffID("player",serenity) or getChi() >= 2) and castSpell(tg,spinning_crane_kick) then
+            if tiaoshi.is_enabled then
+                print(6108)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    self:rest()
     -- actions.st+=/rushing_jade_wind,if=buff.rushing_jade_wind.down&active_enemies>1    
     if getBuffRemain("player",rushing_jade_wind) <= 0 and  active_enemies > 1 then
         if canCast(rushing_jade_wind) and castSpell(tg,rushing_jade_wind) then
@@ -1026,7 +1058,8 @@ function rotation:st( ... )
     end
     self:rest() 
     -- actions.st+=/fist_of_the_white_tiger,if=chi<=2&(buff.rushing_jade_wind.down|energy>46)
-    if getChi() <= 2 and ( getBuffRemain("player",rushing_jade_wind) <= 0 or getRealMana("player") > 46 ) then
+    -- actions.st+=/fist_of_the_white_tiger,if=chi<=2
+    if getChi() <= 2 --[[ and ( getBuffRemain("player",rushing_jade_wind) <= 0 or getRealMana("player") > 46 ) ]] then
         if bhq.is_enabled and canCast(fist_of_the_white_tiger) and getRealMana("player") >= 40 and castSpell(tg,fist_of_the_white_tiger) then
             if tiaoshi.is_enabled then
                 print(6071)
@@ -1050,7 +1083,7 @@ function rotation:st( ... )
     end
     self:rest()
     -- actions.st+=/blackout_kick,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.blackout_kick&(cooldown.rising_sun_kick.remains>3|chi>=3)&(cooldown.fists_of_fury.remains>4|chi>=4|(chi=2&prev_gcd.1.tiger_palm))&buff.swift_roundhouse.stack<2
-    if not (getLastSpell() ==  blackout_kick) and ( getSpellCD(rising_sun_kick) > 3 or getChi() >= 3 ) and ( getSpellCD(fists_of_fury) > 4 or getChi()>= 4 or ( getChi() == 2 and getLastSpell() ==  tiger_palm)) and getBuffStacks("player",277669) < 2 then
+    if not (getLastSpell() ==  blackout_kick) and ( getSpellCD(rising_sun_kick) > 3 or getChi() >= 3 ) and ( getSpellCD(fists_of_fury) > 4 or getChi()>= 4 or ( getChi() == 2 and getLastSpell() ==  tiger_palm and not UnitIsUnit(Y.lastspell_target,tg1) )) and getBuffStacks("player",277669) < 2 then
         if UnitExists(tg1) and canCast(blackout_kick) and getChi() >= 1 and castSpell(tg1,blackout_kick) then
             if tiaoshi.is_enabled then
                 print(21111)
@@ -1084,6 +1117,7 @@ function rotation:st( ... )
     end
     self:rest()
     -- actions.st+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&chi.max-chi>=2&(buff.rushing_jade_wind.down|energy>56)
+    -- actions.st+=/tiger_palm,target_if=min:debuff.mark_of_the_crane.remains,if=!prev_gcd.1.tiger_palm&chi.max-chi>=2
     if not (getLastSpell() == tiger_palm) and UnitPowerMax("player",12) - getChi() >= 2  then
         if UnitExists(tg5) and canCast(tiger_palm) and getRealMana("player") >= 50 and castSpell(tg5,tiger_palm) then
             if tiaoshi.is_enabled then
@@ -1134,6 +1168,8 @@ function rotation:default_action()
     bqns = self.settings.bqns--屏气凝神
     zdj = self.settings.zdj--壮胆酒
     hyj = self.settings.hyj--虎眼酒
+    isbus = self.settings.isbus --坐骑
+    if isbus.is_enabled and isBused("player") then return; end
 
     --------------------------------------------------------------
     if IsLeftControlKeyDown() and isKeyDown(bf) and GetTime() - tt > 1 then
@@ -1232,6 +1268,7 @@ function rotation:default_action()
     hidden_masters_forbidden_touch = 213112
     bloodlust = 2825--嗜血
     rushing_jade_wind = 261715--碧玉疾风
+    dance_of_chiji = 286587
     --------------------------------------------------------------
     if not UnitExists(tg) then
         return 
@@ -1281,17 +1318,17 @@ function rotation:default_action()
     end
     self:rest()
     -- actions+=/rushing_jade_wind,if=talent.serenity.enabled&cooldown.serenity.remains<3&energy.time_to_max>1&buff.rushing_jade_wind.down
-    if getTalent(7,3) and getSpellCD(serenity) < 3 and getTimeToMax("player") > 1 and not UnitBuffID("player",rushing_jade_wind) then
-        if canCast(rushing_jade_wind) and castSpell(tg,rushing_jade_wind) then
-            if tiaoshi.is_enabled then
-                print(1011)
-                return 0
-            else
-                return 0
-            end
-        end
-    end 
-    self:rest()
+    -- if getTalent(7,3) and getSpellCD(serenity) < 3 and getTimeToMax("player") > 1 and not UnitBuffID("player",rushing_jade_wind) then
+    --     if canCast(rushing_jade_wind) and castSpell(tg,rushing_jade_wind) then
+    --         if tiaoshi.is_enabled then
+    --             print(1011)
+    --             return 0
+    --         else
+    --             return 0
+    --         end
+    --     end
+    -- end 
+    -- self:rest()
     -- actions+=/touch_of_karma,interval=90,pct_health=0.5,if=!talent.Good_Karma.enabled,interval=90,pct_health=0.5
     -- actions+=/touch_of_karma,interval=90,pct_health=1,if=talent.good_karma.enabled,interval=90,pct_health=1
     -- actions+=/touch_of_karma,interval=90,pct_health=1.0
@@ -1359,9 +1396,11 @@ function rotation:default_action()
         self:aoe()
     end
     self:rest()	
-    if Y.lastspell_cast == tiger_palm and GetTime() - Y.lastspell_time > gcd*2 then
+    if Y.lastspell_cast == tiger_palm and not UnitIsUnit(Y.lastspell_target,tg) then
         if castSpell(tg,tiger_palm) then
-		    GH_Print("记录一下，看一局能打出多少提示")
+            if Y.count == nil then Y.count = 0;end
+            Y.count = Y.count + 1
+		    GH_Print("记录一下，看一局能打出多少提示，当前为："..Y.count)
 	    end
     end
     self:rest()
