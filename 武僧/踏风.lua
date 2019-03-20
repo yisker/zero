@@ -400,20 +400,20 @@ do
     spsolt_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     spsolt_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
-    -- local wd_setting = rotation.default_setting_category:create_setting("wd"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
-    -- wd_setting.display_name = L["wd"];
-    -- wd_setting.description = "确定是否使用误导，误导谁"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    -- wd_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
-    -- wd_setting.default_value = "宠物"; -- 变量默认值
-    -- wd_setting.optional_values = {"宠物", "当前T"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
-    -- wd_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    -- wd_setting.is_enabled_by_default = true; -- 是否默认启用
-    -- wd_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-    -- wd_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+    local bfzl_setting = rotation.default_setting_category:create_setting("bfzl"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    bfzl_setting.display_name = L["爆发方式"];
+    bfzl_setting.description = "确定爆发的控制方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    bfzl_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    bfzl_setting.default_value = "AOE和BOSS"; -- 变量默认值
+    bfzl_setting.optional_values = {"卡CD", "AOE", "BOSS", "AOE和BOSS", "快捷键"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    bfzl_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    bfzl_setting.is_enabled_by_default = true; -- 是否默认启用
+    bfzl_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    bfzl_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
     local Touch_of_Death_setting = rotation.default_setting_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     Touch_of_Death_setting.display_name = L["Touch_of_Death"];
-    Touch_of_Death_setting.description = "按下这个键和左ctrl键切换爆发状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    Touch_of_Death_setting.description = "如果爆发方式选择快捷键\n按下这个键和左ctrl键切换爆发状态！\n由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     Touch_of_Death_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
     Touch_of_Death_setting.default_value = "Q"; -- 变量默认值
     Touch_of_Death_setting.optional_values = nil -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
@@ -681,11 +681,11 @@ end
 function rotation:precombat_action()
 
     local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发 
-    
+    bfzl = self.settings.bfzl --爆发种类
     -- print(ADDON_SLASH_COMMAND)
     -- print(bf)
     -- print(isKeyDown(bf))
-    if IsLeftControlKeyDown() and isKeyDown(bf) and GetTime() - tt > 1 then
+    if bfzl.value=="快捷键" and IsLeftControlKeyDown() and isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
         tt = GetTime()
         if baofa then
@@ -1169,10 +1169,11 @@ function rotation:default_action()
     zdj = self.settings.zdj--壮胆酒
     hyj = self.settings.hyj--虎眼酒
     isbus = self.settings.isbus --坐骑
+    bfzl = self.settings.bfzl --爆发种类
     if isbus.is_enabled and isBused("player") then return; end
 
     --------------------------------------------------------------
-    if IsLeftControlKeyDown() and isKeyDown(bf) and GetTime() - tt > 1 then
+    if bfzl.value=="快捷键" and IsLeftControlKeyDown() and isKeyDown(bf) and GetTime() - tt > 1 then
         baofa = not baofa
         tt = GetTime()
         if baofa then
@@ -1183,6 +1184,10 @@ function rotation:default_action()
             OverlayY("爆发关闭")
         end
     end 
+
+    
+
+
     --------------------------------------------------------------   
     --获得第一个符合条件的目标
     if tgtype.value == "智能" then
@@ -1199,15 +1204,33 @@ function rotation:default_action()
     end
     if tg then
         TargetUnit(tg)
-    end    
+    end
+    
+    if not UnitExists(tg) then return;end
     --------------------------------------------------------------
     active_enemies = getNumEnemies("player",8)
     spell_targets = active_enemies
+    -- print(active_enemies)
     zj = "player"
     tb = getEnemy(5,filler_unit)
     tier21_4pc = false
     tier19_2pc = false
-    --------------------------------------------------------------
+
+    if bfzl.value=="卡CD" then 
+        baofa=true;
+    elseif (bfzl.value=="AOE" or bfzl.value=="AOE和BOSS") and active_enemies >= aoenum.value then 
+        baofa=true;
+    elseif (bfzl.value=="BOSS" or bfzl.value=="AOE和BOSS") and isBoss(tg) then 
+        baofa=true;
+    elseif bfzl.value=="快捷键" then
+        baofa=baofa
+    else
+        baofa=false    
+    end
+
+   
+
+   --------------------------------------------------------------
     function getDebuffRemainMin(tb,debuffid)
         -- body
         if tb ~= nil and UnitExists(tb[1]) then 
@@ -1396,11 +1419,19 @@ function rotation:default_action()
         self:aoe()
     end
     self:rest()	
-    if Y.lastspell_cast == tiger_palm and not UnitIsUnit(Y.lastspell_target,tg) then
+    if Y.lastspell_cast == tiger_palm  then
+        if canCast(blackout_kick) and getChi() >= 1 and castSpell(tg1,blackout_kick) then
+            if Y.count == nil then Y.count = 0;end
+            Y.count = Y.count + 1
+		    GH_Print("记录一下，看一局能打出多少提示，当前为【2】："..Y.count)
+	    end
+    end
+    self:rest()
+    if Y.lastspell_cast ~= tiger_palm  then
         if castSpell(tg,tiger_palm) then
             if Y.count == nil then Y.count = 0;end
             Y.count = Y.count + 1
-		    GH_Print("记录一下，看一局能打出多少提示，当前为："..Y.count)
+		    GH_Print("记录一下，看一局能打出多少提示，当前为【1】："..Y.count)
 	    end
     end
     self:rest()

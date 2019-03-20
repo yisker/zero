@@ -226,23 +226,7 @@ do
     if Y.debug == nil then Y.debug = false;  end;
     if Y.baofa == nil then Y.baofa = false;  end;
 
-    function SetupTables()        
-        table.wipe(Y.nNove)
-        table.wipe(Y.nTank)
-        local group =  IsInRaid() and "raid" or "party" 
-        local groupSize = IsInRaid() and GetNumGroupMembers() or 
-        GetNumGroupMembers() - 1
-
-        for i=1, groupSize do
-          local groupUnit = group..i      
-          if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
-          if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
-        end
-
-        table.insert(Y.nNove, "player")
-        
-    end
-
+    
     local guid = UnitGUID("player")
     local frame = CreateFrame('Frame')
     frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -360,6 +344,22 @@ do
     --   -- 通过访问Y.nNove获得队友列表，
     --   -- 通过访问Y.nTank获得坦克列表
     --   -------------------------------------------------------------------------------------------------------------------
+    local function SetupTables()        
+        table.wipe(Y.nNove)
+        table.wipe(Y.nTank)
+        local group =  IsInRaid() and "raid" or "party" 
+        local groupSize = IsInRaid() and GetNumGroupMembers() or 
+        GetNumGroupMembers() - 1
+
+        for i=1, groupSize do
+          local groupUnit = group..i      
+          if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
+          if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
+        end
+
+        table.insert(Y.nNove, "player")
+        
+    end
     local updateHealingTable = CreateFrame("frame", nil)
     updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
     updateHealingTable:SetScript("OnEvent", function()
