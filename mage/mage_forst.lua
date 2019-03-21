@@ -46,7 +46,7 @@ rotation.condition_yes_message = L["Welcome to use test module."];
 -- 定义循环加载并不可用时的消息，填入"N/A"则不显示。
 rotation.condition_no_message = "N/A";
 -- 定义循环的执行间隔（秒），如果不设默认是0.1。
-rotation.interval = 0.01;
+rotation.interval = 0.05;
 -- 定义模块专用宏命令，下面的例子会定义出：/zeus test [argument]。如果不需要宏控制，则删除下面一行。
 rotation.macro = "bingfa";
 -----------------------------------------------------------
@@ -274,7 +274,7 @@ do
 
     local Touch_of_Death_setting = dps_category:create_setting("Touch_of_Death"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     Touch_of_Death_setting.display_name = L["爆发"];
-    Touch_of_Death_setting.description = "按下这个键切换爆发状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    Touch_of_Death_setting.description = "按下左Ctrl+这个键切换爆发状态！由于暴雪本身限制，只能支持A-Z，0-9"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
     Touch_of_Death_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
     Touch_of_Death_setting.default_value = "E"; -- 变量默认值
     Touch_of_Death_setting.optional_values = nil -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
@@ -290,21 +290,238 @@ do
     Touch_of_Death_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
     -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
-    local orb_setting = hps_category:create_setting("orb"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    local orb_setting = dps_category:create_setting("orb"); -- 指定变量的名字为test1，用于在脚本中进行引用
     orb_setting.display_name = L["溜溜球"]; -- 变量在界面上显示的名字
-    orb_setting.description = "自动溜溜球"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    orb_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
-    orb_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
-    orb_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
-    orb_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    orb_setting.is_enabled_by_default = true; -- 是否默认启用（勾选框默认选中）
+    orb_setting.description = "溜溜球施法方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    orb_setting.value_type = rotation_setting_type.text; -- 变量值类型（number数组类型）
+    orb_setting.default_value = "AOE和BOSS"; -- 变量默认值（删除此行不设，则为{}）
+    orb_setting.optional_values = {"卡CD","AOE","仅BOSS","AOE和BOSS","手动"}; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    orb_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    orb_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
     orb_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     orb_setting.value_width = 120; -- 值显示宽度像素（默认为100）
 
 
+    -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
+    local bingchuan_setting = dps_category:create_setting("bingchuan"); -- 指定变量的名字为test1，用于在脚本中进行引用
+    bingchuan_setting.display_name = L["冰川尖刺"]; -- 变量在界面上显示的名字
+    bingchuan_setting.description = "冰川施法方式，NGA推荐和冰冷智慧绑定，但是有些人脸黑\n也许8个寒冰箭都触发不了冰冷智慧"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    bingchuan_setting.value_type = rotation_setting_type.text; -- 变量值类型（number数组类型）
+    bingchuan_setting.default_value = "和冰冷智慧绑定"; -- 变量默认值（删除此行不设，则为{}）
+    bingchuan_setting.optional_values = {"脸黑还是算了","和冰冷智慧绑定"}; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
+    bingchuan_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    bingchuan_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
+    bingchuan_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    bingchuan_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+
+
     
 end
+
 -----------------------------------------------------------
+--注册事件
+do
+    local guid = UnitGUID("player")
+    local frame = CreateFrame('Frame')
+    frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+
+    if Y == nil then
+        Y = {}
+    end
+
+    if Y.lastspell_failed == nil then
+        Y.lastspell_failed = 0;
+    end
+    if Y.lastspell_failedtime == nil then
+        Y.lastspell_failedtime = 0;
+    end
+    if Y.lastspell_time == nil then
+        Y.lastspell_time = 0;
+    end
+    if Y.lastspell_cast == nil then
+        Y.lastspell_cast = 0;
+    end
+    if Y.spelllist_failed == nil then 
+        Y.spelllist_failed = {};
+    end
+    if Y.spelllist_success == nil then 
+        Y.spelllist_success = {};
+    end
+    if Y.data == nil then 
+        Y.data = {};
+    end
+    if Y.nNove == nil then 
+        Y.nNove = {};
+    end
+    if Y.nTank == nil then 
+        Y.nTank = {};
+    end
+
+    if tt == nil then
+        tt = 0
+    end
+
+    if Y.spelllist == nil then
+        Y.spelllist = {}
+    end
+
+    if Y.spellcast == nil then
+        Y.spellcast = 0
+    end
+
+    -------------------------------------------------------------------------------------------------------------------
+    -- 记录进入战斗后自己释放成功和失败的技能队列，
+
+    -- 通过访问Y.lastspell_failed获得上一次失败的技能ID，
+    -- Y.lastspell_failedtime获得上一次失败的技能时间，
+    -- Y.spelllist_failed记录失败的施法队列，
+    -- Y.spelllist_failed[id]为最近一次释放同ID技能失败的列表，键值是name，target，stime
+
+    -- 通过访问Y.lastspell_time获得上一次成功的技能ID，
+    -- Y.lastspell_time获得上一次成功的技能时间，
+    -- Y.lastspell_cast记录成功的施法队列，
+    -- Y.spelllist_success[id]为最近一次释放同ID技能成功的列表，键值是name，target，stime
+    -------------------------------------------------------------------------------------------------------------------
+    local function reader(self,event,...)
+        local timeStamp, param, hideCaster, source, sourceName, sourceFlags, 
+        sourceRaidFlags, destination,
+        destName, destFlags, destRaidFlags, spell, spellName, _, spellType = CombatLogGetCurrentEventInfo()
+
+        if source == guid then
+            if param == "SPELL_CAST_FAILED" then
+                if sourceName ~= nil then
+                    if isInCombat("player") and UnitIsUnit(sourceName,"player") and spell ~= 48018 and spell ~= 48020 then
+                        Y.lastspell_failed = spell 
+                        Y.lastspell_failedtime = GetTime()
+                        if Y.spelllist_failed[spell] == nil then 
+                            Y.spelllist_failed[spell] = {};
+                        end
+                        table.insert(Y.spelllist_failed[spell],{name = spellName, target = destination, stime = Y.lastspell_failedtime})                        
+                        if spell == Y.lastspell_start then
+                            Y.lastspell_start = 0
+                        end
+                    end
+                end
+            end
+            
+            if param == "SPELL_CAST_START" or param == "SPELL_CAST_SUCCESS" then
+                if isInCombat("player") and UnitIsUnit(sourceName,"player") then
+                    Y.lastspell_start = spell
+                    Y.spellcast = spell
+                    -- print(("成功对 "..destName.." ".."施放了 "..spellName))
+                end
+            end
+            
+            if param == "SPELL_CAST_SUCCESS" then
+                if sourceName ~= nil then
+                    if isInCombat("player") and UnitIsUnit(sourceName,"player") then
+                        Y.lastspell_time = GetTime()
+                        Y.lastspell_cast = spell
+                        if Y.spelllist_success[spell] == nil then 
+                            Y.spelllist_success[spell] = {};
+                        end
+                        table.insert(Y.spelllist_success[spell],{name = spellName, target = destination, stime = Y.lastspell_time})
+                        table.insert( Y.spelllist, spell )
+                        if destination then
+                            Y.lastspell_target = destination
+                            -- if self.settings.ydebug.is_enabled then             
+                            --     GH_Print("成功对 "..destName.." ".."施放了 "..spellName)
+                            -- end
+                        else
+                            Y.lastspell_target = none
+                        end
+                    end
+                end
+            end
+        end
+
+    end
+    frame:SetScript("OnEvent", reader)
+
+
+    -------------------------------------------------------------------------------------------------------------------
+    -- 记录进入战斗的时间
+    -- 通过访问Y.data["Combat Started"]获得战斗开始时间，
+    -- 离开战斗或者玩家死亡，清除所有的_G
+    -------------------------------------------------------------------------------------------------------------------
+    local Frame = CreateFrame('Frame')
+    Frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    Frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    Frame:RegisterEvent("PLAYER_DEAD")
+    local function EnteringCombat(self,event,...)
+        if event == "PLAYER_REGEN_DISABLED" then
+        -- here we should manage stats snapshots
+        --AgiSnap = getAgility()
+        Y.data["Combat Started"] = GetTime();
+        -- Y.data["GCD"] = getGCD();
+        -- if ydebug.is_enabled then
+        --     GH_Print(" or cffFF0000进入战斗，开始计时")
+        -- end
+        -- SetupTables()
+        end
+        if event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_DEAD"  then
+        
+            Y.data["Combat Started"] = 0
+            Y.lastspell_failed = 0;
+            Y.lastspell_failedtime = 0;
+            Y.lastspell_cast = 0;
+            Y.lastspell_time = 0;
+            Y.spelllist_failed = {};
+            Y.spelllist_success = {};
+            Y.spelllist = {};
+            Y.count = 0
+            Y.spellcast = 0
+            -- Y.data["GCD"] = getGCD();
+            -- SetupTables()
+            -- if self.settings.ydebug.is_enabled then
+            --     GH_Print(" or cffFF0000离开战斗，重置参数")
+            -- end
+        
+        end
+    end
+    Frame:SetScript("OnEvent",EnteringCombat)
+    
+    --   -------------------------------------------------------------------------------------------------------------------
+    --   -- 创建队友列表，通过团队时间驱动刷新
+    --   -- 通过访问_nNova获得列表，
+    --   -- 
+    --   -------------------------------------------------------------------------------------------------------------------
+    --   local updateHealingTable = CreateFrame("frame", nil)
+    --   updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
+    --   updateHealingTable:SetScript("OnEvent", function()
+    --     table.wipe(Y.nNove)
+    --     table.wipe(Y.nTank)  
+    --     SetupTables()
+    --   end)
+    
+    --  -- if Y.nNove == nil then
+    --      -- SetupTables()
+    --  -- end
+    
+    --   function SetupTables()    
+        
+    --  table.wipe(Y.nNove)
+    --     table.wipe(Y.nTank)
+    --     local group =  IsInRaid() and "raid" or "party" 
+    --     local groupSize = IsInRaid() and GetNumGroupMembers() or 
+    --     GetNumGroupMembers() - 1
+
+    --     for i=1, groupSize do 
+    --       local groupUnit = group..i      
+    --       if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
+    --       if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
+    --     end
+
+    --     table.insert(Y.nNove, "player")
+        
+    --   end
+end
+-----------------------------------------------------------
+function csii(unit,spellid)
+    if csi(unit,spellid) then
+        return true
+    end
+end
 --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
 local function filler_unit(Unit)
     if (UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) then
@@ -382,36 +599,36 @@ function rotation:precombat_action()
     --     print(UnitName(tg))
     -- end
     -- castSpell(tg,116)
-    hbht = self.settings.hbht --寒冰屏障
-    if hbht.is_enabled and getHP(zj) <= hbht.value and canCast(11426) and not UnitBuffID("player",11426) and not isBused("player") then
-        if castSpell(zj,11426) then
-        end
-    end
+    -- hbht = self.settings.hbht --寒冰屏障
+    -- if hbht.is_enabled and getHP(zj) <= hbht.value and canCast(11426) and not UnitBuffID("player",11426) and not isBused("player") then
+    --     if castSpell(zj,11426) then
+    --     end
+    -- 
+    castSpell = csi
+    
     local callpet = self.settings.callpet --坐骑
     --水元素
-    local isbus = self.settings.isbus --坐骑  
-    if isbus.is_enabled and not isBused("player") then 
+    local isbus = self.settings.isbus --坐骑 
+    
+    
+    if not isBused("player") then 
         
-        -- if _t1==nil then _t1=GetTime(); end
-        -- if callpet.is_enabled and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then            
-        --     if not UnitExists("pet") or not isAlive("pet") then
-        --         castSpell(zj,31687)
-        --     end
-        -- end    
-        -- _t1=GetTime()+ 5
         if _t1==nil then _t1=GetTime(); end
-        if callpet.is_enabled then
-            if not UnitExists("pet") or not isAlive("pet") and GetTime() >= _t1 then
-                if castSpell(zj,31687) then
-                    _t1=GetTime()+ 5
-                end
+        
+        if not getTalent(1,2) and callpet.is_enabled and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then  
+                      
+            if not UnitExists("pet") or not isAlive("pet") then
+                castSpell("player",31687)
             end
-        end
+        end  
+          
+        _t1=GetTime()+ 5
+        
          
     end    
     
     local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发    
-    if isKeyDown(bf) and GetTime() - tt > 1 then
+    if isKeyDown(bf) and IsLeftControlKeyDown() and GetTime() - tt > 1 then
         baofa = not baofa
         tt = GetTime()
         if baofa then
@@ -430,13 +647,13 @@ end
 
 function rotation:aoe()    
     -- actions.aoe=frozen_orb
-    if orb.is_enabled and canCast(frozen_orb) and castSpell(tg,frozen_orb) then
+    if (orb.value=="卡CD" or orb.value=="AOE" or orb.value=="AOE和BOSS") and canCast(frozen_orb) and castSpell(tg,frozen_orb) then
         if ydebug.is_enabled then
             print(101)
             return 0
         else
             return 0
-        end
+        end 
     end
     self:rest()
     -- actions.aoe+=/blizzard    
@@ -551,6 +768,8 @@ function rotation:aoe()
         end
     end
     self:rest()
+    -- actions.aoe+=/use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
+
     -- actions.aoe+=/frostbolt
     if canCast(frostbolt) and castSpell(tg,frostbolt) then
         if ydebug.is_enabled then
@@ -601,7 +820,7 @@ function rotation:cooldowns()
         end
     end
     self:rest()
-    -- actions.cooldowns+=/rune_of_power,if=prev_gcd.1.frozen_orb|time_to_die>10+cast_time&time_to_die<20
+    -- actions.cooldowns+=/rune_of_power,if=prev_gcd.1.frozen_orb|target.time_to_die>10+cast_time&target.time_to_die<20
     if getLastSpell() == frozen_orb or getTimeToDie(tg) > 10 + getCastTime(rune_of_power) and getTimeToDie(tg) < 20 then
         if canCast(rune_of_power) and castSpell(zj,rune_of_power) then
             if ydebug.is_enabled then
@@ -620,7 +839,7 @@ function rotation:cooldowns()
     self:rest()    
     -- actions.cooldowns+=/potion,if=prev_gcd.1.icy_veins|target.time_to_die<70
     -- actions.cooldowns+=/use_items
-    if baofa and canUse(13) and useItem(13) then
+    if baofa and canUse(13) and useItem(13) then        
         if ydebug.is_enabled then
             print(207)
             return 0
@@ -629,13 +848,17 @@ function rotation:cooldowns()
         end
     end
     self:rest()
-    if baofa and canUse(14) and useItem(14) then
+    if baofa and canUse(14) and useItem(14) then        
         if ydebug.is_enabled then
             print(208)
             return 0
         else
             return 0
         end
+    end
+    if baofa then
+        RM("/use 13")
+        RM("/use 14")
     end
     self:rest()
     -- actions.cooldowns+=/blood_fury
@@ -759,7 +982,7 @@ function rotation:single()
     -- end
     -- self:rest()
     -- actions.single+=/frozen_orb
-    if orb.is_enabled and canCast(frozen_orb) and castSpell(tg,frozen_orb) then
+    if ((orb.value=="仅BOSS" or orb.value=="AOE和BOSS") and isBoss(tg) or orb.value=="卡CD") and canCast(frozen_orb) and castSpell(tg,frozen_orb) then
         if ydebug.is_enabled then
             print(304)
             return 0
@@ -803,7 +1026,7 @@ function rotation:single()
     end
     self:rest()
     -- actions.single+=/ebonbolt
-    if canCast(ebonbolt) and castSpell(tg,ebonbolt) then
+    if not UnitBuffID("player",brain_freeze) and canCast(ebonbolt) and castSpell(tg,ebonbolt) then
         if ydebug.is_enabled then
             print(3091)
             return 0
@@ -837,7 +1060,7 @@ function rotation:single()
     end
     self:rest()
     -- actions.single+=/blizzard,if=cast_time=0|active_enemies>1    
-    if aoe_blizzard.is_enabled and getCastTime(blizzard) == 0 or active_enemies > 1 then
+    if aoe_blizzard.is_enabled and (getCastTime(blizzard) == 0 or active_enemies > 1) then
         if canCast(blizzard) and castSpell(tg,blizzard) then
             if ydebug.is_enabled then
                 print(311)
@@ -870,8 +1093,9 @@ function rotation:single()
         end
     end
     self:rest()
-    -- actions.single+=/flurry,if=azerite.winters_reach.enabled&!buff.brain_freeze.react&buff.winters_reach.react
-    
+ 
+    -- actions.single+=/use_item,name=tidestorm_codex,if=buff.icy_veins.down&buff.rune_of_power.down
+
     -- actions.single+=/frostbolt
     if canCast(frostbolt) and castSpell(tg,frostbolt) then
         if ydebug.is_enabled then
@@ -933,7 +1157,7 @@ end
 function rotation:default_action()
 
     local bf = tonumber(string.byte(string.upper(self.settings.Touch_of_Death.value))) --爆发    
-    if isKeyDown(bf) and GetTime() - tt > 1 then
+    if isKeyDown(bf) and IsLeftControlKeyDown() and GetTime() - tt > 0.5 then
         baofa = not baofa
         tt = GetTime()
         if baofa then
@@ -947,7 +1171,7 @@ function rotation:default_action()
     
     
     -- 不打断施法
-    if UnitCastingInfo("player") or UnitChannelInfo("player") and getSpellCD(61304) > 0 then return; end;
+    if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.01 then return; end;
 
     --获得变量
     aoe_blizzard = self.settings.aoetg --暴风雪
@@ -964,12 +1188,13 @@ function rotation:default_action()
     daduan = self.settings.daduan --打断
     orb = self.settings.orb --溜溜球
     hxfb = self.settings.hxfb --彗星风暴
+    bingchuan = self.settings.bingchuan --冰川
     -- baofa = Y.baofa --爆發
 
     if isbus.is_enabled and isBused("player") then return; end
 
     -- 本地化
-    lastSpellCast = getLastSpell()
+    lastSpellCast = Y.lastspell_cast
 
 
     
@@ -988,6 +1213,8 @@ function rotation:default_action()
     if tgtype.value ~= "智能" then
         tg = "target"
     end
+
+    if not UnitExists(tg) then return;end
     -- GH_Print((tg))
     --本地化自己
     zj = "player"
@@ -1035,16 +1262,10 @@ function rotation:default_action()
     charges_fractional = getChargesFrac
     castSpell = csi
 
-    --确保5层冰刺用黑冰箭之后跟大冰川
-    if getBuffStacks("player",icicles) == 5 and getLastSpell() == ebonbolt then
-        if canCast(glacial_spike) and castSpell(tg,glacial_spike) then
-            return
-        end
-    end
 
-    --确保黑冰剑和大冰刺之后接冰风暴
-    if  ( getLastSpell() == glacial_spike or  (getLastSpell() == ebonbolt and getBuffStacks("player",icicles) ~= 5)) and UnitBuffID("player",brain_freeze) then
-        if canCast(flurry) and castSpell(tg,flurry) then
+    -- 移动时寒冰箭
+    if isMoving("player") then
+        if castSpell(tg,ice_lance) then
             return
         end
     end
@@ -1052,41 +1273,58 @@ function rotation:default_action()
     --确保冰风暴后接冰枪
     if getLastSpell() == flurry then
         if canCast(ice_lance) and castSpell(tg,ice_lance) then
-            return
+            return 0
         end
     end
     
-    -- 确保彗星风暴以后接冰冻术
-    if getLastSpell() == comet_storm and UnitExists("pet") and isAlive("pet") then
-        if canCast(33395) and castSpell(tg,33395) then
-            return
-        end
-    end
-
-    -- 不能接冰冻术接冰环
-    if getLastSpell() == comet_storm and  ( not canCast(33395) or not UnitExists("pet") or not isAlive("pet") )  then
-        if getDistance("player",tg) <= 12 and canCast(122) and castSpell("player",122) then
-            return
-        end
-    end
-
-    --水元素
-    if _t1==nil then _t1=GetTime(); end
-    if callpet.is_enabled then
-        if not UnitExists("pet") or not isAlive("pet") and GetTime() >= _t1 then
-            if castSpell(zj,31687) then
-                _t1=GetTime() + 5
+    --如果脸黑，连续寒冰箭，就空投冰川
+    if bingchuan.value=="脸黑还是算了" then
+        local hbj = #Y.spelllist or 1
+        if hbj >=3 then
+        -- print(getBuffStacks("player",icicles))
+        -- print(Y.lastspell_cast == 116)
+            if getLastSpell() == 116 and Y.spelllist[hbj-1] == 116 and Y.spelllist[hbj-2] == 116 and getSpellCD(257537) > 0 and getBuffStacks("player",icicles) == 5 and not UnitBuffID("player",brain_freeze) then
+                -- print("huiyi")
+                if canCast(glacial_spike) and castSpell(tg,glacial_spike) then
+                    
+                    return 0
+                end
             end
         end
     end
 
-    -- if _t1==nil then _t1=GetTime(); end
-    -- if callpet.is_enabled and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then            
+    --确保5层冰刺用黑冰箭之后跟大冰川
+    if getBuffStacks("player",icicles) == 5 and getLastSpell() == ebonbolt then
+        if canCast(glacial_spike) and castSpell(tg,glacial_spike) then
+            -- print(789)
+            return 0
+        end
+    end
+
+    --确保黑冰剑和大冰刺之后接冰风暴
+    if  ( getLastSpell() == glacial_spike or  (getLastSpell() == ebonbolt and getBuffStacks("player",icicles) ~= 5)) and UnitBuffID("player",brain_freeze) then
+        if canCast(flurry) and castSpell(tg,flurry) then
+            return 0
+        end
+    end
+
+    
+
+
+    --水元素
+    -- if callpet.is_enabled then
     --     if not UnitExists("pet") or not isAlive("pet") then
     --         castSpell(zj,31687)
     --     end
-    -- end    
-    -- _t1=GetTime()+ 5
+    -- end
+
+    if _t1==nil then _t1=GetTime(); end
+    if not getTalent(1,2) and callpet.is_enabled and not amac("player",0) and (not UnitExists("pet") or getHP("pet")==0 or getPetNum()==0) and GetTime() >= _t1 then            
+        if not UnitExists("pet") or not isAlive("pet") then
+            castSpell(zj,31687)
+        end
+    end    
+    _t1=GetTime()+ 5
 
     -- 石头
     if getHP(zj) <= zlsyz.value and canUse(5512) then
@@ -1117,12 +1355,7 @@ function rotation:default_action()
         end
     end
 
-    -- 移动时寒冰箭
-    if isMoving("player") then
-        if castSpell(tg,ice_lance) then
-            return
-        end
-    end
+    
 
 
     -- # Executed every time the actor is available.
@@ -1130,7 +1363,7 @@ function rotation:default_action()
     if daduan.is_enabled and canCast(counterspell) and amac(tg,1,daduan.value) then
         if castSpell(tg,counterspell) then
             if ydebug.is_enabled then
-                print(1)
+                print(101)
                 return 0
             else
                 return 0
@@ -1140,10 +1373,11 @@ function rotation:default_action()
     self:rest()
     -- -- # If the mage has FoF after casting instant Flurry, we can delay the Ice Lance and use other high priority action, if available.
     -- actions+=/ice_lance,if=prev_gcd.1.flurry&brain_freeze_active&!buff.fingers_of_frost.react
-    if lastSpellCast == flurry and UnitBuffID("player",brain_freeze) and not UnitBuffID("player",fingers_of_frost) then
+    -- actions+=/ice_lance,if=prev_gcd.1.flurry&!buff.fingers_of_frost.react
+    if lastSpellCast == flurry and not UnitBuffID("player",fingers_of_frost) then
         if castSpell(tg,ice_lance) then
             if ydebug.is_enabled then
-                print(1)
+                print(102)
                 return 0
             else
                 return 0

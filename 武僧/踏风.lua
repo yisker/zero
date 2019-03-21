@@ -13,7 +13,7 @@ local L = _Locale("zhCN", true);
 if L then
     -- 简体中文系列。
     L[rotation_name] = "武僧-踏风";
-    L["Welcome to use test module."] = "欢迎使用踏风测试模块！";
+    L["Welcome to use test module."] = "欢迎使用踏风模块！";
     L["Test 1"] = "测试1号";
     L["Test 2"] = "测试2号";
     L["At least 2 values must be entered."] = "至少要输入2个值";
@@ -53,7 +53,7 @@ rotation.condition_yes_message = L["Welcome to use test module."];
 -- 定义循环加载并不可用时的消息，填入"N/A"则不显示。
 rotation.condition_no_message = "N/A";
 -- 定义循环的执行间隔（秒），如果不设默认是0.1。
-rotation.interval = 0.1;
+rotation.interval = 0.05;
 -- 定义模块专用宏命令，下面的例子会定义出：/zeus test [argument]。如果不需要宏控制，则删除下面一行。
 rotation.macro = "tafeng";
 -----------------------------------------------------------
@@ -1134,7 +1134,7 @@ function rotation:st( ... )
 end
 function rotation:default_action()
 
-    if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
+    if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.01 then return; end;
     --------------------------------------------------------------
     self:rest();    
     -- spell_haste = GetHaste("player")/100
@@ -1225,7 +1225,7 @@ function rotation:default_action()
     elseif bfzl.value=="快捷键" then
         baofa=baofa
     else
-        baofa=false    
+        baofa=false
     end
 
    
@@ -1325,7 +1325,7 @@ function rotation:default_action()
 
     
     -- actions=auto_attack
-    if time < 5 and UnitExists(tg) then
+    if (time < 5 or not UnitIsUnit(tg,Y.lastspell_target)) and UnitExists(tg) then
         StartAttack(tg)
     end
     -- actions+=/spear_hand_strike,if=target.debuff.casting.react

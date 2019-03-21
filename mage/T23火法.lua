@@ -1,38 +1,36 @@
-do
-    ----------------------------------------------
-    -- 模块属性
-    -----------------------------------------------------------
-    -- 定义循环的唯一ID，可以去https://1024tools.com/uuid生成，保证每次都不一样，宇宙唯一。
-    local rotation_id = "baafcfc6-a327-414d-8b47-e378eb83d8fb";
-    -- 定义循环的英文名称。
-    local rotation_name = "huofa";
-    Scorpio("zeus." .. rotation_name)("");
-    -- 定义多语言字符串。
-    -- local L = _Locale("zhCN", true);
-    if L then
-        -- 简体中文系列。
-        L[rotation_name] = "法师-火法";
-        L["Welcome to use test module."] = "欢迎使用火法模块！";    
-        L["targets"] = "目标选择";
-    end
-    -- L = _Locale("zhTW");
-    -- if L then
-    --     -- 繁体中文系列。
-    --     L[rotation_name] = "測試";
-    --     L["Welcome to use test module."] = "歡迎使用測試模組！";
-    --     L["targets"] = "目标选择";
-    -- end
-    L = _Locale;
-    local rotation = zeus.rotation(rotation_id, L[rotation_name]);
-    -- 定义循环加载并可用时的消息，填入"N/A"则不显示。
-    rotation.condition_yes_message = L["Welcome to use test module."];
-    -- 定义循环加载并不可用时的消息，填入"N/A"则不显示。
-    rotation.condition_no_message = "N/A";
-    -- 定义循环的执行间隔（秒），如果不设默认是0.1。
-    rotation.interval = 0.1;
-    -- 定义模块专用宏命令，下面的例子会定义出：/zeus test [argument]。如果不需要宏控制，则删除下面一行。
-    rotation.macro = "huofa";
+----------------------------------------------
+-- 模块属性
+-----------------------------------------------------------
+-- 定义循环的唯一ID，可以去https://1024tools.com/uuid生成，保证每次都不一样，宇宙唯一。
+local rotation_id = "baafcfc6-a327-414d-8b47-e378eb83d8fb";
+-- 定义循环的英文名称。
+local rotation_name = "huofa";
+Scorpio("zeus." .. rotation_name)("");
+-- 定义多语言字符串。
+-- local L = _Locale("zhCN", true);
+if L then
+    -- 简体中文系列。
+    L[rotation_name] = "法师-火法";
+    L["Welcome to use test module."] = "欢迎使用火法模块！";    
+    L["targets"] = "目标选择";
 end
+-- L = _Locale("zhTW");
+-- if L then
+--     -- 繁体中文系列。
+--     L[rotation_name] = "測試";
+--     L["Welcome to use test module."] = "歡迎使用測試模組！";
+--     L["targets"] = "目标选择";
+-- end
+L = _Locale;
+local rotation = zeus.rotation(rotation_id, L[rotation_name]);
+-- 定义循环加载并可用时的消息，填入"N/A"则不显示。
+rotation.condition_yes_message = L["Welcome to use test module."];
+-- 定义循环加载并不可用时的消息，填入"N/A"则不显示。
+rotation.condition_no_message = "N/A";
+-- 定义循环的执行间隔（秒），如果不设默认是0.1。
+rotation.interval = 0.05;
+-- 定义模块专用宏命令，下面的例子会定义出：/zeus test [argument]。如果不需要宏控制，则删除下面一行。
+rotation.macro = "huofa";
 
 -----------------------------------------------------------
 -- 模块变量
@@ -43,9 +41,10 @@ end
 -- 变量的当前值会保存在WTF中。
 -----------------------------------------------------------
 do
+    
     -- -- 添加一个自定义类别test_category。
     local jc_category = rotation:create_setting_category("jc_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
-    jc_category.display_name = L[" or cff00FFFF基础设置"]; -- 类别在界面上显示的名字
+    jc_category.display_name = L["|cff00FFFF基础设置"]; -- 类别在界面上显示的名字
 
     -- -- 给默认类别添加一个配置变量test1，并配置相关属性。
     local ydebug_setting = jc_category:create_setting("ydebug"); -- 指定变量的名字为test1，用于在脚本中进行引用
@@ -81,21 +80,11 @@ do
     aszh_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
     aszh_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     aszh_setting.value_width = 120; -- 值显示宽度像素（默认为100）
-
-    local preheat_setting = jc_category:create_setting("preheat"); -- 指定变量的名字为test1，用于在脚本中进行引用
-    preheat_setting.display_name = L["是否点出273331特质"]; -- 变量在界面上显示的名字
-    preheat_setting.description = "是否点出273331特质"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
-    preheat_setting.value_type = rotation_setting_type.plain; -- 变量值类型（number数组类型）
-    preheat_setting.default_value = nil; -- 变量默认值（删除此行不设，则为{}）
-    preheat_setting.optional_values = nil; -- 变量备选值（设置备选值后会出现多选下拉菜单，供用户选择）
-    preheat_setting.can_enable_disable = true; -- 是否支持启用停用（支持则在界面上出现勾选框）
-    preheat_setting.is_enabled_by_default = false; -- 是否默认启用（勾选框默认选中）
-    preheat_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
-    preheat_setting.value_width = 120; -- 值显示宽度像素（默认为100）
+    
 
     -- -- 添加一个自定义类别test_category。
     local hps_category = rotation:create_setting_category("hps_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
-    hps_category.display_name = L[" or cff00FFFF治疗设置"]; -- 类别在界面上显示的名字
+    hps_category.display_name = L["|cff00FFFF治疗设置"]; -- 类别在界面上显示的名字
 
     local zlsyz_setting = hps_category:create_setting("zlsyz"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     zlsyz_setting.display_name = L["治疗石"];
@@ -168,7 +157,7 @@ do
 
      -- -- 添加一个自定义类别test_category。
      local dps_category = rotation:create_setting_category("dps_category"); -- 指定类别的名字，目前没啥用，但是还是写上吧
-     dps_category.display_name = L[" or cff00FFFF输出设置"]; -- 类别在界面上显示的名字
+     dps_category.display_name = L["|cff00FFFF输出设置"]; -- 类别在界面上显示的名字
 
 
     local targets_setting = dps_category:create_setting("targets"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
@@ -206,17 +195,45 @@ end
 -----------------------------------------------------------
 --注册事件
 do
-    if Y                                    == nil then Y                                   = {};           end; --初始化总空间
-    if Y.spelllist_failed                   == nil then Y.spelllist_failed                  = {};           end; --初始化最近一次失败法术的记录空间    
-    if Y.spelllist_success                   == nil then Y.spelllist_success                  = {};           end; --初始化最近一次失败法术的记录空间    
-    if Y.spelllist_failed.spellname         == nil then Y.spelllist_failed.spellname        = 0;            end; --初始化最近一次失败法术的记录空间    
-    if Y.spelllist_failed.spelltarget       == nil then Y.spelllist_failed.spelltarget      = "player";     end; --初始化最近一次失败法术的记录空间    
-    if Y.spelllist_failed.spelltime         == nil then Y.spelllist_failed.spelltime        = 0;            end; --初始化最近一次失败法术的记录空间    
-    if Y.lastspell_success                  == nil then Y.lastspell_success                 = {};           end; --初始化最近一次成功法术的记录空间
-    if Y.lastspell_success.spellName         == nil then Y.lastspell_success.spellName        = 0;            end; --初始化最近一次成功法术的记录空间    
-    if Y.lastspell_success.spelltarget       == nil then Y.lastspell_success.spelltarget      = "player";     end; --初始化最近一次成功法术的记录空间    
-    if Y.lastspell_success.spelltime         == nil then Y.lastspell_success.spelltime        = 0;            end; --初始化最近一次成功法术的记录空间  
-    if Y.spell_cast_return                  == nil then Y.spell_cast_return                 = 0;            end; --初始化最近一次成功法术返回的值    
+    
+    if Y                        == nil then Y                       = {};   end; --初始化总空间
+    if Y.spelllist_failed       == nil then 
+        Y.spelllist_failed      = {};                 
+    end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_success       == nil then 
+        Y.spelllist_success      = {};                 
+    end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_failed.spellName       == nil then 
+        Y.spelllist_failed.spellName      = 0                
+    end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_failed.spelltarget       == nil then 
+        Y.spelllist_failed.spelltarget      = "player"                 
+    end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_failed.spelltime       == nil then 
+        Y.spelllist_failed.spelltime      = 0                
+    end; --初始化最近一次失败法术的记录空间 
+    
+          
+    if Y.lastspell_success      == nil then 
+        Y.lastspell_success     = {};
+           
+    end; --初始化最近一次成功法术的记录空间
+    if Y.lastspell_success.spellName      == nil then 
+        Y.lastspell_success.spellName     = 0
+           
+    end; --初始化最近一次成功法术的记录空间
+    if Y.lastspell_success.spelltarget      == nil then 
+        Y.lastspell_success.spelltarget = "player"
+           
+    end; --初始化最近一次成功法术的记录空间
+    if Y.lastspell_success.spelltime      == nil then 
+        Y.lastspell_success.spelltime = 0    
+           
+    end; --初始化最近一次成功法术的记录空间
+    if Y.spell_cast_return      == nil then Y.spell_cast_return     = 0;    end; --初始化最近一次成功法术返回的值 
+    if Y.spelllist_success.list == nil then 
+        Y.spelllist_success.list = {};
+    end   
     
     if Y.data == nil then Y.data = {}; end;
     if Y.nNove == nil then Y.nNove = {}; end;
@@ -226,7 +243,23 @@ do
     if Y.debug == nil then Y.debug = false;  end;
     if Y.baofa == nil then Y.baofa = false;  end;
 
-    
+    function SetupTables()        
+        table.wipe(Y.nNove)
+        table.wipe(Y.nTank)
+        local group =  IsInRaid() and "raid" or "party" 
+        local groupSize = IsInRaid() and GetNumGroupMembers() or 
+        GetNumGroupMembers() - 1
+
+        for i=1, groupSize do
+          local groupUnit = group..i      
+          if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
+          if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
+        end
+
+        table.insert(Y.nNove, "player")
+        
+    end
+
     local guid = UnitGUID("player")
     local frame = CreateFrame('Frame')
     frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
@@ -255,16 +288,17 @@ do
             if param == "SPELL_CAST_FAILED" then
                 if sourceName ~= nil then
                     if isInCombat("player") and UnitIsUnit(sourceName,"player") and spell ~= 48018 and spell ~= 48020 then
-                        Y.spelllist_failed.spellname = spell
+                        Y.spelllist_failed.spellName = spell
                         Y.spelllist_failed.spelltarget = destination
                         Y.spelllist_failed.spelltime = GetTime()
+                        if Y.spell_cast_return == spell then Y.spell_cast_return = 0;end
                         --对本次失败的ID进行初始化
                         if Y.spelllist_failed[spell] == nil then 
                             Y.spelllist_failed[spell] = {};
                         end
                         table.insert(Y.spelllist_failed[spell],{name = spell, target = destination, stime = Y.spelllist_failed.spelltime})
                         if source == guid and Y.debug == true then
-                            GH_Print(spellName.." 失败原因: "..spellType)
+                            print(spellName.." 失败原因: "..spellType)
                         end
                         --如果施法失败，就要把开始施法的数据重置
                         if spell == Y.lastspell_start then
@@ -275,7 +309,7 @@ do
             end
             --针对castspell的返回值处理
             if param == "SPELL_CAST_START" or param == "SPELL_CAST_SUCCESS" then
-                if isInCombat("player") and UnitIsUnit(sourceName,"player") then
+                if --[[ isInCombat("player") and ]] UnitIsUnit(sourceName,"player") then
                     if Y.lastspell_start == nil then Y.lastspell_start = {}; end;
                     Y.lastspell_start.spellName   = spell --记录ID
                     Y.lastspell_start.spelltime   = GetTime() --记录时间
@@ -285,7 +319,7 @@ do
             
             if param == "SPELL_CAST_SUCCESS" then
                 if sourceName ~= nil then
-                    if isInCombat("player") and UnitIsUnit(sourceName,"player") then
+                    if isInCombat("player") and UnitIsUnit(sourceName,"player") then                        
                         Y.lastspell_success.spellName = spell
                         Y.lastspell_success.spelltarget = destination
                         Y.lastspell_success.spelltime = GetTime()
@@ -293,9 +327,13 @@ do
                             Y.spelllist_success[spell] = {};
                         end
                         table.insert(Y.spelllist_success[spell],{name = spell, target = destination, stime = Y.lastspell_success.spelltime})
+                        if Y.spelllist_success.list == nil then 
+                            Y.spelllist_success.list = {};
+                        end
+                        table.insert(Y.spelllist_success.list,spell)
                         if destination then
                             if Y.debug == true then             
-                                GH_Print("成功对 "..destName.." ".."施放了 "..spellName)
+                                print("成功对 "..destName.." ".."施放了 "..spellName)
                             end                        
                         end
                     end
@@ -324,16 +362,16 @@ do
         SetupTables()
         end
         if event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_DEAD"  then
-            Y.data["Combat Started"] = 0
-            Y.spelllist_failed = {};
-            Y.lastspell_success = {};
-            Y.spell_cast_return = 0;
-            Y.spelllist_failed.spellname = 0
+            Y.data["Combat Started"] = 0            
+            Y.spell_cast_return = 0; 
+            Y.spelllist_failed={}
+            Y.lastspell_success={}
+            Y.spelllist_failed.spellName = 0
             Y.spelllist_failed.spelltarget = "player"
-            Y.spelllist_failed.spelltime = 0
+            Y.spelllist_failed.spelltime = 0 
             Y.lastspell_success.spellName = 0
             Y.lastspell_success.spelltarget = "player"
-            Y.lastspell_success.spelltime = 0      
+            Y.lastspell_success.spelltime = 0     
         
         end
     end
@@ -344,22 +382,6 @@ do
     --   -- 通过访问Y.nNove获得队友列表，
     --   -- 通过访问Y.nTank获得坦克列表
     --   -------------------------------------------------------------------------------------------------------------------
-    local function SetupTables()        
-        table.wipe(Y.nNove)
-        table.wipe(Y.nTank)
-        local group =  IsInRaid() and "raid" or "party" 
-        local groupSize = IsInRaid() and GetNumGroupMembers() or 
-        GetNumGroupMembers() - 1
-
-        for i=1, groupSize do
-          local groupUnit = group..i      
-          if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
-          if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
-        end
-
-        table.insert(Y.nNove, "player")
-        
-    end
     local updateHealingTable = CreateFrame("frame", nil)
     updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
     updateHealingTable:SetScript("OnEvent", function()
@@ -369,6 +391,10 @@ do
     end)
 
 end
+
+-----------------------------------------------------------
+-- 全局函数
+-----------------------------------------------------------
 --过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
 local function filler_unit(Unit)
     if (UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) then
@@ -377,54 +403,65 @@ local function filler_unit(Unit)
         return false
     end
 end
---为了1,1天赋创造的函数,估算掉血到90还有多久
+--血降到90需要的时间
 local function round2(num, idp)
     local mult = 10^(idp or 0)
     return math.floor(num * mult + 0.5) / mult
-  end
-  
-local thpcurr,thpstart,timestart,currtar,priortar,timecurr,timeToDie
-local function getTimeTo90(unit)
-      unit = unit or "target";
-      if getHP(unit) < 90 then return -999;end
-      if thpcurr == nil then thpcurr = 0; end --定义目标当前血量
-      if thpstart == nil then thpstart = 0; end --定义目标起始血量
-      if timestart == nil then timestart = 0; end --定义目标起始时间
-      if UnitIsVisible(unit) and not UnitIsDeadOrGhost(unit) then --目标存在
-          if currtar ~= UnitGUID(unit) then --如果当前目标和参数目标不一致，把当前目标放到priortar，再指定当前目标为参数目标
-              priortar = currtar;
-              currtar = UnitGUID(unit);
-          end
-          if thpstart == 0 and timestart == 0 then --如果目标起始血量为0，起始血量赋值为当前血量，起始时间赋值为当前时间
-              thpstart = UnitHealth(unit);
-              timestart = GetTime();
-          else --如果目标起始血量和时间都已经设定好了（这已经是第二次运算才会给的值）
-              thpcurr = UnitHealth(unit); --目标当前血量赋值
-              timecurr = GetTime(); --目标当前时间赋值
-              if thpcurr >= thpstart then --如果当前血量大于起始血量，计算失败，把当前血量赋值给起始血量，返回999的错误值
-                  thpstart = thpcurr; 
-                  timeToDie = -999;
-              else
-                  if ((timecurr - timestart)==0) or ((thpstart - thpcurr)==0) then --如果时间或者血量都一致，说明是第一次运算，返回999错误值
-                      timeToDie = -999;
-                  else
-                      timeToDie = round2((thpcurr - UnitHealthMax(unit)*0.9)/((thpstart - thpcurr) / (timecurr - timestart)),2); --当前血量/（血量差 / 时间差）==血量掉落的速度
-                  end
-              end
-          end
-      elseif not UnitIsVisible(unit) or currtar ~= UnitGUID(unit) then
-          currtar = 0;
-          priortar = 0;
-          thpstart = 0;
-          timestart = 0;
-          timeToDie = 0;
-      end
-      if timeToDie == nil then
-          return -999
-      else
-          return timeToDie
-      end
-  end
+end
+function getTimeToPct(unit,pct)
+    unit = unit or "target";
+    pct = pct or 90
+    if getHP(unit) < pct then return -999; end
+    if thpcurr == nil then thpcurr = 0; end
+    if thpstart == nil then thpstart = 0; end
+    if timestart == nil then timestart = 0; end
+    if UnitIsVisible(unit) and not UnitIsDeadOrGhost(unit) then
+        if currtar ~= UnitGUID(unit) then
+            priortar = currtar;
+            currtar = UnitGUID(unit);
+        end
+        if thpstart == 0 and timestart == 0 then
+            thpstart = UnitHealth(unit);
+            timestart = GetTime();
+        else
+            thpcurr = UnitHealth(unit);
+            timecurr = GetTime();
+            if thpcurr >= thpstart then
+                thpstart = thpcurr;
+                timeToDie = -999;
+            else
+                if ((timecurr - timestart)==0) or ((thpstart - thpcurr)==0) then
+                    timeToDie = -999;
+                else
+                    timeToDie = round2((thpcurr-UnitHealthMax(unit)*pct*0.01)/((thpstart - thpcurr) / (timecurr - timestart)),2);
+                end
+            end
+        end
+    elseif not UnitIsVisible(unit) or currtar ~= UnitGUID(unit) then
+        currtar = 0;
+        priortar = 0;
+        thpstart = 0;
+        timestart = 0;
+        timeToDie = 0;
+    end
+    if timeToDie == nil then
+        return -999
+    else
+        return timeToDie
+    end
+end
+function getFullRechargeTime(spellID)
+    local currentCharges,maxCharges,start,CD=GetSpellCharges(spellID)
+    if maxCharges ~= nil then
+        local currentChargeTime=(currentCharges or 0)<(maxCharges or 0) and CD -(GetTime()-(start or 0)) or 0
+        local leftChargesTotalTime = (maxCharges - currentCharges - 1) * CD
+        if currentCharges ~= maxCharges then
+            return currentChargeTime + leftChargesTotalTime
+        end
+
+    end
+    return 0
+end
 -----------------------------------------------------------
 -- 模块脚本
 -----------------------------------------------------------
@@ -454,7 +491,7 @@ function rotation:condition_action()
 end
 function rotation:prestart_action()
     -- 编写模块启动前脚本。
-    print("oop")
+    print("载入oop")
     function getPower(Unit, index)
         local value = value
         if select(3, UnitClass("player")) == 11 or select(3, UnitClass("player")) == 4 then
@@ -481,9 +518,13 @@ function rotation:prestart_action()
         end
         return UnitPowerMax(Unit, index)
     end
-    function getRacialID()
+    
+    function getRacial()
         local race = select(2,UnitRace("player"))
-
+        local BloodElfRacial
+        local DraeneiRacial
+        local OrcRacial
+    
         if race == "BloodElf" then
             BloodElfRacial = select(7, GetSpellInfo(GetSpellInfo(69179)))
         end
@@ -518,7 +559,16 @@ function rotation:prestart_action()
             DarkIronDwarf = 265221, -- Fireblood
             MagharOrc = 274738, -- Ancestral Call
         }
-        return racialSpells[race]
+        local trueRace = nil
+        local forTheAlliance = UnitBuffID("player",193863) or false
+        local forTheHorde = UnitBuffID("player", 193864) or false
+        if not forTheAlliance or not forTheHorde then trueRace = racialSpells[race] end
+        if trueRace ~= nil then
+            return trueRace
+        else
+            return racialSpells[race]
+        end
+        -- return racialSpells[race]
     end
     function getHeirloomNeck()
         local necks = {
@@ -536,6 +586,333 @@ function rotation:prestart_action()
         end
         return 0
     end
+
+    Item = {};
+    ItemMixin = {};
+
+    do
+        local ItemEventListener;
+
+        --[[static]] function Item:CreateFromItemLocation(itemLocation)
+            if type(itemLocation) ~= "table" or type(itemLocation.HasAnyLocation) ~= "function" or not itemLocation:HasAnyLocation() then
+                error("Usage: Item:CreateFromItemLocation(notEmptyItemLocation)", 2);
+            end
+            local item = CreateFromMixins(ItemMixin);
+            item:SetItemLocation(itemLocation);
+            return item;
+        end
+
+        --[[static]] function Item:CreateFromBagAndSlot(bagID, slotIndex)
+            if type(bagID) ~= "number" or type(slotIndex) ~= "number" then
+                error("Usage: Item:CreateFromBagAndSlot(bagID, slotIndex)", 2);
+            end
+            local item = CreateFromMixins(ItemMixin);
+            item:SetItemLocation(ItemLocation:CreateFromBagAndSlot(bagID, slotIndex));
+            return item;
+        end
+
+        --[[static]] function Item:CreateFromEquipmentSlot(equipmentSlotIndex)
+            if type(equipmentSlotIndex) ~= "number" then
+                error("Usage: Item:CreateFromEquipmentSlot(equipmentSlotIndex)", 2);
+            end
+            local item = CreateFromMixins(ItemMixin);
+            item:SetItemLocation(ItemLocation:CreateFromEquipmentSlot(equipmentSlotIndex));
+            return item;
+        end
+
+        --[[static]] function Item:CreateFromItemLink(itemLink)
+            if type(itemLink) ~= "string" then
+                error("Usage: Item:CreateFromItemLink(itemLinkString)", 2);
+            end
+            local item = CreateFromMixins(ItemMixin);
+            item:SetItemLink(itemLink);
+            return item;
+        end
+
+        --[[static]] function Item:CreateFromItemID(itemID)
+            if type(itemID) ~= "number" then
+                error("Usage: Item:CreateFromItemID(itemID)", 2);
+            end
+            local item = CreateFromMixins(ItemMixin);
+            item:SetItemID(itemID);
+            return item;
+        end
+
+        function ItemMixin:SetItemLocation(itemLocation)
+            self:Clear();
+            self.itemLocation = itemLocation;
+        end
+
+        function ItemMixin:SetItemLink(itemLink)
+            self:Clear();
+            self.itemLink = itemLink;
+        end
+
+        function ItemMixin:SetItemID(itemID)
+            self:Clear();
+            self.itemID = itemID;
+        end
+
+        function ItemMixin:GetItemLocation()
+            return self.itemLocation;
+        end
+
+        function ItemMixin:HasItemLocation()
+            return self.itemLocation ~= nil;
+        end
+
+        function ItemMixin:Clear()
+            self.itemLocation = nil;
+            self.itemLink = nil;
+            self.itemID = nil;
+        end
+
+        function ItemMixin:IsItemEmpty()
+            if self:GetStaticBackingItem() then
+                return not C_Item.DoesItemExistByID(self:GetStaticBackingItem());
+            end
+
+            return not self:IsItemInPlayersControl();
+        end
+
+        function ItemMixin:GetStaticBackingItem()
+            return self.itemLink or self.itemID;
+        end
+
+        function ItemMixin:IsItemInPlayersControl()
+            local itemLocation = self:GetItemLocation();
+            return itemLocation and C_Item.DoesItemExist(itemLocation); 
+        end
+
+        -- Item API
+        function ItemMixin:GetItemID()
+            if self:GetStaticBackingItem() then
+                return (GetItemInfoInstant(self:GetStaticBackingItem()));
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemID(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:IsItemLocked()
+            return self:IsItemInPlayersControl() and C_Item.IsLocked(self:GetItemLocation());
+        end
+
+        function ItemMixin:LockItem()
+            if self:IsItemInPlayersControl() then
+                C_Item.LockItem(self:GetItemLocation());
+            end
+        end
+
+        function ItemMixin:UnlockItem()
+            if self:IsItemInPlayersControl() then
+                C_Item.UnlockItem(self:GetItemLocation());
+            end
+        end
+
+        function ItemMixin:GetItemIcon() -- requires item data to be loaded
+            if self:GetStaticBackingItem() then
+                return C_Item.GetItemIconByID(self:GetStaticBackingItem());
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemIcon(self:GetItemLocation());
+            end
+        end
+
+        function ItemMixin:GetItemName() -- requires item data to be loaded
+            if self:GetStaticBackingItem() then
+                return C_Item.GetItemNameByID(self:GetStaticBackingItem());
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemName(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetItemLink() -- requires item data to be loaded
+            if self.itemLink then
+                return self.itemLink;
+            end
+
+            if self.itemID then
+                return (select(2, GetItemInfo(self.itemID)));
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemLink(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetItemQuality() -- requires item data to be loaded
+            if self:GetStaticBackingItem() then
+                return C_Item.GetItemQualityByID(self:GetStaticBackingItem());
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemQuality(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetCurrentItemLevel() -- requires item data to be loaded
+            if self:GetStaticBackingItem() then
+                return (GetDetailedItemLevelInfo(self:GetStaticBackingItem()));
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetCurrentItemLevel(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetItemQualityColor() -- requires item data to be loaded
+            local itemQuality = self:GetItemQuality();
+            return ITEM_QUALITY_COLORS[itemQuality]; -- may be nil if item data isn't loaded
+        end
+
+        function ItemMixin:GetInventoryType()
+            if self:GetStaticBackingItem() then
+                return C_Item.GetItemInventoryTypeByID(self:GetStaticBackingItem());
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemInventoryType(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetItemGUID()
+            if self:GetStaticBackingItem() then
+                return nil;
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemGUID(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetInventoryTypeName()
+            if not self:IsItemEmpty() then
+                return select(4, GetItemInfoInstant(self:GetItemID()));
+            end
+        end
+
+        function ItemMixin:IsItemDataCached()
+            if self:GetStaticBackingItem() then
+                return C_Item.IsItemDataCachedByID(self:GetStaticBackingItem());
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.IsItemDataCached(self:GetItemLocation());
+            end
+            return true; 
+        end
+
+        function ItemMixin:IsDataEvictable()
+            -- Item data could be evicted from the cache
+            return true;
+        end
+
+        -- Add a callback to be executed when item data is loaded, if the item data is already loaded then execute it immediately
+        function ItemMixin:ContinueOnItemLoad(callbackFunction)
+            if type(callbackFunction) ~= "function" or self:IsItemEmpty() then
+                error("Usage: NonEmptyItem:ContinueOnLoad(callbackFunction)", 2);
+            end
+
+            ItemEventListener:AddCallback(self:GetItemID(), callbackFunction);
+        end
+
+        -- Same as ContinueOnItemLoad, except it returns a function that when called will cancel the continue
+        function ItemMixin:ContinueWithCancelOnItemLoad(callbackFunction)
+            if type(callbackFunction) ~= "function" or self:IsItemEmpty() then
+                error("Usage: NonEmptyItem:ContinueWithCancelOnItemLoad(callbackFunction)", 2);
+            end
+
+            return ItemEventListener:AddCancelableCallback(self:GetItemID(), callbackFunction);
+        end
+
+        --[ Item Event Listener ]
+
+        ItemEventListener = CreateFrame("Frame");
+        ItemEventListener.callbacks = {};
+
+        ItemEventListener:SetScript("OnEvent", 
+            function(self, event, ...)
+                if event == "ITEM_DATA_LOAD_RESULT" then
+                    local itemID, success = ...;
+                    if success then
+                        self:FireCallbacks(itemID);
+                    else
+                        self:ClearCallbacks(itemID);
+                    end
+                end
+            end
+        );
+        ItemEventListener:RegisterEvent("ITEM_DATA_LOAD_RESULT");
+
+        local CANCELED_SENTINEL = -1;
+
+        function ItemEventListener:AddCallback(itemID, callbackFunction)
+            local callbacks = self:GetOrCreateCallbacks(itemID);
+            table.insert(callbacks, callbackFunction);
+            C_Item.RequestLoadItemDataByID(itemID);
+        end
+
+        function ItemEventListener:AddCancelableCallback(itemID, callbackFunction)
+            local callbacks = self:GetOrCreateCallbacks(itemID);
+            table.insert(callbacks, callbackFunction);
+            C_Item.RequestLoadItemDataByID(itemID);
+
+            local index = #callbacks;
+            return function()
+                if #callbacks > 0 and callbacks[index] ~= CANCELED_SENTINEL then
+                    callbacks[index] = CANCELED_SENTINEL;
+                    return true;
+                end
+                return false;
+            end;
+        end
+
+        function ItemEventListener:FireCallbacks(itemID)
+            local callbacks = self:GetCallbacks(itemID);
+            if callbacks then
+                self:ClearCallbacks(itemID);
+                for i, callback in ipairs(callbacks) do
+                    if callback ~= CANCELED_SENTINEL then
+                        xpcall(callback, CallErrorHandler);
+                    end
+                end
+
+                for i = #callbacks, 1, -1 do
+                    callbacks[i] = nil;
+                end
+            end
+        end
+
+        function ItemEventListener:ClearCallbacks(itemID)
+            self.callbacks[itemID] = nil;
+        end
+
+        function ItemEventListener:GetCallbacks(itemID)
+            return self.callbacks[itemID];
+        end
+
+        function ItemEventListener:GetOrCreateCallbacks(itemID)
+            local callbacks = self.callbacks[itemID];
+            if not callbacks then
+                callbacks = {};
+                self.callbacks[itemID] = callbacks;
+            end
+            return callbacks;
+        end
+    end             
+
     cUnit = {}
     cPlayer = {}
     --构造技能，buff，debuff，特质表
@@ -3065,6 +3442,7 @@ function rotation:prestart_action()
                     earthenSpike                = 188089,
                     frostbrand                  = 147732,
                     lightningConduit            = 275391,
+                    primalPrimer                = 273006,
                     searingAssault              = 268429,
                     stormTempests               = 214265,
                 },
@@ -3719,7 +4097,7 @@ function rotation:prestart_action()
                     global                          = 61304,
                     shadowmeld                      = 58984,
                     quakingPalm                     = 107079,
-                    racial                          = getRacialID(),
+                    racial                          = getRacial(),
                     lightsJudgment                  = 247427,
                 },
                 artifacts                           = {
@@ -3929,7 +4307,13 @@ function rotation:prestart_action()
         self.charges        = {} 
         self.spell	        = {}
         self.pct_health     = getHP
-        self.time_to_die    = getTimeToDie  
+        self.time_to_die    = getTimeToDie 
+        self.spell	    		= {}        -- Spells all classes may have (e.g. Racials, Mass Ressurection)
+        self.talent         = {}        -- Talents
+        self.timeToMax	    = 0		-- Time To Max Power
+        self.traits         = {}	-- Azerite Traits
+        self.units          = {}  
+        self.action          = {}  
         return self
     end
 
@@ -4044,7 +4428,12 @@ function rotation:prestart_action()
             -- 构造施法函数
             self.cast[k] = function(thisUnit,FacingCheck,MovementCheck,SpamAllowed,KnownSkip,DeadCheck,DistanceSkip,usableSkip)
                 if thisUnit == nil then thisUnit = "target";end
-                return castSpell(thisUnit,v,FacingCheck,MovementCheck,SpamAllowed,KnownSkip,DeadCheck,DistanceSkip,usableSkip) and Y.spell_cast_return == v
+                return csi(thisUnit,v,FacingCheck,MovementCheck,SpamAllowed,KnownSkip,DeadCheck,DistanceSkip,usableSkip) 
+                -- if Y.spell_cast_return == v then
+                --     return true
+                -- else
+                --     return false
+                -- end
             end
             self.cast.able[k] = function()
                 return canCast(v)
@@ -4053,11 +4442,14 @@ function rotation:prestart_action()
 
             self.prev_gcd[k] = function (targetunit)
                 if targetunit == nil then targetunit = "target";end
-                return Y.lastspell_success.spellname == v and UnitIsUnit(Y.lastspell_success.spelltarget,targetunit)
+                return Y.lastspell_success.spellName == v --[[ and UnitIsUnit(Y.lastspell_success.spelltarget,targetunit) ]]
             end
 
             local action = self.action[k]
             action.cast_time = function()
+                return getCastTime(v)
+            end
+            action.execute_time = function()
                 return getCastTime(v)
             end
             action.charges = function()
@@ -4066,6 +4458,22 @@ function rotation:prestart_action()
             action.full_recharge_time = function()
                 return getFullRechargeTime(v)
             end
+            action.executing = function (unit,intr)
+                return isCastingSpell(unit,v,intr)
+            end
+            action.execute_remains = function (unit)
+                if unit == nil then unit = "player";end
+                return getCastTimeRemain(unit)
+            end
+            action.in_flight = function ()
+                return getOneMyMissile() == v
+            end
+            action.in_flight_remains = function ()
+                if getOneMyMissile() == v then
+                    return 0.1
+                end
+            end
+            
             
             
         end
@@ -4178,10 +4586,20 @@ function rotation:prestart_action()
                     if sourceUnit == nil then sourceUnit = 'player' end
                     return UnitBuffID(thisUnit,v,sourceUnit) ~= nil
                 end
+                buff.react = function(thisUnit,sourceUnit)
+                    if thisUnit == nil then thisUnit = 'player' end
+                    if sourceUnit == nil then sourceUnit = 'player' end
+                    return UnitBuffID(thisUnit,v,sourceUnit) ~= nil
+                end
                 buff.ticking = function(thisUnit,sourceUnit)
                     if thisUnit == nil then thisUnit = 'player' end
                     if sourceUnit == nil then sourceUnit = 'player' end
                     return UnitBuffID(thisUnit,v,sourceUnit) ~= nil
+                end
+                buff.down = function(thisUnit,sourceUnit)
+                    if thisUnit == nil then thisUnit = 'player' end
+                    if sourceUnit == nil then sourceUnit = 'player' end
+                    return not UnitBuffID(thisUnit,v,sourceUnit)
                 end
                 buff.duration = function(thisUnit,sourceUnit)
                     if thisUnit == nil then thisUnit = 'player' end
@@ -4331,15 +4749,16 @@ function rotation:prestart_action()
 
         -- 构造天赋
         local function getTalentInfo()
+            local talentFound
             activeSpecGroup = GetActiveSpecGroup()
             if self.talent == nil then self.talent = {} end
-            for r = 1, 7 do --search each talent row
-                for c = 1, 3 do -- search each talent column
-                -- Cache Talent IDs for talent checks
-                    local _,_,_,selected,_,talentID = GetTalentInfo(r,c,activeSpecGroup)
-                    -- Compare Row/Column Spell Id to Talent Id List for matches
-                    for k,v in pairs(self.spell.talents) do
+            for k,v in pairs(self.spell.talents) do
+                talentFound = false
+                for r = 1, 7 do --search each talent row
+                    for c = 1, 3 do -- search each talent column
+                        local _,_,_,selected,_,talentID = GetTalentInfo(r,c,activeSpecGroup)
                         if v == talentID then
+                            talentFound = true
                             -- Add All Matches to Talent List for Boolean Checks
                             self.talent[k] = selected
                             -- Add All Active Ability Matches to Ability/Spell List for Use Checks
@@ -4347,8 +4766,15 @@ function rotation:prestart_action()
                                 self.spell['abilities'][k] = v
                                 self.spell[k] = v
                             end
+                            break;
                         end
                     end
+                    -- If we found the talent, then stop looking for it.
+                    if talentFound then break end
+                end
+                -- No matching talent for listed talent id, report to
+                if not talentFound then
+                    Print("|cffff0000No talent found for: |r"..k.." ("..v..") |cffff0000in the talent spell list, please notify profile developer.")
                 end
             end
         end
@@ -4395,10 +4821,10 @@ function rotation:prestart_action()
             end
         end
 
-        if self.talent == nil then 
-            getTalentInfo();
-            getAzeriteTraitInfo();
-        end
+        -- if self.talent == nil then 
+        getTalentInfo();
+        getAzeriteTraitInfo();
+        -- end
         
         
         return self
@@ -4417,51 +4843,1045 @@ function rotation:prestop_action()
     -- 编写模块停止前脚本。
     print("stop now not ");
 end
-function rotation:active_talents(args)
-    -- actions.active_talents=livingBomb,
+function rotation:precombat_action()
+    -------------------------------------------------
+    --每一秒刷新一次oop
+    if _G._T2 == nil then
+        -- body
+        _G._T2 = 0
+    end
+    if GetTime() - _G._T2 > 1 then
+        player              = cPlayer:new("player",63)
+        target              = player
+        talent              = player.talent
+        buff                = player.buff
+        debuff              = player.debuff
+        cast                = player.cast
+        cooldown            = player.cooldown
+        power               = player.power
+        azerite             = player.traits
+        pct_health          = player.pct_health
+        full_recharge_time  = player.full_recharge_time
+        charges             = player.charges
+        action              = player.action
+        prev_gcd            = player.prev_gcd
+        _G._T2 = GetTime()
+    end
+    -----------------------------------------------------
+
+    -- print(ydebug.is_enabled)
+    -- print(cast.scorch())
+end
+
+function rotation:active_talents()
+    -- print("active_talents")
+    -- actions.active_talents=living_bomb,if=active_enemies>1&buff.combustion.down&(cooldown.combustion.remains>cooldown.living_bomb.duration|cooldown.combustion.ready)
+
     if active_enemies>1 and buff.combustion.down() and (cooldown.combustion.remains()>cooldown.livingBomb.duration() or cooldown.combustion.ready()) then
-        if cast.able.livingBomb() and cast.livingBomb() then
+        if cast.able.livingBomb() and cast.livingBomb(tg) then
             if ydebug.is_enabled then
                 print(201)
-                return 0
+                return
             else
-                return 0
+                return
             end
         end
     end
-    -- actions.active_talents+=/meteor,
-    if buff.runeOfPower.up() and (((getTalent(1,1) and getHP("target") >= 90) and getTimeTo90(tg)>cooldown.meteor.duration) or not (getTalent(1,1) and getHP("target") >= 90)) or cooldown.runeOfPower.remains()>target.time_to_die() and action.runeOfPower.charges()<1 or (cooldown.meteor.duration()<cooldown.combustion.remains() or cooldown.combustion.ready()) and not talent.runeOfPower and (cooldown.meteor.duration()<getTimeTo90(tg) or not talent.firestarter or not (getTalent(1,1) and getHP("target") >= 90)) then
-        if cast.able.meteor() and cast.meteor() then
+    self:rest()
+    -- actions.active_talents+=/meteor,if=buff.rune_of_power.up&(firestarter.remains>cooldown.meteor.duration|!firestarter.active)|cooldown.rune_of_power.remains>target.time_to_die&action.rune_of_power.charges<1|(cooldown.meteor.duration<cooldown.combustion.remains|cooldown.combustion.ready)&!talent.rune_of_power.enabled&(cooldown.meteor.duration<firestarter.remains|!talent.firestarter.enabled|!firestarter.active)
+
+    if buff.runeOfPower.up() and (getTimeToPct(tg,90)>cooldown.meteor.duration() or not (getTalent(1,1) and getHP(tg) > 90)) or cooldown.runeOfPower.remains()>target.time_to_die(tg) and action.runeOfPower.charges()<1 or (cooldown.meteor.duration()<cooldown.combustion.remains() or cooldown.combustion.ready()) and not talent.runeOfPower and (cooldown.meteor.duration()<getTimeToPct(tg,90) or not talent.firestarter or not (getTalent(1,1) and getHP(tg) > 90)) then
+        if cast.able.meteor() and cast.meteor(tg) then
             if ydebug.is_enabled then
-                print(202)
-                return 0
+                print(201)
+                return
             else
-                return 0
+                return
             end
-        end
+        end        
     end
+    -- self:rest()
+    return 0
 
 end
+function rotation:bm_combustion_phase()
+    -- print("bm_combustion_phase")
+    -- actions.bm_combustion_phase=lights_judgment,if=buff.combustion.down
+
+    if buff.combustion.down() then
+        if cast.able.lightsJudgment() and cast.lightsJudgment(tg) then
+            if ydebug.is_enabled then
+                print(301)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    self:rest()
+    -- actions.bm_combustion_phase+=/living_bomb,if=buff.combustion.down&active_enemies>1
+
+    if buff.combustion.down() and active_enemies>1 then
+        if cast.able.livingBomb() and cast.livingBomb() then
+            if ydebug.is_enabled then
+                print(302)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/rune_of_power,if=buff.combustion.down
+
+    if buff.combustion.down() then
+        if cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
+            if ydebug.is_enabled then
+                print(303)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/fire_blast,use_while_casting=1,if=buff.blaster_master.down&(talent.rune_of_power.enabled&action.rune_of_power.executing&action.rune_of_power.execute_remains<0.6|(cooldown.combustion.ready|buff.combustion.up)&!talent.rune_of_power.enabled&!action.pyroblast.in_flight&!action.fireball.in_flight)
+
+    if buff.blasterMaster.down() and (talent.runeOfPower and action.runeOfPower.executing() and action.runeOfPower.execute_remains()<0.6 or (cooldown.combustion.ready() or buff.combustion.up()) and not talent.runeOfPower and not action.pyroblast.in_flight() and not action.fireball.in_flight()) then
+        if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+            if ydebug.is_enabled then
+                print(304)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/call_action_list,name=active_talents
+
+    self:active_talents()
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if=azerite.blaster_master.enabled&((action.meteor.in_flight&action.meteor.in_flight_remains<0.2)|!talent.meteor.enabled|prev_gcd.1.meteor)&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
+
+    if x1==1 and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<0.2) or not talent.meteor or prev_gcd.meteor()) and (buff.runeOfPower.up() or not talent.runeOfPower) then
+        if cast.able.combustion() and cast.combustion(zj) then
+            if ydebug.is_enabled then
+                print(305)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/potion
+    -- actions.bm_combustion_phase+=/bloodFury
+    -- actions.bm_combustion_phase+=/berserking
+    -- actions.bm_combustion_phase+=/fireblood
+    -- actions.bm_combustion_phase+=/ancestralCall
+    -- actions.bm_combustion_phase+=/call_action_list,name=trinkets
+    self:trinkets()
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up
+
+    if prev_gcd.scorch() and buff.heating_up.up() then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(306)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/pyroblast,if=buff.hot_streak.up
+
+    if buff.hotStreak.up() then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(307)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/pyroblast,if=buff.pyroclasm.react&cast_time<buff.combustion.remains
+
+    if buff.pyroclasm.react() and action.pyroblast.cast_time()<buff.combustion.remains() then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(308)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/phoenix_flames
+
+    if cast.able.phoenixsFlames() and charges.phoenixsFlames.exists() and cast.phoenixsFlames(tg) then
+        if ydebug.is_enabled then
+            print(309)
+            return 0
+        else
+            return 0
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/fire_blast,use_off_gcd=1,if=buff.blaster_master.stack=1&buff.hot_streak.down&!buff.pyroclasm.react&prev_gcd.1.pyroblast&(buff.blaster_master.remains<0.15|gcd.remains<0.15)
+
+    if buff.blasterMaster.stack()==1 and buff.hotStreak.down() and not buff.pyroclasm.react() and prev_gcd.pyroblast() and (buff.blasterMaster.remains()<0.15 or getSpellCD(61304)<0.15) then
+        if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+            if ydebug.is_enabled then
+                print(310)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/fire_blast,use_while_casting=1,if=buff.blaster_master.stack=1&(action.scorch.executing&action.scorch.execute_remains<0.15|buff.blaster_master.remains<0.15)
+
+    if buff.blasterMaster.stack()==1 and (action.scorch.executing() and action.scorch.execute_remains()<0.15 or buff.blasterMaster.remains()<0.15) then
+        if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+            if ydebug.is_enabled then
+                print(311)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/scorch,if=buff.hot_streak.down&(cooldown.fire_blast.remains<cast_time|action.fire_blast.charges>0)
+
+    if buff.hotStreak.down() and (cooldown.fireBlast.remains()<action.scorch.cast_time() or action.fireBlast.charges()>0) then
+        if cast.able.scorch() and cast.scorch(tg) then
+            if ydebug.is_enabled then
+                print(312)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/fire_blast,use_while_casting=1,use_off_gcd=1,if=buff.blaster_master.stack>1&(prev_gcd.1.scorch&!buff.hot_streak.up&!action.scorch.executing|buff.blaster_master.remains<0.15)
+
+    if buff.blasterMaster.stack()>1 and (prev_gcd.scorch() and not buff.hotStreak.up() and not action.scorch.executing() or buff.blasterMaster.remains()<0.15) then
+        if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+            if ydebug.is_enabled then
+                print(313)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1
+
+    if buff.combustion.remains()<gcd and active_enemies>1 then
+        if cast.able.livingBomb() and cast.livingBomb(tg) then
+            if ydebug.is_enabled then
+                print(314)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/dragons_breath,if=buff.combustion.remains<gcd.max
+
+    if buff.combustion.remains()<gcd then
+        if cast.able.dragonsBreath() and getDistance(zj,tg) <=12 and cast.dragonsBreath() then
+            if ydebug.is_enabled then
+                print(315)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.bm_combustion_phase+=/scorch
+
+    if cast.able.scorch() and cast.scorch(tg) then
+        if ydebug.is_enabled then
+            print(316)
+            return 0
+        else
+            return 0
+        end
+    end
+    return 0
+
+end
+function rotation:combustion_phase()
+    -- print("combustion_phase")
+    -- # Combustion phase prepares abilities with a delay, then launches into the Combustion sequence
+    -- actions.combustion_phase=lights_judgment,if=buff.combustion.down
+
+    if buff.combustion.down() then
+        if cast.able.lightsJudgment() and cast.lightsJudgment(tg) then
+            if ydebug.is_enabled then
+                print(401)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    self:rest()
+    -- actions.combustion_phase+=/call_action_list,name=bm_combustion_phase,if=azerite.blaster_master.enabled&talent.flame_on.enabled
+
+    if x1==1 and talent.flameOn then
+        self:bm_combustion_phase()
+        -- self:rest()
+    end
+    -- actions.combustion_phase+=/rune_of_power,if=buff.combustion.down
+
+    if buff.combustion.down() then
+        if cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
+            if ydebug.is_enabled then
+                print(402)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.combustion_phase+=/call_action_list,name=active_talents
+
+    self:active_talents()
+    -- self:rest()
+    -- actions.combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if=(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((action.meteor.in_flight&action.meteor.in_flight_remains<=0.5)|!talent.meteor.enabled)&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
+
+    if ( not x1==1 or not talent.flameOn) and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<=0.5) or  not talent.meteor) and (buff.runeOfPower.up() or not talent.runeOfPower) then
+        if cast.able.combustion() and cast.combustion(zj) then
+            if ydebug.is_enabled then
+                print(403)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.combustion_phase+=/potion
+    -- actions.combustion_phase+=/bloodFury
+    -- actions.combustion_phase+=/berserking
+    -- actions.combustion_phase+=/fireblood
+    -- actions.combustion_phase+=/ancestralCall
+    -- actions.combustion_phase+=/call_action_list,name=trinkets
+    self:trinkets()
+    -- self:rest()
+    -- actions.combustion_phase+=/flamestrike,if=((talent.flame_patch.enabled&active_enemies>2)|active_enemies>6)&buff.hot_streak.react
+
+    if ((talent.flame_patch and active_enemies>2) or active_enemies>6) and buff.hotStreak.react() then
+        if cast.able.flamestrike() and cast.flamestrike(tg) then            
+            if ydebug.is_enabled then
+                print(404)
+                return 0
+            else
+                return 0
+            end
+            
+        end
+    end
+    -- self:rest()
+    -- actions.combustion_phase+=/pyroblast,if=buff.pyroclasm.react&buff.combustion.remains>cast_time
+
+    if buff.pyroclasm.react() and buff.combustion.remains()>action.pyroblast.cast_time() then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(405)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.combustion_phase+=/pyroblast,if=buff.hot_streak.react
+
+    if buff.hotStreak.react() then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(406)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.combustion_phase+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((buff.combustion.up&(buff.heating_up.react&!action.pyroblast.in_flight&!action.scorch.executing)|(action.scorch.execute_remains&buff.heating_up.down&buff.hot_streak.down&!action.pyroblast.in_flight)))
+
+    if ( not x1==1 or not talent.flameOn) and ((buff.combustion.up() and (buff.heatingUp.react() and not action.pyroblast.in_flight() and not action.scorch.executing()) or (action.scorch.execute_remains()>0 and buff.heatingUp.down() and buff.hotStreak.down() and not action.pyroblast.in_flight()))) then
+        if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+            if ydebug.is_enabled then
+                print(407)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.combustion_phase+=/pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up
+
+    if prev_gcd.scorch() and buff.heatingUp.up() then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(408)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.combustion_phase+=/phoenix_flames
+
+    if cast.able.phoenixsFlames() and charges.phoenixsFlames.exists() and cast.phoenixsFlames(tg) then
+        if ydebug.is_enabled then
+            print(409)
+            return 0
+        else
+            return 0
+        end
+    end
+    -- self:rest()
+    -- actions.combustion_phase+=/scorch,if=buff.combustion.remains>cast_time&buff.combustion.up|buff.combustion.down
+
+    if buff.combustion.remains()>action.scorch.cast_time() and buff.combustion.up() or buff.combustion.down() then
+        if cast.able.scorch() and cast.scorch(tg) then
+            if ydebug.is_enabled then
+                print(410)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.combustion_phase+=/living_bomb,if=buff.combustion.remains<gcd.max&active_enemies>1
+
+    if buff.combustion.remains()<gcd and active_enemies>1 then
+        if cast.able.livingBomb() and cast.livingBomb() then
+            if ydebug.is_enabled then
+                print(411)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.combustion_phase+=/dragons_breath,if=buff.combustion.remains<gcd.max&buff.combustion.up
+
+    if buff.combustion.remains()<gcd and buff.combustion.up() then
+        if cast.able.dragonsBreath() and getDistance(zj,tg) <=12 and cast.dragonsBreath() then
+            if ydebug.is_enabled then
+                print(412)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.combustion_phase+=/scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+
+    if target.pct_health(tg)<=30 and talent.searing_touch then
+        if cast.able.scorch() and cast.scorch(tg) then
+            if ydebug.is_enabled then
+                print(413)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    return 0
+
+end
+function rotation:rop_phase()
+    -- print("rop_phase")
+    -- actions.rop_phase=rune_of_power
+    if cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
+        if ydebug.is_enabled then
+            print(501)
+            return 0
+        else
+            return 0
+        end
+    end
+    self:rest()
+    -- actions.rop_phase+=/flamestrike,if=((talent.flame_patch.enabled&active_enemies>1)|active_enemies>4)&buff.hot_streak.react
+
+    if ((talent.flamePatch and active_enemies>1) or active_enemies>4) and buff.hotStreak.react() then
+        if cast.able.flamestrike() and cast.flamestrike(tg) then
+            if ydebug.is_enabled then
+                print(502)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.rop_phase+=/pyroblast,if=buff.hot_streak.react
+
+    if buff.hotStreak.react() then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(503)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.rop_phase+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0|firestarter.active&buff.rune_of_power.up)&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(action.phoenix_flames.charges>=1&talent.phoenix_flames.enabled)|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)|(talent.firestarter.enabled&firestarter.active)))
+
+    if (cooldown.combustion.remains()>0 or (getTalent(1,1) and getHP(tg) > 90) and buff.runeOfPower.up()) and ( not buff.heatingUp.react() and not buff.hotStreak.react() and not prev_gcd.fireBlast() and (action.fireBlast.charges()>=2 or (action.phoenixsFlames.charges()>=1 and talent.phoenixsFlames) or (talent.alexstraszasFury and cooldown.dragonsBreath.ready()) or (talent.searingTouch and target.pct_health(tg)<=30) or (talent.firestarter and (getTalent(1,1) and getHP(tg) > 90)))) then
+        if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+            if ydebug.is_enabled then
+                print(504)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.rop_phase+=/call_action_list,name=active_talents
+
+    self:active_talents()
+    -- self:rest()
+    -- actions.rop_phase+=/pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains&buff.rune_of_power.remains>cast_time
+
+    if buff.pyroclasm.react() and action.pyroblast.cast_time()<buff.pyroclasm.remains() and buff.runeOfPower.remains()>action.pyroblast.cast_time() then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(505)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.rop_phase+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0|firestarter.active&buff.rune_of_power.up)&(buff.heating_up.react&(target.health.pct>=30|!talent.searing_touch.enabled))
+
+    if (cooldown.combustion.remains()>0 or (getTalent(1,1) and getHP(tg) > 90) and buff.runeOfPower.up()) and (buff.heatingUp.react() and (target.pct_health(tg)>=30 or not talent.searingTouch)) then
+        if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+            if ydebug.is_enabled then
+                print(506)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.rop_phase+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0|firestarter.active&buff.rune_of_power.up)&talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react)
+
+    if (cooldown.combustion.remains()>0 or (getTalent(1,1) and getHP(tg) > 90) and buff.runeOfPower.up()) and talent.searingTouch and target.pct_health(tg)<=30 and (buff.heatingUp.react() and not action.scorch.executing() or not buff.heatingUp.react() and not buff.hotStreak.react()) then
+        if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+            if ydebug.is_enabled then
+                print(507)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.rop_phase+=/pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&(!talent.flame_patch.enabled|active_enemies=1)
+
+    if prev_gcd.scorch() and buff.heatingUp.up() and talent.searingTouch and target.pct_health(tg)<=30 and ( not talent.flamePatch or active_enemies==1) then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(508)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.rop_phase+=/phoenix_flames,if=!prev_gcd.1.phoenix_flames&buff.heating_up.react
+
+    if not prev_gcd.phoenixsFlames() and buff.heatingUp.react() then
+        if cast.able.phoenixsFlames() and charges.phoenixsFlames.exists() and cast.phoenixsFlames(tg) then
+            if ydebug.is_enabled then
+                print(509)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.rop_phase+=/scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+
+    if target.pct_health(tg)<=30 and talent.searingTouch then
+        if cast.able.scorch() and cast.scorch(tg) then
+            if ydebug.is_enabled then
+                print(510)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.rop_phase+=/dragons_breath,if=active_enemies>2
+
+    if active_enemies>2 then
+        if cast.able.dragonsBreath() and getDistance(zj,tg) <=12 and cast.dragonsBreath() then
+            if ydebug.is_enabled then
+                print(511)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.rop_phase+=/flamestrike,if=(talent.flame_patch.enabled&active_enemies>2)|active_enemies>5
+
+    if (talent.flamePatch and active_enemies>2) or active_enemies>5 then
+        if cast.able.flamestrike() and cast.flamestrike(tg) then
+            if ydebug.is_enabled then
+                print(512)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.rop_phase+=/fireball
+
+    if cast.able.fireball() and cast.fireball(tg) then
+        if ydebug.is_enabled then
+            print(512)
+            return 0
+        else
+            return 0
+        end
+    end
+    -- self:rest()
+    return 0
+end
+function rotation:standard_rotation()
+    -- print("standard_rotation")
+    -- actions.standard_rotation=flamestrike,if=((talent.flame_patch.enabled&active_enemies>1&!firestarter.active)|active_enemies>4)&buff.hot_streak.react
+
+    if ((talent.flamePatch and active_enemies>1 and not (getTalent(1,1) and getHP(tg) > 90)) or active_enemies>4) and buff.hotStreak.react() then
+        if cast.able.flamestrike() and cast.flamestrike(tg) then
+            if ydebug.is_enabled then
+                print(601)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    self:rest()
+    -- actions.standard_rotation+=/pyroblast,if=buff.hot_streak.react&buff.hot_streak.remains<action.fireball.execute_time
+
+    if buff.hotStreak.react() and buff.hotStreak.remains()<action.fireball.execute_time() then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(602)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.standard_rotation+=/pyroblast,if=buff.hot_streak.react&(prev_gcd.1.fireball|firestarter.active|action.pyroblast.in_flight)
+
+    if buff.hotStreak.react() and (prev_gcd.fireball() or (getTalent(1,1) and getHP(tg) > 90) or action.pyroblast.in_flight()) then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(603)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.standard_rotation+=/pyroblast,if=buff.hot_streak.react&target.health.pct<=30&talent.searing_touch.enabled
+
+    if buff.hotStreak.react() and target.pct_health(tg)<=30 and talent.searingTouch then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(604)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.standard_rotation+=/pyroblast,if=buff.pyroclasm.react&cast_time<buff.pyroclasm.remains
+
+    if buff.pyroclasm.react() and action.pyroblast.cast_time()<buff.pyroclasm.remains() then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(605)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.standard_rotation+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0&buff.rune_of_power.down|firestarter.active)&!talent.kindling.enabled&!variable.fire_blast_pooling&(((action.fireball.executing|action.pyroblast.executing)&(buff.heating_up.react|firestarter.active&!buff.hot_streak.react&!buff.heating_up.react))|(talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!action.pyroblast.in_flight&!action.fireball.in_flight))|(firestarter.active&(action.pyroblast.in_flight|action.fireball.in_flight)&!buff.heating_up.react&!buff.hot_streak.react))
+
+    if (cooldown.combustion.remains()>0 and buff.runeOfPower.down() or (getTalent(1,1) and getHP(tg) > 90)) and not talent.kindling and not variable.fireBlast_pooling and (((action.fireball.executing() or action.pyroblast.executing()) and (buff.heatingUp.react() or (getTalent(1,1) and getHP(tg) > 90) and not buff.hotStreak.react() and not buff.heatingUp.react())) or (talent.searingTouch and target.pct_health(tg)<=30 and (buff.heatingUp.react() and not action.scorch.executing() or not buff.hotStreak.react() and not buff.heatingUp.react() and action.scorch.executing() and not action.pyroblast.in_flight() and not action.fireball.in_flight())) or ((getTalent(1,1) and getHP(tg) > 90) and (action.pyroblast.in_flight() or action.fireball.in_flight()) and not buff.heatingUp.react() and not buff.hotStreak.react())) then
+        if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+            if ydebug.is_enabled then
+                print(606)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.standard_rotation+=/fire_blast,if=talent.kindling.enabled&buff.heating_up.react&(cooldown.combustion.remains>full_recharge_time+2+talent.kindling.enabled|firestarter.remains>full_recharge_time|(!talent.rune_of_power.enabled|cooldown.rune_of_power.remains>target.time_to_die&action.rune_of_power.charges<1)&cooldown.combustion.remains>target.time_to_die)
+
+    if talent.kindling then
+        x2 = 1
+    else
+        x2 = 0
+    end
+    if talent.kindling and buff.heatingUp.react() and (cooldown.combustion.remains()>action.fireBlast.full_recharge_time()+2+x2 or getTimeToPct(tg,90)>action.fireBlast.full_recharge_time() or ( not talent.runeOfPower or cooldown.runeOfPower.remains()>target.time_to_die(tg) and action.runeOfPower.charges()<1) and cooldown.combustion.remains()>target.time_to_die(tg)) then
+        if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+            if ydebug.is_enabled then
+                print(607)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.standard_rotation+=/pyroblast,if=prev_gcd.1.scorch&buff.heating_up.up&talent.searing_touch.enabled&target.health.pct<=30&((talent.flame_patch.enabled&active_enemies=1&!firestarter.active)|(active_enemies<4&!talent.flame_patch.enabled))
+
+    if prev_gcd.scorch() and buff.heatingUp.up() and talent.searingTouch and target.pct_health(tg)<=30 and ((talent.flamePatch and active_enemies==1 and  not (getTalent(1,1) and getHP(tg) > 90)) or (active_enemies<4 and not talent.flamePatch)) then
+        if cast.able.pyroblast() and cast.pyroblast(tg) then
+            if ydebug.is_enabled then
+                print(608)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.standard_rotation+=/phoenix_flames,if=(buff.heating_up.react|(!buff.hot_streak.react&(action.fire_blast.charges>0|talent.searing_touch.enabled&target.health.pct<=30)))&!variable.phoenix_pooling
+
+    if (buff.heatingUp.react() or ( not buff.hotStreak.react() and (action.fireBlast.charges()>0 or talent.searingTouch and target.pct_health(tg)<=30))) and not variable.phoenix_pooling then
+        if cast.able.phoenixsFlames() and charges.phoenixsFlames.exists() and cast.phoenixsFlames(tg) then
+            if ydebug.is_enabled then
+                print(609)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.standard_rotation+=/call_action_list,name=active_talents
+
+    self:active_talents()
+    -- self:rest()
+    -- actions.standard_rotation+=/dragons_breath,if=active_enemies>1
+
+    if active_enemies>1 then
+        if cast.able.dragonsBreath() and getDistance(zj,tg) <=12 and cast.dragonsBreath() then
+            if ydebug.is_enabled then
+                print(610)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.standard_rotation+=/use_item,name=tidestorm_codex,if=cooldown.combustion.remains>20|talent.firestarter.enabled&firestarter.remains>20
+
+    -- actions.standard_rotation+=/scorch,if=target.health.pct<=30&talent.searing_touch.enabled
+
+    if target.pct_health(tg)<=30 and talent.searingTouch then
+        if cast.able.scorch() and cast.scorch(tg) then
+            if ydebug.is_enabled then
+                print(611)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
+    -- self:rest()
+    -- actions.standard_rotation+=/fireball
+    if cast.able.fireball() and cast.fireball(tg) then
+        if ydebug.is_enabled then
+            print(612)
+            return 0
+        else
+            return 0
+        end
+    end
+    -- self:rest()
+    -- actions.standard_rotation+=/scorch
+    if cast.able.scorch() and cast.scorch(tg) then
+        if ydebug.is_enabled then
+            print(613)
+            return 0
+        else
+            return 0
+        end
+    end
+    -- self:rest()
+    return
+end
+function rotation:trinkets(args)
+    -- actions.trinkets=use_items
+    if canUse(13) then useItem(13);end
+    if canUse(14) then useItem(14);end
+    RunMacroText("/use 13")
+    RunMacroText("/use 14")
+    return 0
+end
+
 
 function rotation:default_action()
 
-    player          = cPlayer:new("player",63)
-    target          = player
-    talent          = player.talent
-    buff            = player.buff
-    debuff          = player.debuff
-    cast            = player.cast
-    cooldown        = player.cooldown
-    power           = player.power
-    azerite         = player.traits
-    pct_health      = player.pct_health
-    full_recharge_time=player.full_recharge_time
-    charges         = player.charges
-    action          = player.action
+    -- if _G._T3==nil then _G._T3 = GetTime();end
+    -- print(GetTime()-_G._T3)
+    -- _G._T3 = GetTime()
+    -------------------------------------------------
+    --每一秒刷新一次oop
+    if _G._T2 == nil then
+        -- body
+        _G._T2 = 0
+    end
+    -- print(prev_gcd.fireball())
+    -- print(Y.lastspell_success.spellname)
+    if GetTime() - _G._T2 > 1 then
+        player              = cPlayer:new("player",63)
+        target              = player
+        talent              = player.talent
+        buff                = player.buff
+        debuff              = player.debuff
+        cast                = player.cast
+        cooldown            = player.cooldown
+        power               = player.power
+        azerite             = player.traits
+        pct_health          = player.pct_health
+        full_recharge_time  = player.full_recharge_time
+        charges             = player.charges
+        action              = player.action
+        prev_gcd            = player.prev_gcd
+        _G._T2 = GetTime()
+    end
+    ---------------------------------------------------
+
+    tgtype = self.settings.targets
+    ydebug = self.settings.ydebug
+    if variable == nil then
+        variable = {}
+    end
+    
     
 
+    -- print(azerite.blasterMaster.enabled)
+    if azerite.blasterMaster.enabled then
+        x1 = 1
+    else
+        x1 = 0
+    end
+    -- print(x1)
+
+    self:rest()
+    if (talent.runeOfPower and cooldown.combustion.remains()<=action.runeOfPower.cast_time() or cooldown.combustion.ready()) and  not (getTalent(1,1) and getHP(tg) > 90) or buff.combustion.up() then
+        -- actions.combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if=(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((action.meteor.in_flight&action.meteor.in_flight_remains<=0.5)|!talent.meteor.enabled)&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
+
+        if ( not x1==1 or not talent.flameOn) and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<=0.5) or  not talent.meteor) and (buff.runeOfPower.up() or not talent.runeOfPower) then
+            if cast.able.combustion() and cast.combustion(zj) then
+                if ydebug.is_enabled then
+                    print(4031)
+                    return
+                else
+                    return
+                end
+            end
+        end
+        self:rest()
+        -- actions.combustion_phase+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((buff.combustion.up&(buff.heating_up.react&!action.pyroblast.in_flight&!action.scorch.executing)|(action.scorch.execute_remains&buff.heating_up.down&buff.hot_streak.down&!action.pyroblast.in_flight)))
+
+        if ( not x1==1 or not talent.flameOn) and ((buff.combustion.up() and (buff.heatingUp.react() and not action.pyroblast.in_flight() and not action.scorch.executing()) or (action.scorch.execute_remains()>0 and buff.heatingUp.down() and buff.hotStreak.down() and not action.pyroblast.in_flight()))) then
+            if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+                if ydebug.is_enabled then
+                    print(4071)
+                    return
+                else
+                    return
+                end
+            end
+        end
+        -- self:rest()
+        if x1==1 and talent.flameOn then
+            -- actions.bm_combustion_phase+=/fire_blast,use_while_casting=1,if=buff.blaster_master.down&(talent.rune_of_power.enabled&action.rune_of_power.executing&action.rune_of_power.execute_remains<0.6|(cooldown.combustion.ready|buff.combustion.up)&!talent.rune_of_power.enabled&!action.pyroblast.in_flight&!action.fireball.in_flight)
+
+            if buff.blasterMaster.down() and (talent.runeOfPower and action.runeOfPower.executing() and action.runeOfPower.execute_remains()<0.6 or (cooldown.combustion.ready() or buff.combustion.up()) and not talent.runeOfPower and not action.pyroblast.in_flight() and not action.fireball.in_flight()) then
+                if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+                    if ydebug.is_enabled then
+                        print(3041)
+                        return
+                    else
+                        return
+                    end
+                end
+            end
+            -- self:rest()
+            -- actions.bm_combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if=azerite.blaster_master.enabled&((action.meteor.in_flight&action.meteor.in_flight_remains<0.2)|!talent.meteor.enabled|prev_gcd.1.meteor)&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
+
+            if x1==1 and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<0.2) or not talent.meteor or prev_gcd.meteor()) and (buff.runeOfPower.up() or not talent.runeOfPower) then
+                if cast.able.combustion() and cast.combustion(zj) then
+                    if ydebug.is_enabled then
+                        print(3051)
+                        return
+                    else
+                        return
+                    end
+                end
+            end
+            -- self:rest()
+            -- actions.bm_combustion_phase+=/fire_blast,use_off_gcd=1,if=buff.blaster_master.stack=1&buff.hot_streak.down&!buff.pyroclasm.react&prev_gcd.1.pyroblast&(buff.blaster_master.remains<0.15|gcd.remains<0.15)
+
+            if buff.blasterMaster.stack()==1 and buff.hotStreak.down() and not buff.pyroclasm.react() and prev_gcd.pyroblast() and (buff.blasterMaster.remains()<0.15 or getSpellCD(61304)<0.15) then
+                if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+                    if ydebug.is_enabled then
+                        print(3101)
+                        return
+                    else
+                        return
+                    end
+                end
+            end
+            -- self:rest()
+            -- actions.bm_combustion_phase+=/fire_blast,use_while_casting=1,if=buff.blaster_master.stack=1&(action.scorch.executing&action.scorch.execute_remains<0.15|buff.blaster_master.remains<0.15)
+
+            if buff.blasterMaster.stack()==1 and (action.scorch.executing() and action.scorch.execute_remains()<0.15 or buff.blasterMaster.remains()<0.15) then
+                if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+                    if ydebug.is_enabled then
+                        print(3111)
+                        return
+                    else
+                        return
+                    end
+                end
+            end
+            -- self:rest()
+            -- actions.bm_combustion_phase+=/fire_blast,use_while_casting=1,use_off_gcd=1,if=buff.blaster_master.stack>1&(prev_gcd.1.scorch&!buff.hot_streak.up&!action.scorch.executing|buff.blaster_master.remains<0.15)
+
+            if buff.blasterMaster.stack()>1 and (prev_gcd.scorch() and not buff.hotStreak.up() and not action.scorch.executing() or buff.blasterMaster.remains()<0.15) then
+                if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+                    if ydebug.is_enabled then
+                        print(3131)
+                        return
+                    else
+                        return
+                    end
+                end
+            end
+            -- self:rest()
+
+        end
+    end
+
+    -- self:rest()
+    if buff.runeOfPower.up() and buff.combustion.down() then
+        -- actions.rop_phase+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0|firestarter.active&buff.rune_of_power.up)&(!buff.heating_up.react&!buff.hot_streak.react&!prev_off_gcd.fire_blast&(action.fire_blast.charges>=2|(action.phoenix_flames.charges>=1&talent.phoenix_flames.enabled)|(talent.alexstraszas_fury.enabled&cooldown.dragons_breath.ready)|(talent.searing_touch.enabled&target.health.pct<=30)|(talent.firestarter.enabled&firestarter.active)))
+
+        if (cooldown.combustion.remains()>0 or (getTalent(1,1) and getHP(tg) > 90) and buff.runeOfPower.up()) and ( not buff.heatingUp.react() and not buff.hotStreak.react() and not prev_gcd.fireBlast() and (action.fireBlast.charges()>=2 or (action.phoenixsFlames.charges()>=1 and talent.phoenixsFlames) or (talent.alexstraszasFury and cooldown.dragonsBreath.ready()) or (talent.searingTouch and target.pct_health(tg)<=30) or (talent.firestarter and (getTalent(1,1) and getHP(tg) > 90)))) then
+            if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+                if ydebug.is_enabled then
+                    print(5041)
+                    return
+                else
+                    return
+                end
+            end
+        end
+        self:rest()
+        -- actions.rop_phase+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0|firestarter.active&buff.rune_of_power.up)&(buff.heating_up.react&(target.health.pct>=30|!talent.searing_touch.enabled))
+
+        if (cooldown.combustion.remains()>0 or (getTalent(1,1) and getHP(tg) > 90) and buff.runeOfPower.up()) and (buff.heatingUp.react() and (target.pct_health(tg)>=30 or not talent.searingTouch)) then
+            if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+                if ydebug.is_enabled then
+                    print(5061)
+                    return
+                else
+                    return
+                end
+            end
+        end
+        -- self:rest()
+        -- actions.rop_phase+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0|firestarter.active&buff.rune_of_power.up)&talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.heating_up.react&!buff.hot_streak.react)
+
+        if (cooldown.combustion.remains()>0 or (getTalent(1,1) and getHP(tg) > 90) and buff.runeOfPower.up()) and talent.searingTouch and target.pct_health(tg)<=30 and (buff.heatingUp.react() and not action.scorch.executing() or not buff.heatingUp.react() and not buff.hotStreak.react()) then
+            if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+                if ydebug.is_enabled then
+                    print(5071)
+                    return
+                else
+                    return
+                end
+            end
+        end
+        -- self:rest()
+    end
+    -- self:rest()
+
+    -- actions.standard_rotation+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(cooldown.combustion.remains>0&buff.rune_of_power.down|firestarter.active)&!talent.kindling.enabled&!variable.fire_blast_pooling&(((action.fireball.executing|action.pyroblast.executing)&(buff.heating_up.react|firestarter.active&!buff.hot_streak.react&!buff.heating_up.react))|(talent.searing_touch.enabled&target.health.pct<=30&(buff.heating_up.react&!action.scorch.executing|!buff.hot_streak.react&!buff.heating_up.react&action.scorch.executing&!action.pyroblast.in_flight&!action.fireball.in_flight))|(firestarter.active&(action.pyroblast.in_flight|action.fireball.in_flight)&!buff.heating_up.react&!buff.hot_streak.react))
+
+    if (cooldown.combustion.remains()>0 and buff.runeOfPower.down() or (getTalent(1,1) and getHP(tg) > 90)) and not talent.kindling and not variable.fireBlast_pooling and (((action.fireball.executing() or action.pyroblast.executing()) and (buff.heatingUp.react() or (getTalent(1,1) and getHP(tg) > 90) and not buff.hotStreak.react() and not buff.heatingUp.react())) or (talent.searingTouch and target.pct_health(tg)<=30 and (buff.heatingUp.react() and not action.scorch.executing() or not buff.hotStreak.react() and not buff.heatingUp.react() and action.scorch.executing() and not action.pyroblast.in_flight() and not action.fireball.in_flight())) or ((getTalent(1,1) and getHP(tg) > 90) and (action.pyroblast.in_flight() or action.fireball.in_flight()) and not buff.heatingUp.react() and not buff.hotStreak.react())) then
+        if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
+            if ydebug.is_enabled then
+                print(6061)
+                return
+            else
+                return
+            end
+        end
+    end
+    -- self:rest()
+
     -- 不打断施法
-    if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
+    if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0 then return; end;
 
     tgtype = self.settings.targets --目标选择
 
@@ -4486,15 +5906,18 @@ function rotation:default_action()
         active_enemies = getNumEnemies(tg,8)
     else
         active_enemies = 0
-    end    
+    end  
     
     gcd = getGCD()
     time = getCombatTime()
-    expected_combat_length = getTimeToDie(tg)
-    active_enemies = getNumEnemies(tg,8)
-    tb = getEnemy(35,filler_unit)
+    -- expected_combat_length = getTimeToDie(tg)
+    -- active_enemies = getNumEnemies(tg,8)
+    -- tb = getEnemy(35,filler_unit)
+    
 
-
+    --------------------------------------------------------
+    -- 循环开始
+    --------------------------------------------------------
     -- mage="T23_Mage_Fire"
     -- source=default
     -- spec=fire
@@ -4523,18 +5946,18 @@ function rotation:default_action()
     -- actions.precombat+=/arcane_intellect
     -- # This variable sets the time at which Rune of Power should start being saved for the next Combustion phase
     -- actions.precombat+=/variable,name=combustion_rop_cutoff,op=set,value=60
-    if variable == nil then variable = {}; end
     variable.combustion_rop_cutoff = 60
     -- actions.precombat+=/snapshot_stats
-    -- actions.precombat+=/mirrorImage
+    -- actions.precombat+=/mirror_image
     -- actions.precombat+=/potion
     -- actions.precombat+=/pyroblast
 
     -- # Executed every time the actor is available.
     -- actions=counterspell
-    -- actions+=/mirrorImage,
+    -- actions+=/mirror_image,if=buff.combustion.down
+
     if buff.combustion.down() then
-        if cast.able.mirrorImage() and cast.mirrorImage() then
+        if cast.able.mirrorImage() and cast.mirrorImage(zj) then
             if ydebug.is_enabled then
                 print(101)
                 return 0
@@ -4543,9 +5966,11 @@ function rotation:default_action()
             end
         end
     end
-    -- actions+=/runeOfPower,
-    if talent.firestarter and getTimeTo90(tg)>full_recharge_time.runeOfPower() or cooldown.combustion.remains()>variable.combustion_rop_cutoff and buff.combustion.down() or target.time_to_die()<cooldown.combustion.remains() and buff.combustion.down() then
-        if charges.runeOfPower() >= 1 and cast.able.runeOfPower() and cast.runeOfPower() then
+    -- self:rest()
+    -- actions+=/rune_of_power,if=talent.firestarter.enabled&firestarter.remains>full_recharge_time|cooldown.combustion.remains>variable.combustion_rop_cutoff&buff.combustion.down|target.time_to_die<cooldown.combustion.remains&buff.combustion.down
+
+    if talent.firestarter and getTimeToPct(tg,90)>charges.runeOfPower.full_recharge_time() or cooldown.combustion.remains()>variable.combustion_rop_cutoff and buff.combustion.down() or target.time_to_die(tg)<cooldown.combustion.remains() and buff.combustion.down() then
+        if cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
             if ydebug.is_enabled then
                 print(102)
                 return 0
@@ -4554,47 +5979,35 @@ function rotation:default_action()
             end
         end
     end
-    self:rest()
-    -- actions+=/call_action_list,name=combustion_phase,
-    if (talent.runeOfPower and cooldown.combustion.remains()<=action.runeOfPower.cast_time() or cooldown.combustion.ready()) and not (getTalent(1,1) and getHP(tg) >= 90) or buff.combustion.up() then
+    -- self:rest()
+    -- actions+=/call_action_list,name=combustion_phase,if=(talent.rune_of_power.enabled&cooldown.combustion.remains<=action.rune_of_power.cast_time|cooldown.combustion.ready)&!firestarter.active|buff.combustion.up
+
+    if (talent.runeOfPower and cooldown.combustion.remains()<=action.runeOfPower.cast_time() or cooldown.combustion.ready()) and  not (getTalent(1,1) and getHP(tg) > 90) or buff.combustion.up() then
         self:combustion_phase()
+        return 0
     end
-    self:rest()
-    -- actions+=/call_action_list,name=rop_phase,
+    -- actions+=/call_action_list,name=rop_phase,if=buff.rune_of_power.up&buff.combustion.down
+
     if buff.runeOfPower.up() and buff.combustion.down() then
         self:rop_phase()
+        return 0
     end
-    self:rest()
-    -- actions+=/variable,name=fireBlast_pooling,value
-    variable.fireBlast_pooling=talent.runeOfPower and cooldown.runeOfPower.remains()<cooldown.fireBlast.full_recharge_time() and (cooldown.combustion.remains()>variable.combustion_rop_cutoff or (getTalent(1,1) and getHP(tg) >= 90)) and (cooldown.runeOfPower.remains()<target.time_to_die() or action.runeOfPower.charges()>0) or cooldown.combustion.remains()<action.fireBlast.full_recharge_time()+cooldown.fireBlast.duration()*azerite.blaster_master.enabled and not (getTalent(1,1) and getHP(tg) >= 90) and cooldown.combustion.remains()<target.time_to_die() or talent.firestarter and (getTalent(1,1) and getHP(tg) >= 90) and getTimeTo90(tg)<cooldown.fireBlast.full_recharge_time()+cooldown.fireBlast.duration()*azerite.blaster_master.enabled
-    -- actions+=/variable,name=
-    variable.phoenix_pooling=talent.runeOfPower and cooldown.runeOfPower.remains()<cooldown.phoenixFlames.full_recharge_time() and cooldown.combustion.remains()>variable.combustion_rop_cutoff and (cooldown.runeOfPower.remains()<target.time_to_die() or action.runeOfPower.charges()>0) or cooldown.combustion.remains()<action.phoenixFlames.full_recharge_time() and cooldown.combustion.remains()<target.time_to_die()
+    -- actions+=/variable,name=fire_blast_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.fire_blast.full_recharge_time&(cooldown.combustion.remains>variable.combustion_rop_cutoff|firestarter.active)&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|cooldown.combustion.remains<action.fire_blast.full_recharge_time+cooldown.fire_blast.duration*azerite.blaster_master.enabled&!firestarter.active&cooldown.combustion.remains<target.time_to_die|talent.firestarter.enabled&firestarter.active&firestarter.remains<cooldown.fire_blast.full_recharge_time+cooldown.fire_blast.duration*azerite.blaster_master.enabled
+   
+    variable.fireBlast_pooling = talent.runeOfPower and cooldown.runeOfPower.remains()<cooldown.fireBlast.full_recharge_time() and (cooldown.combustion.remains()>variable.combustion_rop_cutoff or (getTalent(1,1) and getHP(tg) > 90)) and (cooldown.runeOfPower.remains()<target.time_to_die(tg) or action.runeOfPower.charges()>0) or cooldown.combustion.remains()<action.fireBlast.full_recharge_time()+cooldown.fireBlast.duration()*x1 and not (getTalent(1,1) and getHP(tg) > 90) and cooldown.combustion.remains()<target.time_to_die(tg) or talent.firestarter and (getTalent(1,1) and getHP(tg) > 90) and getTimeToPct(tg,90)<cooldown.fireBlast.full_recharge_time()+cooldown.fireBlast.duration()*x1
+    -- self:rest()
+    -- actions+=/variable,name=phoenix_pooling,value=talent.rune_of_power.enabled&cooldown.rune_of_power.remains<cooldown.phoenix_flames.full_recharge_time&cooldown.combustion.remains>variable.combustion_rop_cutoff&(cooldown.rune_of_power.remains<target.time_to_die|action.rune_of_power.charges>0)|cooldown.combustion.remains<action.phoenix_flames.full_recharge_time&cooldown.combustion.remains<target.time_to_die
+
+    variable.phoenix_pooling = talent.runeOfPower and cooldown.runeOfPower.remains()<cooldown.phoenixsFlames.full_recharge_time() and cooldown.combustion.remains()>variable.combustion_rop_cutoff and (cooldown.runeOfPower.remains()<target.time_to_die(tg) or action.runeOfPower.charges()>0) or cooldown.combustion.remains()<action.phoenixsFlames.full_recharge_time() and cooldown.combustion.remains()<target.time_to_die(tg)
+    -- self:rest()
     -- actions+=/call_action_list,name=standard_rotation
-    self:standard_rotation()
-    self:rest()
-    return 0    
+
+    self:standard_rotation()    
+    -- self:rest()
+    return 0
+
 end
 -----------------------------------------------------------
 -- 注册模块（自己手动开启）
 -----------------------------------------------------------
 rotation_manager.instance:register(rotation);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
