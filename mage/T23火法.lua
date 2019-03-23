@@ -171,6 +171,30 @@ do
     targets_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
     targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 
+
+    local nlfw_setting = dps_category:create_setting("nlfw"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    nlfw_setting.display_name = L["能量符文"];
+    nlfw_setting.description = "确定能量符文的释放方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    nlfw_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    nlfw_setting.default_value = "卡CD"; -- 变量默认值
+    nlfw_setting.optional_values = {"卡CD", "AOE或BOSS"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    nlfw_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    nlfw_setting.is_enabled_by_default = false; -- 是否默认启用
+    nlfw_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    nlfw_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
+
+    local ranshao_setting = dps_category:create_setting("ranshao"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
+    ranshao_setting.display_name = L["燃烧"];
+    ranshao_setting.description = "确定燃烧的释放方式"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
+    ranshao_setting.value_type = rotation_setting_type.text; -- 变量值类型（text类型）
+    ranshao_setting.default_value = "AOE或BOSS"; -- 变量默认值
+    ranshao_setting.optional_values = {"卡CD", "AOE或BOSS", "BOSS"}; -- 变量备选值（设置备选值后会出现单选下拉菜单，供用户选择）
+    ranshao_setting.can_enable_disable = false; -- 是否支持启用停用（支持则在界面上出现勾选框）
+    ranshao_setting.is_enabled_by_default = false; -- 是否默认启用
+    ranshao_setting.validator = nil; -- 变量值校验函数，检测值除了类型以外的其他合法性（因为带备选值，所以不可能需要校验，不设即可）
+    ranshao_setting.value_width = 130; -- 值显示宽度像素（默认为100）
+
     local daduan_setting = dps_category:create_setting("daduan"); -- 指定变量的名字，用于在脚本中进行引用（注意，哪怕是不同类别下的配置变量名字也不能重复）
     daduan_setting.display_name = L["打断"];
     daduan_setting.description = "打断"; -- 变量在界面上的鼠标提示说明，充分利用换行符和暴雪颜色可以实现丰富的效果
@@ -4866,6 +4890,9 @@ function rotation:precombat_action()
         action              = player.action
         prev_gcd            = player.prev_gcd
         _G._T2 = GetTime()
+        if not UnitBuffID("player",1459) then
+            castSpell("player",1459)
+        end
     end
     -----------------------------------------------------
 
@@ -4935,7 +4962,7 @@ function rotation:bm_combustion_phase()
     -- actions.bm_combustion_phase+=/rune_of_power,if=buff.combustion.down
 
     if buff.combustion.down() then
-        if cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
+        if fz and cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
             if ydebug.is_enabled then
                 print(303)
                 return 0
@@ -4964,8 +4991,8 @@ function rotation:bm_combustion_phase()
     -- self:rest()
     -- actions.bm_combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if=azerite.blaster_master.enabled&((action.meteor.in_flight&action.meteor.in_flight_remains<0.2)|!talent.meteor.enabled|prev_gcd.1.meteor)&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
 
-    if x1==1 and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<0.2) or not talent.meteor or prev_gcd.meteor()) and (buff.runeOfPower.up() or not talent.runeOfPower) then
-        if cast.able.combustion() and cast.combustion(zj) then
+    if (x1==1) and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<0.2) or not talent.meteor or prev_gcd.meteor()) and (buff.runeOfPower.up() or not talent.runeOfPower) then
+        if rs and cast.able.combustion() and cast.combustion(zj) then
             if ydebug.is_enabled then
                 print(305)
                 return 0
@@ -5142,14 +5169,14 @@ function rotation:combustion_phase()
     self:rest()
     -- actions.combustion_phase+=/call_action_list,name=bm_combustion_phase,if=azerite.blaster_master.enabled&talent.flame_on.enabled
 
-    if x1==1 and talent.flameOn then
+    if (x1==1) and talent.flameOn then
         self:bm_combustion_phase()
         -- self:rest()
     end
     -- actions.combustion_phase+=/rune_of_power,if=buff.combustion.down
 
     if buff.combustion.down() then
-        if cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
+        if fz and cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
             if ydebug.is_enabled then
                 print(402)
                 return 0
@@ -5164,9 +5191,9 @@ function rotation:combustion_phase()
     self:active_talents()
     -- self:rest()
     -- actions.combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if=(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((action.meteor.in_flight&action.meteor.in_flight_remains<=0.5)|!talent.meteor.enabled)&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
-
-    if ( not x1==1 or not talent.flameOn) and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<=0.5) or  not talent.meteor) and (buff.runeOfPower.up() or not talent.runeOfPower) then
-        if cast.able.combustion() and cast.combustion(zj) then
+    
+    if ( not (x1==1) or not talent.flameOn) and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<=0.5) or  not talent.meteor) and (buff.runeOfPower.up() or not talent.runeOfPower) then
+        if rs and cast.able.combustion() and cast.combustion(zj) then
             if ydebug.is_enabled then
                 print(403)
                 return 0
@@ -5226,7 +5253,7 @@ function rotation:combustion_phase()
     -- self:rest()
     -- actions.combustion_phase+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((buff.combustion.up&(buff.heating_up.react&!action.pyroblast.in_flight&!action.scorch.executing)|(action.scorch.execute_remains&buff.heating_up.down&buff.hot_streak.down&!action.pyroblast.in_flight)))
 
-    if ( not x1==1 or not talent.flameOn) and ((buff.combustion.up() and (buff.heatingUp.react() and not action.pyroblast.in_flight() and not action.scorch.executing()) or (action.scorch.execute_remains()>0 and buff.heatingUp.down() and buff.hotStreak.down() and not action.pyroblast.in_flight()))) then
+    if ( not (x1==1) or not talent.flameOn) and ((buff.combustion.up() and (buff.heatingUp.react() and not action.pyroblast.in_flight() and not action.scorch.executing()) or (action.scorch.execute_remains()>0 and buff.heatingUp.down() and buff.hotStreak.down() and not action.pyroblast.in_flight()))) then
         if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
             if ydebug.is_enabled then
                 print(407)
@@ -5319,7 +5346,7 @@ end
 function rotation:rop_phase()
     -- print("rop_phase")
     -- actions.rop_phase=rune_of_power
-    if cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
+    if fz and cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
         if ydebug.is_enabled then
             print(501)
             return 0
@@ -5668,6 +5695,7 @@ function rotation:standard_rotation()
 end
 function rotation:trinkets(args)
     -- actions.trinkets=use_items
+    -- print("trinkets")
     if canUse(13) then useItem(13);end
     if canUse(14) then useItem(14);end
     RunMacroText("/use 13")
@@ -5705,11 +5733,25 @@ function rotation:default_action()
         action              = player.action
         prev_gcd            = player.prev_gcd
         _G._T2 = GetTime()
+        if not UnitBuffID("player",1459) then
+            castSpell("player",1459)
+        end
     end
     ---------------------------------------------------
 
     tgtype = self.settings.targets
     ydebug = self.settings.ydebug
+    nlfw = self.settings.nlfw
+    ranshao = self.settings.ranshao
+    zlsyz = self.settings.zlsyz --治疗石
+    hbpz = self.settings.hbpz --寒冰屏障
+    hbht = self.settings.hbht --寒冰护体
+    lgpz = self.settings.lgpz --棱光屏障
+    daduan = self.settings.daduan --打断
+
+    
+
+
     if variable == nil then
         variable = {}
     end
@@ -5728,8 +5770,8 @@ function rotation:default_action()
     if (talent.runeOfPower and cooldown.combustion.remains()<=action.runeOfPower.cast_time() or cooldown.combustion.ready()) and  not (getTalent(1,1) and getHP(tg) > 90) or buff.combustion.up() then
         -- actions.combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if=(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((action.meteor.in_flight&action.meteor.in_flight_remains<=0.5)|!talent.meteor.enabled)&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
 
-        if ( not x1==1 or not talent.flameOn) and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<=0.5) or  not talent.meteor) and (buff.runeOfPower.up() or not talent.runeOfPower) then
-            if cast.able.combustion() and cast.combustion(zj) then
+        if ( not (x1==1) or not talent.flameOn) and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<=0.5) or  not talent.meteor) and (buff.runeOfPower.up() or not talent.runeOfPower) then
+            if rs and cast.able.combustion() and cast.combustion(zj) then
                 if ydebug.is_enabled then
                     print(4031)
                     return
@@ -5741,7 +5783,7 @@ function rotation:default_action()
         self:rest()
         -- actions.combustion_phase+=/fire_blast,use_off_gcd=1,use_while_casting=1,if=(!azerite.blaster_master.enabled|!talent.flame_on.enabled)&((buff.combustion.up&(buff.heating_up.react&!action.pyroblast.in_flight&!action.scorch.executing)|(action.scorch.execute_remains&buff.heating_up.down&buff.hot_streak.down&!action.pyroblast.in_flight)))
 
-        if ( not x1==1 or not talent.flameOn) and ((buff.combustion.up() and (buff.heatingUp.react() and not action.pyroblast.in_flight() and not action.scorch.executing()) or (action.scorch.execute_remains()>0 and buff.heatingUp.down() and buff.hotStreak.down() and not action.pyroblast.in_flight()))) then
+        if ( not (x1==1) or not talent.flameOn) and ((buff.combustion.up() and (buff.heatingUp.react() and not action.pyroblast.in_flight() and not action.scorch.executing()) or (action.scorch.execute_remains()>0 and buff.heatingUp.down() and buff.hotStreak.down() and not action.pyroblast.in_flight()))) then
             if cast.able.fireBlast() and charges.fireBlast.exists() and cast.fireBlast(tg) then
                 if ydebug.is_enabled then
                     print(4071)
@@ -5752,7 +5794,7 @@ function rotation:default_action()
             end
         end
         -- self:rest()
-        if x1==1 and talent.flameOn then
+        if (x1==1) and talent.flameOn then
             -- actions.bm_combustion_phase+=/fire_blast,use_while_casting=1,if=buff.blaster_master.down&(talent.rune_of_power.enabled&action.rune_of_power.executing&action.rune_of_power.execute_remains<0.6|(cooldown.combustion.ready|buff.combustion.up)&!talent.rune_of_power.enabled&!action.pyroblast.in_flight&!action.fireball.in_flight)
 
             if buff.blasterMaster.down() and (talent.runeOfPower and action.runeOfPower.executing() and action.runeOfPower.execute_remains()<0.6 or (cooldown.combustion.ready() or buff.combustion.up()) and not talent.runeOfPower and not action.pyroblast.in_flight() and not action.fireball.in_flight()) then
@@ -5768,8 +5810,8 @@ function rotation:default_action()
             -- self:rest()
             -- actions.bm_combustion_phase+=/combustion,use_off_gcd=1,use_while_casting=1,if=azerite.blaster_master.enabled&((action.meteor.in_flight&action.meteor.in_flight_remains<0.2)|!talent.meteor.enabled|prev_gcd.1.meteor)&(buff.rune_of_power.up|!talent.rune_of_power.enabled)
 
-            if x1==1 and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<0.2) or not talent.meteor or prev_gcd.meteor()) and (buff.runeOfPower.up() or not talent.runeOfPower) then
-                if cast.able.combustion() and cast.combustion(zj) then
+            if (x1==1) and ((action.meteor.in_flight() and action.meteor.in_flight_remains()<0.2) or not talent.meteor or prev_gcd.meteor()) and (buff.runeOfPower.up() or not talent.runeOfPower) then
+                if rs and cast.able.combustion() and cast.combustion(zj) then
                     if ydebug.is_enabled then
                         print(3051)
                         return
@@ -5913,6 +5955,47 @@ function rotation:default_action()
     -- expected_combat_length = getTimeToDie(tg)
     -- active_enemies = getNumEnemies(tg,8)
     -- tb = getEnemy(35,filler_unit)
+
+    if nlfw.value=="卡CD" then
+        fz=true
+    elseif nlfw.value=="AOE或BOSS" and (isBoss(tg) or active_enemies >= 3) then
+        fz = true
+    else
+        fz=false
+    end
+
+    if ranshao.value=="卡CD" then
+        rs=true
+    elseif ranshao.value=="AOE或BOSS" and (isBoss(tg) or active_enemies >= 3) then
+        rs = true
+    elseif ranshao.value=="BOSS" and isBoss(tg)  then
+        rs = true
+    else
+        rs=false
+    end
+
+    -- 石头
+    if getHP(zj) <= zlsyz.value and canUse(5512) then
+        useItem(5512)
+    end    
+
+    -- 当自己的血低于多少时，则释放寒冰屏障45438（做阈值，默认20）
+    if hbpz.is_enabled and getHP(zj) <= hbpz.value and canCast(45438) then
+        if castSpell(zj,45438) then
+        end
+    end
+
+    -- 当自己的血低于多少时，则释放寒冰护体11426（做阈值，默认70）
+    if hbht.is_enabled and getHP(zj) <= hbht.value and canCast(235313) and not UnitBuffID("player",235313) then
+        if castSpell(zj,235313) then
+        end
+    end
+
+    -- 当自己的血低于多少时，则释放棱光屏障235450（做阈值，默认30）
+    if lgpz.is_enabled and getHP(zj) <= lgpz.value and canCast(235450) then
+        if castSpell(zj,235450) then
+        end
+    end
     
 
     --------------------------------------------------------
@@ -5954,6 +6037,16 @@ function rotation:default_action()
 
     -- # Executed every time the actor is available.
     -- actions=counterspell
+    if daduan.is_enabled and canCast(counterspell) and amac(tg,1,daduan.value) then
+        if castSpell(tg,counterspell) then
+            if ydebug.is_enabled then
+                print(100)
+                return 0
+            else
+                return 0
+            end
+        end
+    end
     -- actions+=/mirror_image,if=buff.combustion.down
 
     if buff.combustion.down() then
@@ -5970,7 +6063,7 @@ function rotation:default_action()
     -- actions+=/rune_of_power,if=talent.firestarter.enabled&firestarter.remains>full_recharge_time|cooldown.combustion.remains>variable.combustion_rop_cutoff&buff.combustion.down|target.time_to_die<cooldown.combustion.remains&buff.combustion.down
 
     if talent.firestarter and getTimeToPct(tg,90)>charges.runeOfPower.full_recharge_time() or cooldown.combustion.remains()>variable.combustion_rop_cutoff and buff.combustion.down() or target.time_to_die(tg)<cooldown.combustion.remains() and buff.combustion.down() then
-        if cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
+        if fz and cast.able.runeOfPower() and charges.runeOfPower.exists() and cast.runeOfPower(zj) then
             if ydebug.is_enabled then
                 print(102)
                 return 0
