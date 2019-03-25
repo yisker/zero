@@ -3,7 +3,7 @@
 -----------------------------------------------------------
 do
     -- 定义循环的唯一ID，可以去https://1024tools.com/uuid生成，保证每次都不一样，宇宙唯一。
-    local rotation_id = "f60430eb-d774-457a-8913-7bbefd23bf5c";
+    local rotation_id = "f60430eb-d774-457a-8913-7bbefd23bf7c";
     -- 定义循环的英文名称。
     local rotation_name = "test_priest_discipline";
     Scorpio("zeus." .. rotation_name)("");
@@ -11,8 +11,8 @@ do
     local L = _Locale("zhCN", true);
     if L then
         -- 简体中文系列。
-        L[rotation_name] = "测试戒律";
-        L["Welcome to use test module."] = "欢迎使用测试戒律模块！";
+        L[rotation_name] = "萨满-元素";
+        L["Welcome to use test module."] = "欢迎使用测试萨满模块！";
         L["Test 1"] = "测试1号";
         L["Test 2"] = "测试2号";
         L["At least 2 values must be entered."] = "至少要输入2个值";
@@ -24,8 +24,8 @@ do
     L = _Locale("zhTW");
     if L then
         -- 繁体中文系列。
-        L[rotation_name] = "測試戒律";
-        L["Welcome to use test module."] = "歡迎使用測試戒律模組！";
+        L[rotation_name] = "萨满-元素";
+        L["Welcome to use test module."] = "欢迎使用测试萨满模块！";
         L["Test 1"] = "測試1號";
         L["Test 2"] = "測試2號";
         L["At least 2 values must be entered."] = "至少要输入2个值";
@@ -43,7 +43,7 @@ do
     -- 定义循环的执行间隔（秒），如果不设默认是0.1。
     rotation.interval = 0.1;
     -- 定义模块专用宏命令，下面的例子会定义出：/zeus test [argument]。如果不需要宏控制，则删除下面一行。
-    rotation.macro = "abc";
+    rotation.macro = "saman";
 end
 -----------------------------------------------------------
 -- 模块变量
@@ -137,6 +137,231 @@ do
     targets_setting.value_width = 130; -- 值显示宽度像素（默认为100）
 end
 -----------------------------------------------------------
+-- 注册事件
+-----------------------------------------------------------
+--注册事件
+do
+    
+    if Y                        == nil then Y                       = {};   end; --初始化总空间
+    if Y.spelllist_failed       == nil then 
+        Y.spelllist_failed      = {};                 
+    end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_success       == nil then 
+        Y.spelllist_success      = {};                 
+    end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_failed.spellName       == nil then 
+        Y.spelllist_failed.spellName      = 0                
+    end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_failed.spelltarget       == nil then 
+        Y.spelllist_failed.spelltarget      = "player"                 
+    end; --初始化最近一次失败法术的记录空间    
+    if Y.spelllist_failed.spelltime       == nil then 
+        Y.spelllist_failed.spelltime      = 0                
+    end; --初始化最近一次失败法术的记录空间 
+    
+          
+    if Y.lastspell_success      == nil then 
+        Y.lastspell_success     = {};
+           
+    end; --初始化最近一次成功法术的记录空间
+    if Y.lastspell_success.spellName      == nil then 
+        Y.lastspell_success.spellName     = 0
+           
+    end; --初始化最近一次成功法术的记录空间
+    if Y.lastspell_success.spelltarget      == nil then 
+        Y.lastspell_success.spelltarget = "player"
+           
+    end; --初始化最近一次成功法术的记录空间
+    if Y.lastspell_success.spelltime      == nil then 
+        Y.lastspell_success.spelltime = 0    
+           
+    end; --初始化最近一次成功法术的记录空间
+    if Y.spell_cast_return      == nil then Y.spell_cast_return     = 0;    end; --初始化最近一次成功法术返回的值 
+    if Y.spelllist_success.list == nil then 
+        Y.spelllist_success.list = {};
+    end   
+    
+    if Y.data == nil then Y.data = {}; end;
+    if Y.nNove == nil then Y.nNove = {}; end;
+    if Y.nTank == nil then Y.nTank = {}; end;
+
+    
+    if Y.debug == nil then Y.debug = false;  end;
+    if Y.baofa == nil then Y.baofa = false;  end;
+
+    function SetupTables()        
+        table.wipe(Y.nNove)
+        table.wipe(Y.nTank)
+        local group =  IsInRaid() and "raid" or "party" 
+        local groupSize = IsInRaid() and GetNumGroupMembers() or 
+        GetNumGroupMembers() - 1
+
+        for i=1, groupSize do
+          local groupUnit = group..i      
+          if UnitExists(groupUnit) then table.insert(Y.nNove, groupUnit); end -- Inserting a newly created Unit into the Main Frame
+          if UnitExists(groupUnit) and UnitGroupRolesAssigned(groupUnit) == "TANK" then table.insert(Y.nTank, groupUnit); end
+        end
+
+        table.insert(Y.nNove, "player")
+        
+    end
+
+    local guid = UnitGUID("player")
+    local frame = CreateFrame('Frame')
+    frame:RegisterEvent("COMBAT_LOG_EVENT_UNFILTERED")
+    -------------------------------------------------------------------------------------------------------------------
+    -- 记录进入战斗后自己释放成功和失败的技能队列，
+
+    -- 通过访问Y.spelllist_failed.spellname获得上一次失败的技能ID，
+    -- 通过访问Y.spelllist_failed.spelltarget获得上一次失败的技能目标，
+    -- 通过访问Y.spelllist_failed.spelltime获得上一次失败的时间，    
+    -- Y.spelllist_failed[id]为最近一次释放同ID技能失败的列表，键值是name，target，stime
+
+    -- 通过访问Y.lastspell_success.spellname获得上一次成功的技能ID，
+    -- 通过访问Y.lastspell_success.spelltarget获得上一次成功的技能目标，
+    -- 通过访问Y.lastspell_success.spelltime获得上一次成功的时间，
+    -- Y.spelllist_success[id]为最近一次释放同ID技能成功的列表，键值是name，target，stime
+
+    -- Y.spell_cast_return用来返回当前施法的技能id，配合castspell来返回是否施法成功
+    -------------------------------------------------------------------------------------------------------------------
+    local function reader(self,event,...)
+        local timeStamp, param, hideCaster, source, sourceName, sourceFlags, 
+        sourceRaidFlags, destination,
+        destName, destFlags, destRaidFlags, spell, spellName, _, spellType = CombatLogGetCurrentEventInfo()
+
+        if source == guid then
+            --施法失败的处理
+            if param == "SPELL_CAST_FAILED" then
+                if sourceName ~= nil then
+                    if isInCombat("player") and UnitIsUnit(sourceName,"player") and spell ~= 48018 and spell ~= 48020 then
+                        Y.spelllist_failed.spellName = spell
+                        Y.spelllist_failed.spelltarget = destination
+                        Y.spelllist_failed.spelltime = GetTime()
+                        if Y.spell_cast_return == spell then Y.spell_cast_return = 0;end
+                        --对本次失败的ID进行初始化
+                        if Y.spelllist_failed[spell] == nil then 
+                            Y.spelllist_failed[spell] = {};
+                        end
+                        table.insert(Y.spelllist_failed[spell],{name = spell, target = destination, stime = Y.spelllist_failed.spelltime})
+                        if source == guid and Y.debug == true then
+                            print(spellName.." 失败原因: "..spellType)
+                        end
+                        --如果施法失败，就要把开始施法的数据重置
+                        if spell == Y.lastspell_start then
+                            Y.lastspell_start = 0
+                        end
+                    end
+                end
+            end
+            --针对castspell的返回值处理
+            if param == "SPELL_CAST_START" or param == "SPELL_CAST_SUCCESS" then
+                if --[[ isInCombat("player") and ]] UnitIsUnit(sourceName,"player") then
+                    if Y.lastspell_start == nil then Y.lastspell_start = {}; end;
+                    Y.lastspell_start.spellName   = spell --记录ID
+                    Y.lastspell_start.spelltime   = GetTime() --记录时间
+                    Y.spell_cast_return = spell
+                end
+            end
+            
+            if param == "SPELL_CAST_SUCCESS" then
+                if sourceName ~= nil then
+                    if isInCombat("player") and UnitIsUnit(sourceName,"player") then                        
+                        Y.lastspell_success.spellName = spell
+                        Y.lastspell_success.spelltarget = destination
+                        Y.lastspell_success.spelltime = GetTime()
+                        if Y.spelllist_success[spell] == nil then 
+                            Y.spelllist_success[spell] = {};
+                        end
+                        table.insert(Y.spelllist_success[spell],{name = spell, target = destination, stime = Y.lastspell_success.spelltime})
+                        if Y.spelllist_success.list == nil then 
+                            Y.spelllist_success.list = {};
+                        end
+                        table.insert(Y.spelllist_success.list,spell)
+                        if destination then
+                            if Y.debug == true then             
+                                print("成功对 "..destName.." ".."施放了 "..spellName)
+                            end                        
+                        end
+                    end
+                end
+            end
+        end
+
+    end
+    frame:SetScript("OnEvent", reader)
+
+
+    -------------------------------------------------------------------------------------------------------------------
+    -- 记录进入战斗的时间
+    -- 通过访问Y.data["Combat Started"]获得战斗开始时间，
+    -- 离开战斗或者玩家死亡，清除所有的Y
+    -------------------------------------------------------------------------------------------------------------------
+    local Frame = CreateFrame('Frame')
+    Frame:RegisterEvent("PLAYER_REGEN_DISABLED")
+    Frame:RegisterEvent("PLAYER_REGEN_ENABLED")
+    Frame:RegisterEvent("PLAYER_DEAD")
+    local function EnteringCombat(self,event,...)
+        if event == "PLAYER_REGEN_DISABLED" then
+        -- here we should manage stats snapshots
+        --AgiSnap = getAgility()
+        Y.data["Combat Started"] = GetTime();
+        SetupTables()
+        end
+        if event == "PLAYER_REGEN_ENABLED" or event == "PLAYER_DEAD"  then
+            Y.data["Combat Started"] = 0            
+            Y.spell_cast_return = 0; 
+            Y.spelllist_failed={}
+            Y.lastspell_success={}
+            Y.spelllist_failed.spellName = 0
+            Y.spelllist_failed.spelltarget = "player"
+            Y.spelllist_failed.spelltime = 0 
+            Y.lastspell_success.spellName = 0
+            Y.lastspell_success.spelltarget = "player"
+            Y.lastspell_success.spelltime = 0     
+        
+        end
+    end
+    Frame:SetScript("OnEvent",EnteringCombat)
+    
+    --   -------------------------------------------------------------------------------------------------------------------
+    --   -- 创建队友列表，通过团队时间驱动刷新
+    --   -- 通过访问Y.nNove获得队友列表，
+    --   -- 通过访问Y.nTank获得坦克列表
+    --   -------------------------------------------------------------------------------------------------------------------
+    local updateHealingTable = CreateFrame("frame", nil)
+    updateHealingTable:RegisterEvent("GROUP_ROSTER_UPDATE")
+    updateHealingTable:SetScript("OnEvent", function()
+        table.wipe(Y.nNove)
+        table.wipe(Y.nTank)  
+        SetupTables()
+    end)
+
+end
+
+-----------------------------------------------------------
+-- 全局函数
+-----------------------------------------------------------
+--过滤函数，留下敌对目标，并且进入了战斗，并且自己面对方向的
+local function filler_unit(Unit)
+    if (UnitReaction(Unit,"player") == 1 or UnitReaction(Unit,"player") == 2 or UnitReaction(Unit,"player") == 3) and getLineOfSight("player",Unit) and not isLongTimeCCed(Unit) and isFacing("player",Unit) and isInCombat(Unit) then
+        return true
+    else
+        return false
+    end
+end
+function getFullRechargeTime(spellID)
+    local currentCharges,maxCharges,start,CD=GetSpellCharges(spellID)
+    if maxCharges ~= nil then
+        local currentChargeTime=(currentCharges or 0)<(maxCharges or 0) and CD -(GetTime()-(start or 0)) or 0
+        local leftChargesTotalTime = (maxCharges - currentCharges - 1) * CD
+        if currentCharges ~= maxCharges then
+            return currentChargeTime + leftChargesTotalTime
+        end
+
+    end
+    return 0
+end
+-----------------------------------------------------------
 -- 模块脚本
 -----------------------------------------------------------
 function rotation:macro_handler(argument)
@@ -153,7 +378,7 @@ function rotation:condition_action()
 end
 function rotation:prestart_action()
     -- 编写模块启动前脚本。
-    print("oop")
+    print("载入oop")
     function getPower(Unit, index)
         local value = value
         if select(3, UnitClass("player")) == 11 or select(3, UnitClass("player")) == 4 then
@@ -180,9 +405,13 @@ function rotation:prestart_action()
         end
         return UnitPowerMax(Unit, index)
     end
-    function getRacialID()
+    
+    function getRacial()
         local race = select(2,UnitRace("player"))
-
+        local BloodElfRacial
+        local DraeneiRacial
+        local OrcRacial
+    
         if race == "BloodElf" then
             BloodElfRacial = select(7, GetSpellInfo(GetSpellInfo(69179)))
         end
@@ -217,7 +446,16 @@ function rotation:prestart_action()
             DarkIronDwarf = 265221, -- Fireblood
             MagharOrc = 274738, -- Ancestral Call
         }
-        return racialSpells[race]
+        local trueRace = nil
+        local forTheAlliance = UnitBuffID("player",193863) or false
+        local forTheHorde = UnitBuffID("player", 193864) or false
+        if not forTheAlliance or not forTheHorde then trueRace = racialSpells[race] end
+        if trueRace ~= nil then
+            return trueRace
+        else
+            return racialSpells[race]
+        end
+        -- return racialSpells[race]
     end
     function getHeirloomNeck()
         local necks = {
@@ -235,6 +473,333 @@ function rotation:prestart_action()
         end
         return 0
     end
+
+    Item = {};
+    ItemMixin = {};
+
+    do
+        local ItemEventListener;
+
+        --[[static]] function Item:CreateFromItemLocation(itemLocation)
+            if type(itemLocation) ~= "table" or type(itemLocation.HasAnyLocation) ~= "function" or not itemLocation:HasAnyLocation() then
+                error("Usage: Item:CreateFromItemLocation(notEmptyItemLocation)", 2);
+            end
+            local item = CreateFromMixins(ItemMixin);
+            item:SetItemLocation(itemLocation);
+            return item;
+        end
+
+        --[[static]] function Item:CreateFromBagAndSlot(bagID, slotIndex)
+            if type(bagID) ~= "number" or type(slotIndex) ~= "number" then
+                error("Usage: Item:CreateFromBagAndSlot(bagID, slotIndex)", 2);
+            end
+            local item = CreateFromMixins(ItemMixin);
+            item:SetItemLocation(ItemLocation:CreateFromBagAndSlot(bagID, slotIndex));
+            return item;
+        end
+
+        --[[static]] function Item:CreateFromEquipmentSlot(equipmentSlotIndex)
+            if type(equipmentSlotIndex) ~= "number" then
+                error("Usage: Item:CreateFromEquipmentSlot(equipmentSlotIndex)", 2);
+            end
+            local item = CreateFromMixins(ItemMixin);
+            item:SetItemLocation(ItemLocation:CreateFromEquipmentSlot(equipmentSlotIndex));
+            return item;
+        end
+
+        --[[static]] function Item:CreateFromItemLink(itemLink)
+            if type(itemLink) ~= "string" then
+                error("Usage: Item:CreateFromItemLink(itemLinkString)", 2);
+            end
+            local item = CreateFromMixins(ItemMixin);
+            item:SetItemLink(itemLink);
+            return item;
+        end
+
+        --[[static]] function Item:CreateFromItemID(itemID)
+            if type(itemID) ~= "number" then
+                error("Usage: Item:CreateFromItemID(itemID)", 2);
+            end
+            local item = CreateFromMixins(ItemMixin);
+            item:SetItemID(itemID);
+            return item;
+        end
+
+        function ItemMixin:SetItemLocation(itemLocation)
+            self:Clear();
+            self.itemLocation = itemLocation;
+        end
+
+        function ItemMixin:SetItemLink(itemLink)
+            self:Clear();
+            self.itemLink = itemLink;
+        end
+
+        function ItemMixin:SetItemID(itemID)
+            self:Clear();
+            self.itemID = itemID;
+        end
+
+        function ItemMixin:GetItemLocation()
+            return self.itemLocation;
+        end
+
+        function ItemMixin:HasItemLocation()
+            return self.itemLocation ~= nil;
+        end
+
+        function ItemMixin:Clear()
+            self.itemLocation = nil;
+            self.itemLink = nil;
+            self.itemID = nil;
+        end
+
+        function ItemMixin:IsItemEmpty()
+            if self:GetStaticBackingItem() then
+                return not C_Item.DoesItemExistByID(self:GetStaticBackingItem());
+            end
+
+            return not self:IsItemInPlayersControl();
+        end
+
+        function ItemMixin:GetStaticBackingItem()
+            return self.itemLink or self.itemID;
+        end
+
+        function ItemMixin:IsItemInPlayersControl()
+            local itemLocation = self:GetItemLocation();
+            return itemLocation and C_Item.DoesItemExist(itemLocation); 
+        end
+
+        -- Item API
+        function ItemMixin:GetItemID()
+            if self:GetStaticBackingItem() then
+                return (GetItemInfoInstant(self:GetStaticBackingItem()));
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemID(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:IsItemLocked()
+            return self:IsItemInPlayersControl() and C_Item.IsLocked(self:GetItemLocation());
+        end
+
+        function ItemMixin:LockItem()
+            if self:IsItemInPlayersControl() then
+                C_Item.LockItem(self:GetItemLocation());
+            end
+        end
+
+        function ItemMixin:UnlockItem()
+            if self:IsItemInPlayersControl() then
+                C_Item.UnlockItem(self:GetItemLocation());
+            end
+        end
+
+        function ItemMixin:GetItemIcon() -- requires item data to be loaded
+            if self:GetStaticBackingItem() then
+                return C_Item.GetItemIconByID(self:GetStaticBackingItem());
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemIcon(self:GetItemLocation());
+            end
+        end
+
+        function ItemMixin:GetItemName() -- requires item data to be loaded
+            if self:GetStaticBackingItem() then
+                return C_Item.GetItemNameByID(self:GetStaticBackingItem());
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemName(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetItemLink() -- requires item data to be loaded
+            if self.itemLink then
+                return self.itemLink;
+            end
+
+            if self.itemID then
+                return (select(2, GetItemInfo(self.itemID)));
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemLink(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetItemQuality() -- requires item data to be loaded
+            if self:GetStaticBackingItem() then
+                return C_Item.GetItemQualityByID(self:GetStaticBackingItem());
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemQuality(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetCurrentItemLevel() -- requires item data to be loaded
+            if self:GetStaticBackingItem() then
+                return (GetDetailedItemLevelInfo(self:GetStaticBackingItem()));
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetCurrentItemLevel(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetItemQualityColor() -- requires item data to be loaded
+            local itemQuality = self:GetItemQuality();
+            return ITEM_QUALITY_COLORS[itemQuality]; -- may be nil if item data isn't loaded
+        end
+
+        function ItemMixin:GetInventoryType()
+            if self:GetStaticBackingItem() then
+                return C_Item.GetItemInventoryTypeByID(self:GetStaticBackingItem());
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemInventoryType(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetItemGUID()
+            if self:GetStaticBackingItem() then
+                return nil;
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.GetItemGUID(self:GetItemLocation());
+            end
+            return nil;
+        end
+
+        function ItemMixin:GetInventoryTypeName()
+            if not self:IsItemEmpty() then
+                return select(4, GetItemInfoInstant(self:GetItemID()));
+            end
+        end
+
+        function ItemMixin:IsItemDataCached()
+            if self:GetStaticBackingItem() then
+                return C_Item.IsItemDataCachedByID(self:GetStaticBackingItem());
+            end
+
+            if not self:IsItemEmpty() then
+                return C_Item.IsItemDataCached(self:GetItemLocation());
+            end
+            return true; 
+        end
+
+        function ItemMixin:IsDataEvictable()
+            -- Item data could be evicted from the cache
+            return true;
+        end
+
+        -- Add a callback to be executed when item data is loaded, if the item data is already loaded then execute it immediately
+        function ItemMixin:ContinueOnItemLoad(callbackFunction)
+            if type(callbackFunction) ~= "function" or self:IsItemEmpty() then
+                error("Usage: NonEmptyItem:ContinueOnLoad(callbackFunction)", 2);
+            end
+
+            ItemEventListener:AddCallback(self:GetItemID(), callbackFunction);
+        end
+
+        -- Same as ContinueOnItemLoad, except it returns a function that when called will cancel the continue
+        function ItemMixin:ContinueWithCancelOnItemLoad(callbackFunction)
+            if type(callbackFunction) ~= "function" or self:IsItemEmpty() then
+                error("Usage: NonEmptyItem:ContinueWithCancelOnItemLoad(callbackFunction)", 2);
+            end
+
+            return ItemEventListener:AddCancelableCallback(self:GetItemID(), callbackFunction);
+        end
+
+        --[ Item Event Listener ]
+
+        ItemEventListener = CreateFrame("Frame");
+        ItemEventListener.callbacks = {};
+
+        ItemEventListener:SetScript("OnEvent", 
+            function(self, event, ...)
+                if event == "ITEM_DATA_LOAD_RESULT" then
+                    local itemID, success = ...;
+                    if success then
+                        self:FireCallbacks(itemID);
+                    else
+                        self:ClearCallbacks(itemID);
+                    end
+                end
+            end
+        );
+        ItemEventListener:RegisterEvent("ITEM_DATA_LOAD_RESULT");
+
+        local CANCELED_SENTINEL = -1;
+
+        function ItemEventListener:AddCallback(itemID, callbackFunction)
+            local callbacks = self:GetOrCreateCallbacks(itemID);
+            table.insert(callbacks, callbackFunction);
+            C_Item.RequestLoadItemDataByID(itemID);
+        end
+
+        function ItemEventListener:AddCancelableCallback(itemID, callbackFunction)
+            local callbacks = self:GetOrCreateCallbacks(itemID);
+            table.insert(callbacks, callbackFunction);
+            C_Item.RequestLoadItemDataByID(itemID);
+
+            local index = #callbacks;
+            return function()
+                if #callbacks > 0 and callbacks[index] ~= CANCELED_SENTINEL then
+                    callbacks[index] = CANCELED_SENTINEL;
+                    return true;
+                end
+                return false;
+            end;
+        end
+
+        function ItemEventListener:FireCallbacks(itemID)
+            local callbacks = self:GetCallbacks(itemID);
+            if callbacks then
+                self:ClearCallbacks(itemID);
+                for i, callback in ipairs(callbacks) do
+                    if callback ~= CANCELED_SENTINEL then
+                        xpcall(callback, CallErrorHandler);
+                    end
+                end
+
+                for i = #callbacks, 1, -1 do
+                    callbacks[i] = nil;
+                end
+            end
+        end
+
+        function ItemEventListener:ClearCallbacks(itemID)
+            self.callbacks[itemID] = nil;
+        end
+
+        function ItemEventListener:GetCallbacks(itemID)
+            return self.callbacks[itemID];
+        end
+
+        function ItemEventListener:GetOrCreateCallbacks(itemID)
+            local callbacks = self.callbacks[itemID];
+            if not callbacks then
+                callbacks = {};
+                self.callbacks[itemID] = callbacks;
+            end
+            return callbacks;
+        end
+    end             
+
     cUnit = {}
     cPlayer = {}
     --构造技能，buff，debuff，特质表
@@ -345,6 +910,7 @@ function rotation:prestart_action()
                     darkSuccor                  = 101568,
                     empowerRuneWeapon           = 47568,
                     frozenPulse                 = 195750,
+                    icyCitadel                  = 272723,
                     icyTalons                   = 194879,
                     killingMachine              = 51124,
                     pillarOfFrost               = 51271,
@@ -387,7 +953,7 @@ function rotation:prestart_action()
                     runicAttenuation            = 207104,
                 },
                 traits                          = {
-    
+                    icyCitadel                  = 272718,
                 }
             },
             -- Unholy
@@ -430,7 +996,7 @@ function rotation:prestart_action()
                     -- necroticStrike              = 223829,
                     -- outbreak                    = 77575,
                     -- scourgeOfWorlds             = 191748,
-                    -- soulReaper                  = 130736,
+                    soulReaper                  = 130736,
                     virulentPlague              = 191587,
                 },
                 glyphs                          = {
@@ -599,7 +1165,7 @@ function rotation:prestart_action()
                     demonSpikes                 = 203819,
                     bladeTurning                = 247254,
                     empowerWards                = 218256,
-                    imolationAura               = 178740,
+                    immolationAura              = 178740,
                     soulFragments               = 203981,
                     metamorphosis               = 187827,
                     feastofSouls                = 207693,
@@ -682,6 +1248,7 @@ function rotation:prestart_action()
                     barkskin                    = 22812,
                     celestialAlignment          = 194223,
                     fullMoon                    = 274283,
+                    furyOfElune                 = 202770,
                     halfMoon                    = 274282,
                     innervate                   = 29166,
                     lunarStrike                 = 194153,
@@ -701,7 +1268,6 @@ function rotation:prestart_action()
                     blessingOfAnshe             = 202739,
                     incarnationChoseOfElune     = 102560,
                     celestialAlignment          = 194223,
-                    furyOfElune                 = 202770,
                     onethsOverconfidence        = 209407,
                     onethsIntuition             = 209406,
                     solarEmpowerment            = 164545,
@@ -1078,51 +1644,69 @@ function rotation:prestart_action()
             -- Marksmanship
             [254] = {
                 abilities                       = {
-                    aMurderOfCrows              = 131894,
                     aimedShot                   = 19434,
                     arcaneShot                  = 185358,
                     barrage                     = 120360,
                     burstingShot                = 186387,
                     concussiveShot              = 5116,
                     counterShot                 = 147362,
-                    disengage                   = 781,
                     doubleTap                   = 260402,
                     explosiveShot               = 212431,
-                    explosiveShotDetonate       = 212679,
-                    misdirection                = 34477,
                     multiShot                   = 257620,
-                    trueShot                    = 193526,
-                    steadyShot                  = 56641,
+                    piercingShot                = 198670,
                     rapidFire                   = 257044,
+                    serpentSting                = 271788,
+                    steadyShot                  = 56641,
+                    trueShot                    = 193526,
                 },
                 artifacts                       = {
                 },
                 buffs                           = {
                     doubleTap                   = 260402,
-                    lockAndLoad                 = 194594,
-                    trickShots                  = 257622,
-                    trueshot                    = 193526,
-                    preciseShots                = 260242,
-                    lethalShots                 = 260395,
-                    steadyFocus                 = 193534,
                     feignDeath                  = 5384,
+                    lethalShots                 = 260395,
+                    lockAndLoad                 = 194594,
+                    masterMarksman              = 269576,
+                    preciseShots                = 260242,
+                    preciseShots                = 260242,
+                    steadyFocus                 = 193534,
+                    trickShots                  = 257622,
+                    trickShots                  = 257622,
+                    trueshot                    = 288613,
+                    unerringVision              = 274447,
     
                 },
                 debuffs                         = {
                     aMurderOfCrows              = 131894,
                     huntersMark                 = 257284,
+                    serpentSting                = 271788,
                 },
                 glyphs                          = {
     
                 },
                 talents                         = {
-                    lethalShots                 = 260393,
-                    steadyFocus                 = 193533,
                     barrage                     = 120360,
+                    callingTheShots             = 260404,
+                    carefulAim                  = 260228,
+                    doubleTap                   = 260402,
+                    explosiveShot               = 212431,
+                    huntersMark                 = 257284,
+                    lethalShots                 = 260393,
+                    lockAndLoad                 = 194595,
+                    masterMarksman              = 260309,
+                    piercingShot                = 198670,
+                    serpentSting                = 271788,
+                    steadyFocus                 = 193533,
+                    streamline                  = 260367,
+                    volley                      = 260243,
                 },
                 traits                          = {
                     focusedFire                 = 278531,
                     inTheRhytm                  = 264198,
+                    rapidReload                 = 278530,
+                    steadyAim                   = 277651,
+                    surgingShots                = 287707,
+                    unerringVision              = 274444,
                 },
             },
             -- Survival
@@ -1189,8 +1773,10 @@ function rotation:prestart_action()
                 traits                          = {
                     blurOfTalons                = 277653,
                     latentPoison                = 273283,
+                    primevalIntuition           = 288570,
                     upCloseAndPersonal          = 278533,
                     venomousFangs               = 274590,
+                    wildernessSurvival          = 279589,
                 }
             },
             -- All
@@ -1401,9 +1987,9 @@ function rotation:prestart_action()
                 talents                         = {
                     alexstraszasFury            = 235870,
                     blastWave                   = 157981,
-                    cinderstorm                 = 198929,
+                    --cinderstorm                 = 198929,
                     conflagration               = 205023,
-                    controlledBurn              = 205033,
+                    --controlledBurn              = 205033,
                     firestarter                 = 205026,
                     flameOn                     = 205029,
                     flamePatch                  = 205037,
@@ -1441,7 +2027,7 @@ function rotation:prestart_action()
                     iceBarrier                  = 11426,
                 },
                 artifacts                       = {
-                    icyHand                     = 220817,
+                   -- icyHand                     = 220817,
                 },
                 buffs                           = {
                     brainFreeze                 = 190446,
@@ -1465,11 +2051,11 @@ function rotation:prestart_action()
     
                 },
                 talents                         = {
-                    articGale                   = 205038,
+                    --articGale                   = 205038,
                     boneChilling                = 205027,
                     cometStorm                  = 153595,
                     ebonbolt                    = 257537,
-                    frostBomb                   = 112948,
+                    --frostBomb                   = 112948,
                     frozenTouch                 = 205030,
                     glacialSpike                = 199786,
                     iceNova                     = 157997,
@@ -1519,7 +2105,7 @@ function rotation:prestart_action()
                     ringOfFrost                 = 113724,
                     runeOfPower                 = 116011,
                     shimmer                     = 212653,
-                    unstableMagic               = 157976,
+                    --unstableMagic               = 157976,
                 },
             },
         },
@@ -1584,7 +2170,7 @@ function rotation:prestart_action()
                     mistwalk                    = 197945,
                     chiTorpedo                  = 115008,
                     tigersLust                  = 116841,
-                    cracklingJadeLightning       = 117952,
+                    cracklingJadeLightning      = 117952,
                     detox                       = 115450,
                     effuse                      = 116694,
                     envelopingMist              = 124682,
@@ -1675,15 +2261,10 @@ function rotation:prestart_action()
                     chiWave                     = 115098,
                     detox                       = 218164,
                     disable                     = 116095,
-                    energizingElixir            = 115288,
-                    fistOfTheWhiteTiger         = 261947,
                     fistsOfFury                 = 113656,
                     flyingSerpentKick           = 101545,
                     flyingSerpentKickEnd        = 115057,
-                    invokeXuenTheWhiteTiger     = 123904,
                     risingSunKick               = 107428,
-                    rushingJadeWind             = 116847,
-                    serenity                    = 152173,
                     spearHandStrike             = 116705,
                     spinningCraneKick           = 101546,
                     stormEarthAndFire           = 137639,
@@ -1725,7 +2306,7 @@ function rotation:prestart_action()
                     goodKarma                   = 280195,
                     hitCombo                    = 196740,
                     innerStrength               = 261767,
-                    invokeXuen                  = 123904,
+                    invokeXuenTheWhiteTiger     = 123904,
                     rushingJadeWind             = 116847,
                     serenity                    = 152173,
                     spiritualFocus              = 280197,
@@ -1759,6 +2340,7 @@ function rotation:prestart_action()
                 },
                 buffs                           = {
                     blackoutKick                = 116768,
+                    danceOfChiJi                = 286587,
                     dampenHarm                  = 122278,
                     diffuseMagic                = 122783,
                 },
@@ -1914,7 +2496,7 @@ function rotation:prestart_action()
             },
             -- Retribution
             [70] = {
-                abilities                       = {                
+                abilities                       = {
                     bladeOfJustice              = 184575,
                     cleanseToxins               = 213644,
                     divineStorm                 = 53385,
@@ -1950,16 +2532,16 @@ function rotation:prestart_action()
                     glyphOfWingedVengeance      = 57979,
                 },
                 talents                         = {
-                    bladeOfWrath                = 231832, 
-                    consecration                = 205228, 
-                    crusade                     = 231895, 
-                    divineJudgment              = 271580, 
-                    divinePurpose               = 223817, 
-                    executionSentence           = 267798, 
-                    eyeForAnEye                 = 205191,                
-                    firesOfJustice              = 203316, 
-                    fistOfJustice               = 234299, 
-                    hammerOfWrath               = 24275, 
+                    bladeOfWrath                = 231832,
+                    consecration                = 205228,
+                    crusade                     = 231895,
+                    divineJudgment              = 271580,
+                    divinePurpose               = 223817,
+                    executionSentence           = 267798,
+                    eyeForAnEye                 = 205191,
+                    firesOfJustice              = 203316,
+                    fistOfJustice               = 234299,
+                    hammerOfWrath               = 24275,
                     inquisition                 = 84963,
                     justicarsVengeance          = 215661,
                     righteousVerdict            = 267610,
@@ -1975,15 +2557,15 @@ function rotation:prestart_action()
             -- All
             Shared = {
                 abilities                       = {
-                    avengingWrath               = 31884, 
-                    blessingOfFreedom           = 1044, 
+                    avengingWrath               = 31884,
+                    blessingOfFreedom           = 1044,
                     blessingOfProtection        = 1022,
-                    contemplation               = 121183, 
-                    crusaderStrike              = 35395, 
-                    divineShield                = 642, 
-                    divineSteed                 = 190784,  
-                    flashOfLight                = 19750, 
-                    hammerOfJustice             = 853, 
+                    contemplation               = 121183,
+                    crusaderStrike              = 35395,
+                    divineShield                = 642,
+                    divineSteed                 = 190784,
+                    flashOfLight                = 19750,
+                    hammerOfJustice             = 853,
                     handOfReckoning             = 62124,
                     layOnHands                  = 633,
                     redemption                  = 7328,
@@ -1992,7 +2574,7 @@ function rotation:prestart_action()
     
                 },
                 buffs                           = {
-                    divineShield                = 642,                
+                    divineShield                = 642,
                     divineSteed                 = 190784,
                     blessingOfProtection        = 1022,
                 },
@@ -2221,10 +2803,13 @@ function rotation:prestart_action()
                     voidForm                    = 194249,
                     voidTorrent                 = 205065,
                     zeksExterminatus            = 236546, -- Legendary Cloak proc
+                    thoughtsHarvester           = 288340,
                 },
                 debuffs                         = {
                     shadowWordPain              = 589,
                     vampiricTouch               = 34914,
+                    weakenedSoul                = 6788,
+    
                 },
                 glyphs                          = {
     
@@ -2233,6 +2818,7 @@ function rotation:prestart_action()
                     auspiciousSpirits           = 155271,
                     bodyAndSoul                 = 64129,
                     darkVoid                    = 263346,
+                    darkAscension               = 280711,
                     --dominantMind                = 205367,
                     fortressOfTheMind           = 193195,
                     legacyOfTheVoid             = 193225,
@@ -2276,6 +2862,7 @@ function rotation:prestart_action()
                 buffs                           = {
                     classHallSpeed              = 224098,
                     powerWordFortitude          = 21562,
+                    
                 },
                 debuffs                         = {
     
@@ -2324,7 +2911,7 @@ function rotation:prestart_action()
                     hiddenBlades                = 270070,
                     leechingPoison              = 108211,
                     sharpenedBlades             = 272916,
-                    masterAssassins             = 255989,
+                    masterAssassin              = 256735,
                     stealth                     = 1784 or 115191,
                     subterfuge                  = 115192,
                     theDreadlordsDeceit         = 208692,
@@ -2387,7 +2974,6 @@ function rotation:prestart_action()
                     grapplingHook               = 195457,
                     killingSpree                = 51690,
                     masteryMainGauche           = 76806,
-                    parley                      = 199743,
                     pistolShot                  = 185763,
                     riposte                     = 199754,
                     rollTheBones                = 193316,
@@ -2424,6 +3010,7 @@ function rotation:prestart_action()
                     blunderbuss                 = 202895,
                     broadside                   = 193356,
                     buriedTreasure              = 199600,
+                    deadShot                    = 272940,
                     grandMelee                  = 193358,
                     greenskinsWaterloggedWristcuffs = 209420,
                     hiddenBlade                 = 202754,
@@ -2432,13 +3019,13 @@ function rotation:prestart_action()
                     opportunity                 = 195627,
                     ruthlessPrecision           = 193357,
                     rollTheBones                = {
-                    broadside                   = 193356,
-                    buriedTreasure              = 199600,
-                    grandMelee                  = 193358,
-                    ruthlessPrecision           = 193357,
-                    skullAndCrossbones          = 199603,
-                    trueBearing                 = 193359,
-                },
+                        broadside                   = 193356,
+                        buriedTreasure              = 199600,
+                        grandMelee                  = 193358,
+                        ruthlessPrecision           = 193357,
+                        skullAndCrossbones          = 199603,
+                        trueBearing                 = 193359,
+                    },
                     sharkInfestedWaters         = 193357,
                     skullAndCrossbones          = 199603,
                     sliceAndDice                = 5171,
@@ -2446,10 +3033,10 @@ function rotation:prestart_action()
                     stealth                     = 1784,
                     swordplay                   = 211669,
                     trueBearing                 = 193359,
+                    wits                        = 288988,
                 },
                 debuffs                         = {
                     ghostlyStrike               = 196937,
-                    parley                      = 199743,
                 },
                 glyphs                          = {
     
@@ -2459,11 +3046,10 @@ function rotation:prestart_action()
                     dirtyTricks                 = 108216,
                     bladeRush                   = 271877,
                     ghostlyStrike               = 196937,
-                    grapplingHook               = 195457,
+                    grapplingHook               = 256188,
                     hitAndRun                   = 196922,
                     ironStomach                 = 193546,
                     killingSpree                = 51690,
-                    parley                      = 199743,
                     sliceAndDice                = 5171,
                     weaponmaster                = 200733,
                     quickDraw                   = 196938,
@@ -2534,7 +3120,9 @@ function rotation:prestart_action()
                 traits                          = {
                     bladeInTheShadows           = 275896,
                     nightsVengeance             = 273418,
+                    replicatingShadows          = 286121,
                     sharpenedBlades             = 272911,
+                    theFirstDance               = 278681
                 }
             },
             -- All
@@ -2628,7 +3216,7 @@ function rotation:prestart_action()
                 },
                 artifacts                       = {
                     seismicStorm                = 238141,
-                    stormKeeper                 = 205495,
+                    stormkeeper                 = 205495,
                     swellingMaelstrom           = 238105,
                 },
                 buffs                           = {
@@ -2741,6 +3329,7 @@ function rotation:prestart_action()
                     earthenSpike                = 188089,
                     frostbrand                  = 147732,
                     lightningConduit            = 275391,
+                    primalPrimer                = 273006,
                     searingAssault              = 268429,
                     stormTempests               = 214265,
                 },
@@ -3248,7 +3837,8 @@ function rotation:prestart_action()
                     furiousSlash                = 202539,
                     meatCleaver                 = 85739,
                     recklessness                = 1719,
-                    whirlwind					= 85739,
+                    suddenDeath                 = 280776,
+                    whirlwind                   = 85739,
                 },
                 debuffs                         = {
                     siegebreaker                = 280773,
@@ -3275,6 +3865,9 @@ function rotation:prestart_action()
                     warMachine                  = 262231,
                     warpaint                    = 208154,
                 },
+                traits                          = {
+                    coldSteelHotBlood           = 288080
+                }
             },
             -- Protection
             [73] = {
@@ -3312,6 +3905,7 @@ function rotation:prestart_action()
                     vengeanceRevenge            = 202573,
                 },
                 debuffs                         = {
+                    deepwoundsProt              = 115767,
                     demoralizingShout           = 1160,
                     thunderClap                 = 6343,
                 },
@@ -3323,11 +3917,16 @@ function rotation:prestart_action()
                     bolster                     = 280001,
                     boomingVoice                = 202743,
                     cracklingThunder            = 203201,
+                    devastator                  = 236279,
+                    dragonRoar                  = 118000,
                     heavyRepercussions          = 203177,
                     indomitable                 = 202095,
                     intoTheFray                 = 202603,
+                    menace                      = 275338,
                     neverSurrender              = 202561,
+                    punish                      = 275334,
                     ravager                     = 228920,
+                    rumblingEarth               = 275339,
                     safeguard                   = 223657,
                     unstoppableForce            = 275336,
                     vengeance                   = 202572,
@@ -3385,7 +3984,7 @@ function rotation:prestart_action()
                     global                          = 61304,
                     shadowmeld                      = 58984,
                     quakingPalm                     = 107079,
-                    racial                          = getRacialID(),
+                    racial                          = getRacial(),
                     lightsJudgment                  = 247427,
                 },
                 artifacts                           = {
@@ -3394,11 +3993,21 @@ function rotation:prestart_action()
                     concordanceOfTheLegionfall      = 239042,
                 },
                 buffs                               = {
-                    ancientHysteria                 = 90355,                
+                    ancientHysteria                 = 90355,
                     battlePotionOfAgility           = 279152,
                     battlePotionOfIntellect         = 279151,
                     battlePotionOfStrength          = 279153,
-                    bloodlust                       = 2825,
+                    bloodLust                       = {
+                        ancientHysteria             = 90355,
+                        bloodlust                   = 2825,
+                        drumsOfRage                 = 146555,
+                        drumsOfTheMaelstrom         = 256740,
+                        drumsOfTheMountain          = 230935,
+                        heroism                     = 32182,
+                        netherwinds                 = 160452,
+                        primalRage                  = 264667,
+                        timewarp                    = 80353,
+                    },
                     concordanceOfTheLegionfall      = 239042,
                     defiledAugmentation             = 224001, -- Lightforged Augment Rune buff
                     felFocus                        = 242551,
@@ -3561,19 +4170,44 @@ function rotation:prestart_action()
     -- 基本类
     function cUnit:new(unit)
         local self = {}
+        local function getHP(Unit)
+            if Unit == nil then 
+                Unit = "player";
+                return UnitHealth(Unit)/UnitHealthMax(Unit)
+            end
+            if UnitExists(Unit) and not UnitIsDeadOrGhost(Unit) then
+                if UnitIsEnemy("player", Unit) and UnitIsVisible(Unit) then
+                    return UnitHealth(Unit)/UnitHealthMax(Unit)
+                else
+                    if not UnitIsDeadOrGhost(Unit) and UnitIsVisible(Unit) then                        
+                        return UnitHealth(Unit)/UnitHealthMax(Unit)                        
+                    end
+                end
+            end
+            return 0
+        end
+        
         self.artifact       = {} 	
         self.buff           = {}       
         self.debuff         = {}        
         self.cooldown       = {}        
         self.charges        = {} 
-        self.spell	        = {}        
+        self.spell	        = {}
+        self.pct_health     = getHP
+        self.time_to_die    = getTimeToDie 
+        self.spell	    		= {}        -- Spells all classes may have (e.g. Racials, Mass Ressurection)
+        self.talent         = {}        -- Talents
+        self.timeToMax	    = 0		-- Time To Max Power
+        self.traits         = {}	-- Azerite Traits
+        self.units          = {}  
+        self.action          = {}  
         return self
     end
 
     --玩家类
     function cPlayer:new(unit,spec)    
         -- 继承基本类
-        local self = cUnit:new() 
+        local self = cUnit:new(unit)
         -- 根据职业，专精取list数据       
         local playerClass = select(2,UnitClass("player"))
         local spec = select(1,GetSpecializationInfo(GetSpecialization()))
@@ -3613,10 +4247,14 @@ function rotation:prestart_action()
         --构造技能属性
         for k,v in pairs(self.spell.abilities) do
             
-            if self.charges[k]      == nil then self.charges[k]         = {} end        
-            if self.cooldown[k]     == nil then self.cooldown[k]        = {} end 
-            if self.cast            == nil then self.cast               = {} end       
-            if self.cast.able       == nil then self.cast.able          = {} end       
+            if self.charges[k]      == nil then self.charges[k]         = {}; end        
+            if self.cooldown[k]     == nil then self.cooldown[k]        = {}; end 
+            if self.cast            == nil then self.cast               = {}; end       
+            if self.cast.able       == nil then self.cast.able          = {}; end
+            if self.prev_gcd        == nil then self.prev_gcd           = {}; end
+            if self.action[k]       == nil then self.action[k]          = {}; end
+            -- if self.prev_gcd.1      == nil then self.prev_gcd.1         = {} end
+            -- if self.prev_gcd.2      == nil then self.prev_gcd.2         = {} end
 
             -- Build Spell Charges
             local charges = self.charges[k]
@@ -3642,6 +4280,9 @@ function rotation:prestart_action()
             charges.timeTillFull = function()
                 return getFullRechargeTime(v)
             end
+            charges.full_recharge_time = function()
+                return getFullRechargeTime(v)
+            end
 
             -- Build Spell Cooldown
             local cooldown = self.cooldown[k]
@@ -3651,22 +4292,76 @@ function rotation:prestart_action()
             cooldown.up = function()
                 return getSpellCD(v) <= 0
             end
+            cooldown.ready = function()
+                return getSpellCD(v) <= 0
+            end
             cooldown.remain = function()
                 return getSpellCD(v)
             end
             cooldown.remains = function()
                 return getSpellCD(v)
             end
+            cooldown.duration = function()
+                return getSpellCD(v)
+            end
+            cooldown.charges = function()
+                return getCharges(v)
+            end
+            cooldown.full_recharge_time = function()
+                return getFullRechargeTime(v)
+            end
+
 
             -- 构造施法函数
             self.cast[k] = function(thisUnit,FacingCheck,MovementCheck,SpamAllowed,KnownSkip,DeadCheck,DistanceSkip,usableSkip)
                 if thisUnit == nil then thisUnit = "target";end
-                return castSpell(thisUnit,v,FacingCheck,MovementCheck,SpamAllowed,KnownSkip,DeadCheck,DistanceSkip,usableSkip)
+                return csi(thisUnit,v,FacingCheck,MovementCheck,SpamAllowed,KnownSkip,DeadCheck,DistanceSkip,usableSkip) 
+                -- if Y.spell_cast_return == v then
+                --     return true
+                -- else
+                --     return false
+                -- end
             end
             self.cast.able[k] = function()
                 return canCast(v)
                 -- return self.cast[v](nil,"debug")
             end
+
+            self.prev_gcd[k] = function (targetunit)
+                if targetunit == nil then targetunit = "target";end
+                return Y.lastspell_success.spellName == v --[[ and UnitIsUnit(Y.lastspell_success.spelltarget,targetunit) ]]
+            end
+
+            local action = self.action[k]
+            action.cast_time = function()
+                return getCastTime(v)
+            end
+            action.execute_time = function()
+                return getCastTime(v)
+            end
+            action.charges = function()
+                return getCharges(v)
+            end
+            action.full_recharge_time = function()
+                return getFullRechargeTime(v)
+            end
+            action.executing = function (unit,intr)
+                return isCastingSpell(unit,v,intr)
+            end
+            action.execute_remains = function (unit)
+                if unit == nil then unit = "player";end
+                return getCastTimeRemain(unit)
+            end
+            action.in_flight = function ()
+                return getOneMyMissile() == v
+            end
+            action.in_flight_remains = function ()
+                if getOneMyMissile() == v then
+                    return 0.1
+                end
+            end
+            
+            
             
         end
 
@@ -3745,6 +4440,14 @@ function rotation:prestart_action()
                     return getTimeToMax("player")
                 end
             end
+            power.time_to_max = function(amount)
+                if amount == nil then amount = 6 end
+                if isDKRunes then
+                    return runeTimeTill(amount)
+                else
+                    return getTimeToMax("player")
+                end
+            end
         end
 
         --构造buff属性
@@ -3770,10 +4473,20 @@ function rotation:prestart_action()
                     if sourceUnit == nil then sourceUnit = 'player' end
                     return UnitBuffID(thisUnit,v,sourceUnit) ~= nil
                 end
+                buff.react = function(thisUnit,sourceUnit)
+                    if thisUnit == nil then thisUnit = 'player' end
+                    if sourceUnit == nil then sourceUnit = 'player' end
+                    return UnitBuffID(thisUnit,v,sourceUnit) ~= nil
+                end
                 buff.ticking = function(thisUnit,sourceUnit)
                     if thisUnit == nil then thisUnit = 'player' end
                     if sourceUnit == nil then sourceUnit = 'player' end
                     return UnitBuffID(thisUnit,v,sourceUnit) ~= nil
+                end
+                buff.down = function(thisUnit,sourceUnit)
+                    if thisUnit == nil then thisUnit = 'player' end
+                    if sourceUnit == nil then sourceUnit = 'player' end
+                    return not UnitBuffID(thisUnit,v,sourceUnit)
                 end
                 buff.duration = function(thisUnit,sourceUnit)
                     if thisUnit == nil then thisUnit = 'player' end
@@ -3923,15 +4636,16 @@ function rotation:prestart_action()
 
         -- 构造天赋
         local function getTalentInfo()
+            local talentFound
             activeSpecGroup = GetActiveSpecGroup()
             if self.talent == nil then self.talent = {} end
-            for r = 1, 7 do --search each talent row
-                for c = 1, 3 do -- search each talent column
-                -- Cache Talent IDs for talent checks
-                    local _,_,_,selected,_,talentID = GetTalentInfo(r,c,activeSpecGroup)
-                    -- Compare Row/Column Spell Id to Talent Id List for matches
-                    for k,v in pairs(self.spell.talents) do
+            for k,v in pairs(self.spell.talents) do
+                talentFound = false
+                for r = 1, 7 do --search each talent row
+                    for c = 1, 3 do -- search each talent column
+                        local _,_,_,selected,_,talentID = GetTalentInfo(r,c,activeSpecGroup)
                         if v == talentID then
+                            talentFound = true
                             -- Add All Matches to Talent List for Boolean Checks
                             self.talent[k] = selected
                             -- Add All Active Ability Matches to Ability/Spell List for Use Checks
@@ -3939,8 +4653,15 @@ function rotation:prestart_action()
                                 self.spell['abilities'][k] = v
                                 self.spell[k] = v
                             end
+                            break;
                         end
                     end
+                    -- If we found the talent, then stop looking for it.
+                    if talentFound then break end
+                end
+                -- No matching talent for listed talent id, report to
+                if not talentFound then
+                    Print("|cffff0000No talent found for: |r"..k.." ("..v..") |cffff0000in the talent spell list, please notify profile developer.")
                 end
             end
         end
@@ -3987,10 +4708,12 @@ function rotation:prestart_action()
             end
         end
 
-        if self.talent == nil then 
-            getTalentInfo();
-            getAzeriteTraitInfo();
-        end 
+        -- if self.talent == nil then 
+        getTalentInfo();
+        getAzeriteTraitInfo();
+        -- end
+        
+        
         return self
     end
 
@@ -4008,49 +4731,30 @@ function rotation:prestop_action()
     print("stop now not ");
 end
 function rotation:precombat_action()
-    -- 编写在非战斗中循环执行的脚本。
-    -- local test1 = self.settings.test1; -- 返回指定配置变量是否启用+当前值。
-    -- local test5 = self.settings.test5; -- 返回指定配置变量是否启用+当前值。
-    -- print("Precombat", test1.is_enabled, #test1.value, test5.is_enabled, test5.value); -- 这里会打印配置变量的启用状态和值。
-    -- print("Addon Macro is", ADDON_SLASH_COMMAND);
-    -- self:rest();
-
-    
-
-    -- player          = cPlayer:new("player",262)
-    -- talent          = player.talent
-    -- buff            = player.buff
-    -- debuff          = player.debuff
-    -- cast            = player.cast
-    -- cooldown        = player.cooldown
-    -- power           = player.power
-
-    -- target          = cPlayer:new()
-    -- Debuff          = target.debuff
-
-    -- if talent.totemMastery and buff.resonanceTotem.remains()<2 then
-    --     if cast.able.totemMastery() and cast.totemMastery("player") then
-    --         return 0
-    --     end
-    -- end
-    -- -- actions+=/fireElemental, 
-    -- if  not talent.stormElemental then
-    --     if cast.able.fireElemental() and cast.fireElemental("player") then
-    --         return 0
-    --     end
-    -- end
-    -- -- actions+=/stormElemental, 
-    -- if talent.stormElemental and ( not talent.iceFury or  not buff.iceFury.up() and  not cooldown.iceFury.up()) then
-    --     if cast.able.stormElemental() and cast.stormElemental("player") then
-    --         return 0
-    --     end
-    -- end
-    -- -- actions+=/earthElemental, 
-    -- if  not talent.primalElementalist or talent.primalElementalist and (cooldown.fireElemental.remains()<120 and  not talent.stormElemental or cooldown.stormElemental.remains()<120 and talent.stormElemental) then
-    --     if cast.able.earthElemental() and cast.earthElemental("player") then
-    --         return 0
-    --     end
-    -- end
+    -------------------------------------------------
+    --每一秒刷新一次oop
+    if _G._T2 == nil then
+        -- body
+        _G._T2 = 0
+    end
+    if GetTime() - _G._T2 > 1 then
+        player              = cPlayer:new("player",262)
+        target              = player
+        talent              = player.talent
+        buff                = player.buff
+        debuff              = player.debuff
+        cast                = player.cast
+        cooldown            = player.cooldown
+        power               = player.power
+        azerite             = player.traits
+        pct_health          = player.pct_health
+        full_recharge_time  = player.full_recharge_time
+        charges             = player.charges
+        action              = player.action
+        prev_gcd            = player.prev_gcd
+        _G._T2 = GetTime()
+    end
+    -----------------------------------------------------
 
 end
 function rotation:aoe()
@@ -4061,8 +4765,15 @@ function rotation:aoe()
             return 0
         end
     end
-    -- actions.aoe+=/ascendance,if=talent.ascendance.enabled&(talent.storm_elemental.enabled&cooldown.storm_elemental.remains<120&cooldown.storm_elemental.remains>15|!talent.storm_elemental.enabled)
-    if talent.ascendance and (talent.stormElemental and cooldown.stormElemental.remains()<120 and cooldown.stormElemental.remains()>15 or  not talent.stormElemental) then
+    -- actions.aoe+=/flame_shock,target_if=refreshable&(spell_targets.chain_lightning<(5-!talent.totem_mastery.enabled)|!talent.storm_elemental.enabled&(cooldown.fire_elemental.remains>(120+14*spell_haste)|cooldown.fire_elemental.remains<(24-14*spell_haste)))&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120|spell_targets.chain_lightning=3&buff.wind_gust.stack<14)
+    if target_flameShock and (active_enemies<(5-x1) or not talent.stormElemental and (cooldown.fireElemental.remains()>(120+14*GetHaste()) or cooldown.fireElemental.remains()<(24-14*GetHaste()))) and (not talent.stormElemental or cooldown.stormElemental.remains()<120 or active_enemies==3 and buff.windGust.stack()<14) then
+        if cast.able.flameShock() and cast.flameShock() then
+            return 0
+        end
+    end
+
+    -- actions.aoe+=/ascendance,if=talent.ascendance.enabled&(talent.storm_elemental.enabled&cooldown.storm_elemental.remains<120&cooldown.storm_elemental.remains>15|!talent.storm_elemental.enabled)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
+    if talent.ascendance and (talent.stormElemental and cooldown.stormElemental.remains()<120 and cooldown.stormElemental.remains()>15 or  not talent.stormElemental) and (not talent.icefury or not buff.icefury.up() and not cooldown.icefury.up()) then
         if cast.able.ascendance() and cast.ascendance("player") then
             return 0
         end
@@ -4075,11 +4786,11 @@ function rotation:aoe()
     end
     -- # Spread Flame Shock in <=4 target fights, but not during SE uptime, unless you're fighting 3 targets and have less than 14 Wind Gust stacks.
     -- actions.aoe+=/flame_shock,target_if=refreshable&spell_targets.chain_lightning<5&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120|spell_targets.chain_lightning=3&buff.wind_gust.stack<14)
-    if debuff.flameShock.refreshable() and active_enemies<5 and ( not talent.stormElemental or cooldown.stormElemental.remains()<120 or active_enemies==3 and buff.windGust.stack()<14) then
-        if cast.able.flameShock() and cast.flameShock() then
-            return 0
-        end
-    end
+    -- if debuff.flameShock.refreshable() and active_enemies<5 and ( not talent.stormElemental or cooldown.stormElemental.remains()<120 or active_enemies==3 and buff.windGust.stack()<14) then
+    --     if cast.able.flameShock() and cast.flameShock() then
+    --         return 0
+    --     end
+    -- end
     -- # Try to game Earthquake with Master of the Elements buff when fighting 3 targets. Don't overcap Maelstrom not 
     -- actions.aoe+=/earthquake,if=!talent.master_of_the_elements.enabled|buff.stormkeeper.up|maelstrom>=(100-4*spell_targets.chain_lightning)|buff.master_of_the_elements.up|spell_targets.chain_lightning>3
     if  not talent.masterOfTheElements or buff.stormKeeper.up() or power.maelstrom.amount()>=(100-4*active_enemies) or buff.masterOfTheElements.up() or active_enemies>3 then
@@ -4087,13 +4798,41 @@ function rotation:aoe()
             return 0
         end
     end
+    -- actions.aoe+=/chain_lightning,if=buff.stormkeeper.remains<3*gcd*buff.stormkeeper.stack
+    if buff.stormKeeper.remains()<3*gcd*buff.stormKeeper.stack() then
+        if cast.able.chainLightning() and cast.chainLightning() then
+            return 0
+        end
+    end
+
     -- # Only cast Lava Burst on three targets if it is an instant and Storm Elemental is NOT active.
     -- actions.aoe+=/lava_burst,if=(buff.lava_surge.up|buff.ascendance.up)&spell_targets.chain_lightning<4&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120)
-    if (buff.lavaSurge.up() or buff.ascendance.up()) and active_enemies<4 and ( not talent.stormElemental or cooldown.stormElemental.remains()<120) then
+    -- if (buff.lavaSurge.up() or buff.ascendance.up()) and active_enemies<4 and ( not talent.stormElemental or cooldown.stormElemental.remains()<120) then
+    --     if cast.able.lavaBurst() and cast.lavaBurst() then
+    --         return 0
+    --     end
+    -- end
+    -- actions.aoe+=/lava_burst,if=buff.lava_surge.up&spell_targets.chain_lightning<4&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120)&dot.flame_shock.ticking
+    if buff.lavaSurge.up() and active_enemies<4 and ( not talent.stormElemental or cooldown.stormElemental.remains()<120) and debuff.flameShock.ticking() then
         if cast.able.lavaBurst() and cast.lavaBurst() then
             return 0
         end
     end
+
+    -- actions.aoe+=/icefury,if=spell_targets.chain_lightning<4&!buff.ascendance.up
+    if active_enemies<4 and not buff.ascendance.up() then
+        if cast.able.iceFury() and cast.iceFury() then
+            return 0
+        end
+    end
+
+    -- actions.aoe+=/frost_shock,if=spell_targets.chain_lightning<4&buff.icefury.up&!buff.ascendance.up
+    if active_enemies<4 and buff.iceFury.up() and not buff.ascendance.up() then
+        if cast.able.frostShock() and cast.frostShock() then
+            return 0
+        end
+    end
+
     -- # Use Elemental Blast against up to 3 targets as long as Storm Elemental is not active.
     -- actions.aoe+=/elemental_blast,if=talent.elemental_blast.enabled&spell_targets.chain_lightning<4&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains<120)
     if talent.elementalBlast and active_enemies<4 and ( not talent.stormElemental or cooldown.stormElemental.remains()<120) then
@@ -4120,11 +4859,15 @@ function rotation:single_target()
     -- # Single Target Action Priority List
     -- # Ensure FS is active unless you have 14 or more stacks of Wind Gust from Storm Elemental. (Edge case: upcoming Asc but active SE; don't )
     -- actions.single_target=flame_shock,if=(!ticking|talent.storm_elemental.enabled&cooldown.storm_elemental.remains<2*gcd|dot.flame_shock.remains<=gcd|talent.ascendance.enabled&dot.flame_shock.remains<(cooldown.ascendance.remains+buff.ascendance.duration)&cooldown.ascendance.remains<4&(!talent.storm_elemental.enabled|talent.storm_elemental.enabled&cooldown.storm_elemental.remains<120))&buff.wind_gust.stack<14 
-    if ( not debuff.flameShock.ticking() or talent.stormElemental and cooldown.stormElemental.remains()<2*gcd or debuff.flameShock.remains()<=gcd or talent.ascendance and debuff.flameShock.remains()<(cooldown.ascendance.remains()+buff.ascendance.duration()) and cooldown.ascendance.remains()<4 and ( not talent.stormElemental or talent.stormElemental and cooldown.stormElemental.remains()<120)) and buff.windGust.stack()<14 then
-        if cast.able.flameShock() and cast.flameShock() then
-            return 0
-        end
-    end
+    -- if ( not debuff.flameShock.ticking() or talent.stormElemental and cooldown.stormElemental.remains()<2*gcd or debuff.flameShock.remains()<=gcd or talent.ascendance and debuff.flameShock.remains()<(cooldown.ascendance.remains()+buff.ascendance.duration()) and cooldown.ascendance.remains()<4 and ( not talent.stormElemental or talent.stormElemental and cooldown.stormElemental.remains()<120)) and buff.windGust.stack()<14 then
+    --     if cast.able.flameShock() and cast.flameShock() then
+    --         return 0
+    --     end
+    -- end
+
+    -- actions.single_target=flame_shock,target_if=(!ticking|talent.storm_elemental.enabled&cooldown.storm_elemental.remains<2*gcd|dot.flame_shock.remains<=gcd|talent.ascendance.enabled&dot.flame_shock.remains<(cooldown.ascendance.remains+buff.ascendance.duration)&cooldown.ascendance.remains<4&(!talent.storm_elemental.enabled|talent.storm_elemental.enabled&cooldown.storm_elemental.remains<120))&(buff.wind_gust.stack<14|azerite.igneous_potential.rank>=2|buff.lava_surge.up|!buff.bloodlust.up)&!buff.surge_of_power.up
+    if (not debuff.flameShock.ticking() or talent.stormElemental and cooldown.stormElemental.remains()<2*gcd or debuff.flameShock.remains()<=gcd|talent.ascendance.enabled&dot.flame_shock.remains<(cooldown.ascendance.remains+buff.ascendance.duration)&cooldown.ascendance.remains<4&(!talent.storm_elemental.enabled|talent.storm_elemental.enabled&cooldown.storm_elemental.remains<120))&(buff.wind_gust.stack<14|azerite.igneous_potential.rank>=2|buff.lava_surge.up|!buff.bloodlust.up)&!buff.surge_of_power.up
+
     -- # Use Ascendance after you've spent all Lava Burst charges and only if neither Storm Elemental nor iceFury are currently active.
     -- actions.single_target+=/ascendance,if=talent.ascendance.enabled&(time>=60|buff.bloodlust.up)&cooldown.lava_burst.remains>0&(!talent.storm_elemental.enabled|cooldown.storm_elemental.remains>120)&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
     if talent.ascendance and (time>=60 or buff.bloodlust.up()) and cooldown.lavaBurst.remains()>0 and ( not talent.stormElemental or cooldown.stormElemental.remains()>120) and ( not talent.iceFury or  not buff.iceFury.up() and  not cooldown.iceFury.up()) then
@@ -4273,39 +5016,54 @@ function rotation:single_target()
 end
 function rotation:default_action()
 
-    player          = cPlayer:new("player",262)
-    talent          = player.talent
-    buff            = player.buff
-    debuff          = player.debuff
-    cast            = player.cast
-    cooldown        = player.cooldown
-    power           = player.power
-    azerite         = player.traits
-
-    target          = cPlayer:new()
-    Debuff          = target.debuff
+    -------------------------------------------------
+    --每一秒刷新一次oop
+    if _G._T2 == nil then
+        -- body
+        _G._T2 = 0
+    end
+    if GetTime() - _G._T2 > 1 then
+        player              = cPlayer:new("player",63)
+        target              = player
+        talent              = player.talent
+        buff                = player.buff
+        debuff              = player.debuff
+        cast                = player.cast
+        cooldown            = player.cooldown
+        power               = player.power
+        azerite             = player.traits
+        pct_health          = player.pct_health
+        full_recharge_time  = player.full_recharge_time
+        charges             = player.charges
+        action              = player.action
+        prev_gcd            = player.prev_gcd
+        _G._T2 = GetTime()
+    end
+    -----------------------------------------------------
 
     -- 不打断施法
     if UnitCastingInfo("player") or UnitChannelInfo("player") or getSpellCD(61304) > 0.1 then return; end;
 
-    tgtype = self.settings.targets --目标选择
+    tgtype = self.settings.targets
+    ydebug = self.settings.ydebug
+    if variable == nil then
+        variable = {}
+    end
 
     --获得第一个符合条件的目标
     if tgtype.value == "智能" then
-        tg = getOneEnemy(40,filler_unit)
-        
+        tg = getOneEnemy(40,filler_unit)        
         --如果有当前目标，并且当前目标可以攻击，则对当前目标攻击
         if UnitExists("target") and isAlive("target") and UnitCanAttack("player","target") then
-            tg = "target"
-            -- print(tg)
+            tg = "target"            
         end
-        
+        TargetUnit(tg)
     end
-    -- print(tg)
+
     if tgtype.value ~= "智能" then
         tg = "target"
     end
-    -- GH_Print((tg))
+    
     --本地化自己
     zj = "player"
     --获得目标周围8码的敌人数量
@@ -4315,20 +5073,49 @@ function rotation:default_action()
         active_enemies = 0
     end    
     
+    
     gcd = getGCD()
     time = getCombatTime()
     expected_combat_length = getTimeToDie(tg)
     active_enemies = getNumEnemies(tg,8)
+
+
+    function refreshabletarget(args)
+        if args == 1 then
+            if debuff.flameShock.refreshable("target") then
+                return "target"
+            end
+            for i = 1, 99 do
+                local v="nameplate"..i
+                if UnitExists(v) and filler_unit(v) and debuff.flameShock.refreshable(v) then
+                    self:rest()
+                    return v
+                end
+                self:rest()
+            end
+        end    
+    end
+    
+    target_flameShock=refreshabletarget(1)
+
+
+    x1=0
+    if not talent.totemMastery then
+        x1=0
+    elseif talent.totemMastery then
+        x1=1
+    end
+
+
     -- 编写在战斗中循环执行的脚本。
-    -- 下面这是一个用我目前正在开发的SIMC库写的一个简单逻辑：无红字无限打技能。
-    --     shaman="T23_Shaman_Elemental"
+    -- shaman="T23_Shaman_Elemental"
     -- source=default
     -- spec=elemental
     -- level=120
     -- race=tauren
     -- role=spell
     -- position=ranged_back
-    -- talents=1302012
+    -- talents=2301032
 
     -- # Default consumables
     -- potion=battle_potion_of_intellect
@@ -4356,7 +5143,8 @@ function rotation:default_action()
     -- actions.precombat+=/storm_elemental,if=talent.storm_elemental.enabled
     -- actions.precombat+=/potion
     -- actions.precombat+=/elemental_blast,if=talent.elemental_blast.enabled
-    -- actions.precombat+=/lava_burst,if=!talent.elemental_blast.enabled
+    -- actions.precombat+=/lava_burst,if=!talent.elemental_blast.enabled&spell_targets.chain_lightning<3
+    -- actions.precombat+=/chain_lightning,if=spell_targets.chain_lightning>2
 
     -- # Executed every time the actor is available.
     -- # Cast Bloodlust manually if the Azerite Trait Ancestral Resonance is present.
@@ -4372,13 +5160,13 @@ function rotation:default_action()
         end
     end
     -- actions+=/fire_elemental,if=!talent.storm_elemental.enabled
-    if  not talent.stormElemental then
+    if not talent.stormElemental then
         if cast.able.fireElemental() and cast.fireElemental("player") then
             return 0
         end
     end
-    -- actions+=/storm_elemental,if=talent.storm_elemental.enabled&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)
-    if talent.stormElemental and ( not talent.iceFury or  not buff.iceFury.up() and  not cooldown.iceFury.up()) then
+    -- actions+=/storm_elemental,if=talent.storm_elemental.enabled&(!talent.icefury.enabled|!buff.icefury.up&!cooldown.icefury.up)&(!talent.ascendance.enabled|!cooldown.ascendance.up)
+    if talent.stormElemental and ( not talent.iceFury or not buff.iceFury.up() and not cooldown.iceFury.up()) and (not talent.ascendance or not cooldown.ascendance.up()) then
         if cast.able.stormElemental() and cast.stormElemental("player") then
             return 0
         end
@@ -4390,6 +5178,10 @@ function rotation:default_action()
         end
     end
     -- actions+=/use_items
+    if canUse(13) then useItem(13);end
+    if canUse(14) then useItem(14);end
+    RunMacroText("/use 13")
+    RunMacroText("/use 14")
     -- actions+=/blood_fury,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
     -- actions+=/berserking,if=!talent.ascendance.enabled|buff.ascendance.up
     -- actions+=/fireblood,if=!talent.ascendance.enabled|buff.ascendance.up|cooldown.ascendance.remains>50
