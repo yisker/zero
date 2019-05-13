@@ -3913,7 +3913,7 @@ function rotation:prestart_action()
                 },
                 buffs                           = {
                     demonicCalling              = 205146,
-                    demonicCore                 = 267102,
+                    demonicCore                 = 264173,--267102,
                     demonicEmpowerment          = 193396,
                     demonicPower                = 265273,
                     demonwrath                  = 193440,
@@ -3921,7 +3921,7 @@ function rotation:prestart_action()
                     netherPortal                = 267218,
                     shadowyInspiration          = 196269,
                     shadowsBite                 = 272945,
-                    explosivePotential          = 275395,
+                    explosivePotential          = 275398,
                 },
                 debuffs                         = {
                     doom                        = 603,
@@ -5140,7 +5140,7 @@ end
 
 
 function rotation:build_a_shard()
-    
+    print("build_a_shard")
     self:rest()
 
     -- actions.build_a_shard=soul_strike,if=!talent.demonic_consumption.enabled|time>15|prev_gcd.1.hand_of_guldan&!buff.bloodlust.remains
@@ -5172,17 +5172,19 @@ end
 
 function rotation:dcon_opener()
 
+    print("dcon_opener")
     self:rest()
 
     if line_cd_1 == nil then line_cd_1 = 0;end
     if line_cd_2 == nil then line_cd_2 = 0;end
     if line_cd_3 == nil then line_cd_3 = 0;end
 
+
     -- actions.dcon_opener=hand_of_guldan,line_cd=30,if=azerite.explosive_potential.enabled
 
     if azerite.explosivePotential.enabled then
         if GetTime() - line_cd_1 >=30 and soulShards.amount() > 0 and cast.able.handOfGuldan() and cast.handOfGuldan() then
-            line_cd_1 = GetTime()
+            -- line_cd_1 = GetTime()
             if ydebug.is_enabled then
                 print(301)
                 return 0
@@ -5206,7 +5208,7 @@ function rotation:dcon_opener()
     -- actions.dcon_opener+=/doom,line_cd=30
 
     if GetTime() - line_cd_2 >=30 and cast.able.doom() and cast.doom() then
-        line_cd_2 = GetTime()
+        -- line_cd_2 = GetTime()
         if ydebug.is_enabled then
             print(303)
             return 0
@@ -5216,25 +5218,28 @@ function rotation:dcon_opener()
     end
     -- actions.dcon_opener+=/hand_of_guldan,if=prev_gcd.1.hand_of_guldan&soul_shard>0&prev_gcd.2.soul_strike
 
-    if prev_gcd.handOfGuldan() and soulShards.amount()>0 and Y.spelllist_success.list[#Y.spelllist_success.list-1] == 105174 then
-        if soulShards.amount() > 0 and cast.able.handOfGuldan() and cast.handOfGuldan() then
-            if ydebug.is_enabled then
-                print(304)
-                return 0
-            else
-                return 0
+    if #Y.spelllist_success.list > 1 then
+        if prev_gcd.handOfGuldan() and soulShards.amount()>0 and ( Y.spelllist_success.list[#Y.spelllist_success.list-1] == 105174) then
+            if soulShards.amount() > 0 and cast.able.handOfGuldan() and cast.handOfGuldan() then
+                if ydebug.is_enabled then
+                    print(304)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
     end
     -- actions.dcon_opener+=/demonic_strength,if=prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan&(buff.wild_imps.stack>1&action.hand_of_guldan.in_flight)
-
-    if prev_gcd.handOfGuldan() and  not (Y.spelllist_success.list[#Y.spelllist_success.list-1] == 105174) and (getMyImpCount()>1 and action.handOfGuldan.in_flight()) then
-        if cast.able.demonicStrength() and cast.demonicStrength() then
-            if ydebug.is_enabled then
-                print(305)
-                return 0
-            else
-                return 0
+    if #Y.spelllist_success.list > 1 then
+        if prev_gcd.handOfGuldan() and  not ( Y.spelllist_success.list[#Y.spelllist_success.list-1] == 105174) and (getMyImpCount()>1 and action.handOfGuldan.in_flight()) and (getSpellCD(89751) == 0 or getSpellCD(89751) <= 25 ) then
+            if cast.able.demonicStrength() and cast.demonicStrength() then
+                if ydebug.is_enabled then
+                    print(305)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
     end
@@ -5252,7 +5257,7 @@ function rotation:dcon_opener()
 
     if  --[[ not (buff.bloodlust.remains() >0) or ]] time>5 and prev_gcd.handOfGuldan() then
         if GetTime() - line_cd_3 >=30 and cast.able.soulStrike() and cast.soulStrike() then
-            line_cd_3 = GetTime()
+            -- line_cd_3 = GetTime()
             if ydebug.is_enabled then
                 print(307)
                 return 0
@@ -5310,14 +5315,15 @@ function rotation:dcon_opener()
         end
     end
     -- actions.dcon_opener+=/hand_of_guldan,if=soul_shard>=3&prev_gcd.2.hand_of_guldan&time>5&(prev_gcd.1.soul_strike|!talent.soul_strike.enabled&prev_gcd.1.shadow_bolt)
-
-    if soulShards.amount()>=3 and Y.spelllist_success.list[#Y.spelllist_success.list-1] == 105174 and time>5 and (prev_gcd.soulStrike() or not talent.soulStrike and prev_gcd.shadowBolt()) then
-        if soulShards.amount() > 0 and cast.able.handOfGuldan() and cast.handOfGuldan() then
-            if ydebug.is_enabled then
-                print(312)
-                return 0
-            else
-                return 0
+    if #Y.spelllist_success.list > 1 then
+        if soulShards.amount()>=3 and Y.spelllist_success.list[#Y.spelllist_success.list-1] == 105174 and time>5 and (prev_gcd.soulStrike() or not talent.soulStrike and prev_gcd.shadowBolt()) then
+            if soulShards.amount() > 0 and cast.able.handOfGuldan() and cast.handOfGuldan() then
+                if ydebug.is_enabled then
+                    print(312)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
     end
@@ -5355,6 +5361,7 @@ function rotation:dcon_opener()
 end
 
 function rotation:implosion_list()
+    print("implosion_list")
     -- actions.implosion=implosion,if=(buff.wild_imps.stack>=6&(soul_shard<3|prev_gcd.1.call_dreadstalkers|buff.wild_imps.stack>=9|prev_gcd.1.bilescourge_bombers|(!prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan))&!prev_gcd.1.hand_of_guldan&!prev_gcd.2.hand_of_guldan&buff.demonic_power.down)|(time_to_die<3&buff.wild_imps.stack>0)|(prev_gcd.2.call_dreadstalkers&buff.wild_imps.stack>2&!talent.demonic_calling.enabled)
 
     if (getMyImpCount()>=6 and (soulShards.amount()<3 or prev_gcd.callDreadstalkers() or getMyImpCount()>=9 or prev_gcd.bilescourgeBombers() or ( not prev_gcd.handOfGuldan() and not (Y.spelllist_success.list[#Y.spelllist_success.list-1] == 105174))) and  not prev_gcd.handOfGuldan() and not (Y.spelllist_success.list[#Y.spelllist_success.list-1] == 105174) and buff.demonicPower.down()) or (target.time_to_die()<3 and getMyImpCount()>0) or ((Y.spelllist_success.list[#Y.spelllist_success.list-1] == 104316) and getMyImpCount()>2 and not talent.demonicCalling) then
@@ -5509,6 +5516,7 @@ function rotation:implosion_list()
 end
 
 function rotation:netherPortal_list()
+    print("netherPortal_list")
     -- actions.nether_portal=call_action_list,name=nether_portal_building,if=cooldown.nether_portal.remains<20
 
     if cooldown.netherPortal.remains()<20 then
@@ -5523,6 +5531,7 @@ function rotation:netherPortal_list()
 end
 
 function rotation:netherPortal_active()
+    print("netherPortal_active")
     -- actions.nether_portal_active=bilescourge_bombers
 
     if soulShards.amount() >1 and cast.able.bilescourgeBombers() and cast.bilescourgeBombers() then
@@ -5631,6 +5640,7 @@ function rotation:netherPortal_active()
 end
 
 function rotation:netherPortal_building()
+    print("netherPortal_building")
     -- actions.nether_portal_building=nether_portal,if=soul_shard>=5&(!talent.power_siphon.enabled|buff.demonic_core.up)
 
     if soulShards.amount()>=5 and ( not talent.powerSiphon or buff.demonicCore.up()) then
@@ -5760,7 +5770,7 @@ function rotation:default_action()
     end
 
 
-    emnum = getNumEnemies(tg,8)
+    emnum = getNumEnemies(tg,8)+1
     gcd = getGCD()
     time = getCombatTime()
 
@@ -5772,7 +5782,7 @@ function rotation:default_action()
         -- print("fhl_2")
         return;
    end;
-    if getSpellCD(61304) > 0.01   then
+    if getSpellCD(61304) > 0   then
         -- print("fhl_3")
         return;
    end;
@@ -5847,30 +5857,33 @@ function rotation:default_action()
     -- actions+=/fireblood,if=pet.demonic_tyrant.active|target.time_to_die<=15
     -- actions+=/call_action_list,name=dcon_opener,if=talent.demonic_consumption.enabled&time<30&!cooldown.summon_demonic_tyrant.remains
 
-    if talent.demonicConsumption and time<30 and  not (cooldown.summonDemonicTyrant.remains()>0) then
+    if talent.demonicConsumption and time<30 and not (cooldown.summonDemonicTyrant.remains()>0) then
         self:dcon_opener()
+        print("end of open")
+        return 0
     end
     -- actions+=/hand_of_guldan,if=azerite.explosive_potential.rank&time<5&soul_shard>2&buff.explosive_potential.down&buff.wild_imps.stack<3&!prev_gcd.1.hand_of_guldan&&!prev_gcd.2.hand_of_guldan
-
-    if azerite.explosivePotential.rank >= 1 and time<5 and soulShards.amount()>2 and buff.explosivePotential.down() and getMyImpCount()<3 and  not prev_gcd.handOfGuldan() and  not (Y.spelllist_success.list[#Y.spelllist_success.list-1] == 105174) then
-        if soulShards.amount() > 0 and cast.able.handOfGuldan() and cast.handOfGuldan() then
-            if ydebug.is_enabled then
-                print(101)
-                return
-            else
-                return
+    -- if #Y.spelllist_success.list > 1 then
+        if azerite.explosivePotential.rank >= 1 and time<5 and soulShards.amount()>2 and buff.explosivePotential.down() and getMyImpCount()<3 and  not prev_gcd.handOfGuldan() and  not (Y.spelllist_success.list[#Y.spelllist_success.list-1] == 105174) then
+            if soulShards.amount() > 0 and cast.able.handOfGuldan() and cast.handOfGuldan() then
+                if ydebug.is_enabled then
+                    print(101)
+                    return 0
+                else
+                    return 0
+                end
             end
         end
-    end
+    -- end
     -- actions+=/demonbolt,if=soul_shard<=3&buff.demonic_core.up&buff.demonic_core.stack=4
-
+    
     if soulShards.amount()<=3 and buff.demonicCore.up() and buff.demonicCore.stack()==4 then
         if cast.able.demonbolt() and cast.demonbolt() then
             if ydebug.is_enabled then
                 print(102)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -5880,9 +5893,9 @@ function rotation:default_action()
         if getMyImpCount()>0 and cast.able.implosion() and cast.implosion() then
             if ydebug.is_enabled then
                 print(103)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -5892,9 +5905,9 @@ function rotation:default_action()
         if cast.able.doom() and cast.doom() then
             if ydebug.is_enabled then
                 print(104)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -5904,21 +5917,21 @@ function rotation:default_action()
         if soulShards.amount() >1 and cast.able.bilescourgeBombers() and cast.bilescourgeBombers() then
             if ydebug.is_enabled then
                 print(105)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
     -- actions+=/demonic_strength,if=(buff.wild_imps.stack<6|buff.demonic_power.up)|spell_targets.implosion<2
 
     if (getMyImpCount()<6 or buff.demonicPower.up()) or emnum<2 then
-        if cast.able.demonicStrength() and cast.demonicStrength() then
+        if (getSpellCD(89751) == 0 or getSpellCD(89751) <= 25 ) and cast.able.demonicStrength() and cast.demonicStrength()  then
             if ydebug.is_enabled then
                 print(106)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -5926,11 +5939,13 @@ function rotation:default_action()
 
     if talent.netherPortal and emnum<=2 then
         self:netherPortal_list()
+        return 0
     end
     -- actions+=/call_action_list,name=implosion,if=spell_targets.implosion>1
 
     if emnum>1 then
         self:implosion_list()
+        return 0
     end
     -- actions+=/grimoire_felguard,if=(target.time_to_die>120|target.time_to_die<cooldown.summon_demonic_tyrant.remains+15|cooldown.summon_demonic_tyrant.remains<13)
 
@@ -5938,9 +5953,9 @@ function rotation:default_action()
         if soulShards.amount()>0 and cast.able.grimoireFelguard() and cast.grimoireFelguard() then
             if ydebug.is_enabled then
                 print(107)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -5950,9 +5965,9 @@ function rotation:default_action()
         if soulShards.amount()>0 and cast.able.summonVilefiend() and cast.summonVilefiend() then
             if ydebug.is_enabled then
                 print(108)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -5962,9 +5977,9 @@ function rotation:default_action()
         if soulShards.amount()>1 and cast.able.callDreadstalkers() and cast.callDreadstalkers() then
             if ydebug.is_enabled then
                 print(109)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -5973,9 +5988,9 @@ function rotation:default_action()
     if soulShards.amount() >1 and cast.able.bilescourgeBombers() and cast.bilescourgeBombers() then
         if ydebug.is_enabled then
             print(110)
-            return
+            return 0
         else
-            return
+            return 0
         end
     end
     -- actions+=/hand_of_guldan,if=(azerite.baleful_invocation.enabled|talent.demonic_consumption.enabled)&prev_gcd.1.hand_of_guldan&cooldown.summon_demonic_tyrant.remains<2
@@ -5984,9 +5999,9 @@ function rotation:default_action()
         if soulShards.amount() > 0 and cast.able.handOfGuldan() and cast.handOfGuldan() then
             if ydebug.is_enabled then
                 print(110)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -5997,9 +6012,9 @@ function rotation:default_action()
         if cast.able.summonDemonicTyrant() and cast.summonDemonicTyrant() then
             if ydebug.is_enabled then
                 print(111)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -6009,9 +6024,9 @@ function rotation:default_action()
         if cast.able.powerSiphon() and cast.powerSiphon() then
             if ydebug.is_enabled then
                 print(112)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -6021,9 +6036,9 @@ function rotation:default_action()
         if cast.able.doom() and cast.doom() then
             if ydebug.is_enabled then
                 print(113)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -6033,9 +6048,9 @@ function rotation:default_action()
         if soulShards.amount() > 0 and cast.able.handOfGuldan() and cast.handOfGuldan() then
             if ydebug.is_enabled then
                 print(114)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -6045,9 +6060,9 @@ function rotation:default_action()
         if cast.able.soulStrike() and cast.soulStrike() then
             if ydebug.is_enabled then
                 print(115)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
@@ -6057,15 +6072,29 @@ function rotation:default_action()
         if cast.able.demonbolt() and cast.demonbolt() then
             if ydebug.is_enabled then
                 print(115)
-                return
+                return 0
             else
-                return
+                return 0
             end
         end
     end
+
+    -- if soulShards.amount()<=3 and buff.demonicCore.up() then
+    --     if cast.able.demonbolt() and cast.demonbolt() then
+    --         if ydebug.is_enabled then
+    --             print(116)
+    --             return 0
+    --         else
+    --             return 0
+    --         end
+    --     end
+    -- end
+
     -- actions+=/call_action_list,name=build_a_shard
 
     self:build_a_shard()
+
+    return 0
 
 end
 
